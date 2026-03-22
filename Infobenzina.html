@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Carburanti">
+<meta name="theme-color" content="#0f1012">
+<title>OsservaPrezzi Carburanti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1012;--surf:#181a1c;--surf2:#202224;--surf3:#282a2d;
+  --brd:rgba(255,255,255,0.08);--brd2:rgba(255,255,255,0.15);
+  --tx:#edeae4;--tx2:#a8a49e;--mut:#6e6c67;
+  --am:#e8a030;--am-d:rgba(232,160,48,0.13);--am-b:rgba(232,160,48,0.28);
+  --gn:#4caf7d;--gn-d:rgba(76,175,125,0.12);
+  --rd:#e05a4a;--rd-d:rgba(224,90,74,0.12);
+  --bl:#5b9bd5;--pu:#c97fd4;
+  --fm:'DM Mono',monospace;--fd:'Fraunces',Georgia,serif;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+body{
+  background:var(--bg);color:var(--tx);font-family:var(--fm);
+  font-size:14px;min-height:100vh;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── SETUP ────────────────────────────────────────────────── */
+#setup{
+  position:fixed;inset:0;background:var(--bg);z-index:200;
+  display:flex;align-items:center;justify-content:center;padding:24px;
+}
+.setup-card{
+  background:var(--surf);border:1px solid var(--brd2);
+  border-radius:14px;padding:32px 28px;max-width:440px;width:100%;
+}
+.setup-logo{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.s-icon{width:42px;height:42px;background:var(--am);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.setup-logo h1{font-family:var(--fd);font-weight:700;font-size:1.15rem;letter-spacing:-.02em;line-height:1.2}
+.setup-logo small{font-size:0.6rem;color:var(--mut);display:block;text-transform:uppercase;letter-spacing:.1em}
+.setup-card p{font-size:0.8rem;color:var(--tx2);margin-bottom:18px;line-height:1.7}
+.setup-card label{display:block;font-size:0.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.setup-card input{
+  width:100%;background:var(--surf2);border:1px solid var(--brd2);color:var(--tx);
+  font-family:var(--fm);font-size:0.82rem;padding:11px 14px;border-radius:7px;
+  outline:none;transition:border-color .2s;margin-bottom:8px;
+}
+.setup-card input:focus{border-color:var(--am)}
+.setup-hint{font-size:0.7rem;color:var(--mut);margin-bottom:20px}
+.setup-hint a{color:var(--am);text-decoration:none}
+.btn-full{
+  width:100%;background:var(--am);color:#0d0e0f;border:none;
+  font-family:var(--fm);font-size:0.85rem;font-weight:500;
+  padding:12px;border-radius:7px;cursor:pointer;
+  transition:opacity .2s;
+}
+.btn-full:hover{opacity:.88}
+.btn-full:disabled{opacity:.4;cursor:not-allowed}
+.setup-err{font-size:0.72rem;color:var(--rd);margin-top:8px;text-align:center;min-height:16px}
+
+/* ── LOADER ───────────────────────────────────────────────── */
+#loader{
+  position:fixed;inset:0;background:var(--bg);z-index:100;
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+}
+.ld-logo{display:flex;align-items:center;gap:10px}
+.ld-icon{width:38px;height:38px;background:var(--am);border-radius:9px;display:flex;align-items:center;justify-content:center}
+.ld-logo h2{font-family:var(--fd);font-weight:700;font-size:1rem;letter-spacing:-.02em}
+.ld-bar-w{width:200px;height:3px;background:var(--surf2);border-radius:2px;overflow:hidden}
+.ld-bar{height:100%;background:var(--am);width:0%;transition:width .4s ease;border-radius:2px}
+.ld-msg{font-size:0.72rem;color:var(--mut);letter-spacing:.03em}
+.ld-err{font-size:0.78rem;color:var(--rd);text-align:center;max-width:300px;line-height:1.6;display:none}
+.btn-retry{background:var(--am);color:#0d0e0f;border:none;font-family:var(--fm);font-size:0.78rem;font-weight:500;padding:8px 18px;border-radius:6px;cursor:pointer;display:none;margin-top:4px}
+
+/* ── APP ──────────────────────────────────────────────────── */
+#app{display:none}
+header{
+  border-bottom:1px solid var(--brd);padding:12px 16px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  position:sticky;top:0;background:var(--bg);z-index:10;
+}
+.logo{display:flex;align-items:center;gap:9px}
+.h-icon{width:30px;height:30px;background:var(--am);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo h1{font-family:var(--fd);font-weight:700;font-size:.88rem;letter-spacing:-.02em}
+.logo small{font-size:0.55rem;color:var(--mut);display:block;text-transform:uppercase;letter-spacing:.1em}
+.hdr-r{display:flex;align-items:center;gap:6px}
+.ts-badge{font-size:0.6rem;color:var(--mut);background:var(--surf);border:1px solid var(--brd);border-radius:4px;padding:2px 8px;white-space:nowrap}
+.data-badge{font-size:0.6rem;color:var(--am);background:var(--am-d);border:1px solid var(--am-b);border-radius:4px;padding:2px 8px;white-space:nowrap}
+.btn-xs{background:var(--surf);border:1px solid var(--brd2);color:var(--tx2);font-family:var(--fm);font-size:0.68rem;padding:4px 9px;border-radius:5px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-xs:hover{color:var(--tx);background:var(--surf2)}
+
+main{max-width:700px;margin:0 auto;padding:16px 14px calc(24px + var(--safe-bottom))}
+
+.sect{font-size:0.6rem;letter-spacing:.13em;text-transform:uppercase;color:var(--mut);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sect::after{content:'';flex:1;height:1px;background:var(--brd)}
+.tag{display:inline-block;font-size:0.56rem;background:var(--am-d);color:var(--am);border:1px solid var(--am-b);padding:1px 6px;border-radius:3px;letter-spacing:.05em;text-transform:uppercase;margin-left:4px;vertical-align:middle}
+.tag-src{background:var(--gn-d);color:var(--gn);border-color:rgba(76,175,125,.3)}
+
+/* CARDS */
+.cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:22px}
+@media(min-width:480px){.cards-grid{grid-template-columns:repeat(4,1fr)}}
+.card{background:var(--surf);border:1px solid var(--brd);border-radius:9px;padding:12px 14px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:9px 9px 0 0}
+.c-bz::before{background:var(--am)}
+.c-go::before{background:var(--bl)}
+.c-gpl::before{background:var(--gn)}
+.c-met::before{background:var(--pu)}
+.clabel{font-size:0.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.cprice{font-family:var(--fd);font-size:1.55rem;font-weight:700;line-height:1;color:var(--tx);letter-spacing:-.02em}
+.cunit{font-size:0.62rem;color:var(--mut);margin-top:4px}
+.cmode{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap}
+.mb{font-size:0.58rem;padding:1px 5px;border-radius:3px}
+.mb-s{background:var(--am-d);color:var(--am)}
+.mb-v{background:var(--surf2);color:var(--tx2)}
+@keyframes flash{0%,100%{opacity:1}40%{opacity:.25}}
+.flash{animation:flash .5s ease}
+
+/* SEARCH */
+.search-box{display:flex;gap:7px;margin-bottom:8px}
+.search-wrap{flex:1;position:relative}
+.search-wrap input{
+  width:100%;background:var(--surf);border:1px solid var(--brd2);color:var(--tx);
+  font-family:var(--fm);font-size:0.82rem;padding:10px 14px;border-radius:7px;
+  outline:none;transition:border-color .2s;
+  -webkit-appearance:none;
+}
+.search-wrap input::placeholder{color:var(--mut)}
+.search-wrap input:focus{border-color:var(--am)}
+.btn-go{background:var(--am);color:#0d0e0f;border:none;font-family:var(--fm);font-size:0.8rem;font-weight:500;padding:10px 16px;border-radius:7px;cursor:pointer;transition:opacity .15s;white-space:nowrap}
+.btn-go:hover{opacity:.87}
+.btn-go:disabled{opacity:.4;cursor:not-allowed}
+
+/* SUGGESTIONS */
+.sug{background:var(--surf2);border:1px solid var(--brd2);border-radius:7px;overflow:hidden;display:none;margin-bottom:10px}
+.sug-row{padding:9px 14px;font-size:0.8rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px;transition:background .1s}
+.sug-row:hover{background:var(--surf3)}
+.sug-row:not(:last-child){border-bottom:1px solid var(--brd)}
+.sug-prov{font-size:0.62rem;color:var(--mut);white-space:nowrap}
+
+/* FILTERS */
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;display:none}
+.fb{background:var(--surf);border:1px solid var(--brd2);color:var(--tx2);font-family:var(--fm);font-size:0.68rem;padding:5px 10px;border-radius:5px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.fb:hover,.fb.on{color:var(--am);border-color:var(--am);background:var(--am-d)}
+
+/* STATUS */
+.status{display:flex;align-items:center;gap:7px;font-size:0.68rem;color:var(--mut);margin-bottom:14px;min-height:20px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--mut);flex-shrink:0;transition:background .3s}
+.dot.ld{background:var(--am);animation:pulse 1.2s ease-in-out infinite}
+.dot.ok{background:var(--gn)}
+.dot.err{background:var(--rd)}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.6)}}
+
+/* RESULTS */
+.res-hdr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+.res-title{font-family:var(--fd);font-weight:700;font-size:.95rem;color:var(--tx)}
+.res-sub{font-size:0.68rem;color:var(--mut)}
+
+.slist{display:flex;flex-direction:column;gap:7px;margin-bottom:20px}
+.station{
+  background:var(--surf);border:1px solid var(--brd);border-radius:8px;
+  padding:11px 14px;display:grid;grid-template-columns:28px 1fr auto;
+  gap:6px 12px;align-items:center;transition:border-color .15s;
+}
+.station:hover{border-color:var(--brd2)}
+.st-rank{font-family:var(--fd);font-size:1.15rem;font-weight:700;color:var(--mut);text-align:center;line-height:1}
+.r1{color:var(--am)}
+.r2,.r3{color:var(--tx2)}
+.st-info{min-width:0}
+.st-name{font-size:0.8rem;font-weight:500;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-addr{font-size:0.68rem;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-tags{display:flex;gap:5px;margin-top:3px;flex-wrap:wrap}
+.st-tag{font-size:0.58rem;background:var(--surf2);color:var(--tx2);padding:1px 5px;border-radius:3px}
+.st-p{text-align:right}
+.st-price{font-family:var(--fd);font-size:1.3rem;font-weight:700;color:var(--tx);white-space:nowrap}
+.cheap{color:var(--gn)}
+.dear{color:var(--rd)}
+.st-unit{font-size:0.6rem;color:var(--mut);text-align:right}
+.st-dt{font-size:0.58rem;color:var(--mut);text-align:right;opacity:.65}
+
+.no-res{background:var(--surf);border:1px solid var(--brd);border-radius:8px;padding:20px;text-align:center;color:var(--mut);font-size:0.8rem}
+
+footer{border-top:1px solid var(--brd);padding:10px 16px calc(10px + var(--safe-bottom));font-size:0.62rem;color:var(--mut);text-align:center;line-height:1.7}
+footer a{color:var(--mut);text-decoration:underline}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.fi{animation:fadeIn .25s ease both}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- SETUP: inserisci URL del Worker -->
+<div id="setup">
+  <div class="setup-card">
+    <div class="setup-logo">
+      <div class="s-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0d0e0f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 22V4a2 2 0 012-2h6a2 2 0 012 2v18"/><path d="M5 12h10"/>
+          <path d="M15 7l4 4-4 4"/><path d="M19 7v8"/>
+        </svg>
+      </div>
+      <div><h1>OsservaPrezzi</h1><small>Carburanti Italia</small></div>
+    </div>
+    <p>Inserisci l'URL del tuo Cloudflare Worker. Viene salvato solo su questo dispositivo.</p>
+    <label for="worker-url">URL Cloudflare Worker</label>
+    <input type="url" id="worker-url" placeholder="https://opf.TUO-NOME.workers.dev" autocomplete="off" />
+    <div class="setup-hint">
+      Segui le istruzioni nel file <strong>ISTRUZIONI.txt</strong> per creare il Worker gratis su
+      <a href="https://workers.cloudflare.com" target="_blank">workers.cloudflare.com</a>
+    </div>
+    <button class="btn-full" onclick="saveWorkerUrl()">Connetti →</button>
+    <div class="setup-err" id="setup-err"></div>
+  </div>
+</div>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="ld-logo">
+    <div class="ld-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0d0e0f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 22V4a2 2 0 012-2h6a2 2 0 012 2v18"/><path d="M5 12h10"/>
+        <path d="M15 7l4 4-4 4"/><path d="M19 7v8"/>
+      </svg>
+    </div>
+    <h2>OsservaPrezzi</h2>
+  </div>
+  <div class="ld-bar-w"><div class="ld-bar" id="lbar"></div></div>
+  <div class="ld-msg" id="lmsg">Carico dati…</div>
+  <div class="ld-err" id="lerr"></div>
+  <button class="btn-retry" id="lretry" onclick="loadMedie()">↻ Riprova</button>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header>
+    <div class="logo">
+      <div class="h-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0d0e0f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 22V4a2 2 0 012-2h6a2 2 0 012 2v18"/><path d="M5 12h10"/>
+          <path d="M15 7l4 4-4 4"/><path d="M19 7v8"/>
+        </svg>
+      </div>
+      <div><h1>OsservaPrezzi <small>Carburanti</small></h1></div>
+    </div>
+    <div class="hdr-r">
+      <span class="data-badge" id="data-badge">—</span>
+      <span class="ts-badge" id="ts-badge">—</span>
+      <button class="btn-xs" onclick="resetWorker()">⚙</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="sect">Medie nazionali <span class="tag tag-src">MIMIT live</span></div>
+    <div class="cards-grid">
+      <div class="card c-bz">
+        <div class="clabel">Benzina</div>
+        <div class="cprice" id="avg-bz">—</div>
+        <div class="cunit">€/litro</div>
+        <div class="cmode">
+          <span class="mb mb-s" id="s-bz">self —</span>
+          <span class="mb mb-v" id="v-bz">serv. —</span>
+        </div>
+      </div>
+      <div class="card c-go">
+        <div class="clabel">Gasolio</div>
+        <div class="cprice" id="avg-go">—</div>
+        <div class="cunit">€/litro</div>
+        <div class="cmode">
+          <span class="mb mb-s" id="s-go">self —</span>
+          <span class="mb mb-v" id="v-go">serv. —</span>
+        </div>
+      </div>
+      <div class="card c-gpl">
+        <div class="clabel">GPL</div>
+        <div class="cprice" id="avg-gpl">—</div>
+        <div class="cunit">€/litro</div>
+        <div class="cmode">
+          <span class="mb mb-s" id="s-gpl">self —</span>
+          <span class="mb mb-v" id="v-gpl">serv. —</span>
+        </div>
+      </div>
+      <div class="card c-met">
+        <div class="clabel">Metano</div>
+        <div class="cprice" id="avg-met">—</div>
+        <div class="cunit">€/kg</div>
+        <div class="cmode">
+          <span class="mb mb-s" id="s-met">self —</span>
+          <span class="mb mb-v" id="v-met">serv. —</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sect">Cerca impianti</div>
+    <div class="search-box">
+      <div class="search-wrap">
+        <input type="text" id="qinput" placeholder="Comune — es. Abbiategrasso, Milano…" autocomplete="off" autocorrect="off" autocapitalize="words" />
+      </div>
+      <button class="btn-go" id="sbtn" onclick="doSearch()">Cerca</button>
+    </div>
+    <div class="sug" id="sug"></div>
+
+    <div class="filter-row" id="frow">
+      <button class="fb on" data-f="Benzina" onclick="setFuel(this)">Benzina</button>
+      <button class="fb" data-f="Gasolio" onclick="setFuel(this)">Gasolio</button>
+      <button class="fb" data-f="GPL" onclick="setFuel(this)">GPL</button>
+      <button class="fb" data-f="Metano" onclick="setFuel(this)">Metano</button>
+      <button class="fb" id="self-btn" onclick="toggleSelf()">Solo self</button>
+    </div>
+
+    <div class="status">
+      <div class="dot" id="sdot"></div>
+      <span id="stxt">Pronto</span>
+    </div>
+
+    <div id="results"></div>
+  </main>
+
+  <footer>
+    Dati: <a href="https://www.mimit.gov.it/it/open-data/elenco-dataset/carburanti-prezzi-praticati-e-anagrafica-degli-impianti" target="_blank">Open data MIMIT</a>
+    · aggiornamento giornaliero ore 08:00 · Licenza IODL 2.0
+  </footer>
+</div>
+
+<script>
+let WORKER = '';
+let activeComune = null;
+let activeFuel = 'Benzina';
+let activeSelf = false;
+let suggestTimer = null;
+
+// ── Init ──────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('opf_worker');
+  if (saved) { WORKER = saved; startApp(); }
+  updateTs();
+  setInterval(updateTs, 30000);
+  document.getElementById('qinput').addEventListener('input', onInput);
+  document.getElementById('qinput').addEventListener('keydown', e => { if(e.key==='Enter'){ document.getElementById('sug').style.display='none'; doSearch(); } });
+  document.addEventListener('click', e => { if(!e.target.closest('#sug') && !e.target.closest('#qinput')) document.getElementById('sug').style.display='none'; });
+  document.getElementById('worker-url').addEventListener('keydown', e => { if(e.key==='Enter') saveWorkerUrl(); });
+});
+
+// ── Setup ─────────────────────────────────────────────────────
+async function saveWorkerUrl() {
+  const url = document.getElementById('worker-url').value.trim().replace(/\/$/, '');
+  const err = document.getElementById('setup-err');
+  err.textContent = '';
+  if (!url.startsWith('https://')) { err.textContent = "L'URL deve iniziare con https://"; return; }
+  const btn = document.querySelector('#setup .btn-full');
+  btn.disabled = true; btn.textContent = 'Verifico…';
+  try {
+    const res = await fetch(url + '/');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    await res.json();
+    WORKER = url;
+    localStorage.setItem('opf_worker', url);
+    document.getElementById('setup').style.display = 'none';
+    startApp();
+  } catch(e) {
+    err.textContent = 'Worker non raggiungibile: ' + e.message;
+    btn.disabled = false; btn.textContent = 'Connetti →';
+  }
+}
+
+function resetWorker() {
+  if (!confirm('Cambiare Worker URL?')) return;
+  localStorage.removeItem('opf_worker');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('setup').style.display = 'flex';
+  document.getElementById('worker-url').value = WORKER;
+  WORKER = '';
+}
+
+// ── App start ─────────────────────────────────────────────────
+function startApp() {
+  showLoader(true);
+  document.getElementById('app').style.display = 'none';
+  loadMedie();
+}
+
+function showLoader(show) {
+  document.getElementById('loader').style.display = show ? 'flex' : 'none';
+}
+
+async function loadMedie() {
+  document.getElementById('lerr').style.display = 'none';
+  document.getElementById('lretry').style.display = 'none';
+  setLd(10, 'Connessione al Worker…');
+  try {
+    setLd(40, 'Carico medie nazionali…');
+    const data = await api('/api/medie');
+    setLd(100, 'Pronto!');
+    renderMedie(data);
+    await sleep(250);
+    showLoader(false);
+    document.getElementById('app').style.display = 'block';
+  } catch(e) {
+    document.getElementById('lmsg').textContent = '';
+    document.getElementById('lerr').textContent = 'Errore: ' + e.message;
+    document.getElementById('lerr').style.display = 'block';
+    document.getElementById('lretry').style.display = 'block';
+  }
+}
+
+function setLd(pct, msg) {
+  document.getElementById('lbar').style.width = pct + '%';
+  document.getElementById('lmsg').textContent = msg;
+}
+
+// ── API ───────────────────────────────────────────────────────
+async function api(path) {
+  const res = await fetch(WORKER + path);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+// ── Medie nazionali ───────────────────────────────────────────
+function renderMedie(data) {
+  const map = { bz:'Benzina', go:'Gasolio', gpl:'GPL', met:'Metano' };
+  for (const [k, fuel] of Object.entries(map)) {
+    const d = data[fuel] || {};
+    const avg = document.getElementById('avg-' + k);
+    avg.textContent = d.self ? d.self.toFixed(3) : 'n.d.';
+    avg.classList.remove('flash'); void avg.offsetWidth; avg.classList.add('flash');
+    document.getElementById('s-' + k).textContent = d.self  ? 'self '  + d.self.toFixed(3)  : 'self n.d.';
+    document.getElementById('v-' + k).textContent = d.serv  ? 'serv. ' + d.serv.toFixed(3)  : 'serv. n.d.';
+  }
+}
+
+// ── Autocomplete ──────────────────────────────────────────────
+function onInput() {
+  clearTimeout(suggestTimer);
+  const q = document.getElementById('qinput').value.trim();
+  if (q.length < 2) { document.getElementById('sug').style.display = 'none'; return; }
+  suggestTimer = setTimeout(() => fetchSuggest(q), 280);
+}
+
+async function fetchSuggest(q) {
+  try {
+    const results = await api('/api/comuni?q=' + encodeURIComponent(q));
+    const sug = document.getElementById('sug');
+    if (!results.length) { sug.style.display = 'none'; return; }
+    sug.innerHTML = '';
+    results.forEach(r => {
+      const div = document.createElement('div');
+      div.className = 'sug-row';
+      div.innerHTML = `<span>${cap(r.nome)}</span><span class="sug-prov">${r.provincia} · ${r.count} imp.</span>`;
+      div.onclick = () => {
+        document.getElementById('qinput').value = cap(r.nome);
+        sug.style.display = 'none';
+        activeComune = r.nome;
+        activeFuel = 'Benzina'; activeSelf = false;
+        resetFilters();
+        fetchStations();
+      };
+      sug.appendChild(div);
+    });
+    sug.style.display = 'block';
+  } catch(e) {}
+}
+
+// ── Cerca ─────────────────────────────────────────────────────
+async function doSearch() {
+  const q = document.getElementById('qinput').value.trim().toUpperCase();
+  if (!q) { document.getElementById('qinput').focus(); return; }
+  // Try exact match via suggest
+  try {
+    const res = await api('/api/comuni?q=' + encodeURIComponent(q));
+    if (res.length > 0) {
+      const exact = res.find(r => r.nome === q) || res[0];
+      activeComune = exact.nome;
+      document.getElementById('qinput').value = cap(exact.nome);
+      activeFuel = 'Benzina'; activeSelf = false;
+      resetFilters();
+      fetchStations();
+    } else {
+      setStatus('err', 'Comune non trovato');
+      document.getElementById('results').innerHTML = `<div class="no-res">Nessun comune trovato per "${cap(q)}"</div>`;
+    }
+  } catch(e) {
+    setStatus('err', e.message);
+  }
+}
+
+async function fetchStations() {
+  if (!activeComune) return;
+  document.getElementById('frow').style.display = 'flex';
+  setStatus('ld', 'Cerco impianti a ' + cap(activeComune) + '…');
+  document.getElementById('sbtn').disabled = true;
+  try {
+    const url = `/api/cerca?comune=${encodeURIComponent(activeComune)}&carburante=${encodeURIComponent(activeFuel)}&self=${activeSelf?1:0}`;
+    const data = await api(url);
+    renderStations(data);
+    setStatus('ok', `${data.length} impianti trovati · ${cap(activeComune)}`);
+  } catch(e) {
+    setStatus('err', 'Errore: ' + e.message);
+  } finally {
+    document.getElementById('sbtn').disabled = false;
+  }
+}
+
+function renderStations(data) {
+  const area = document.getElementById('results');
+  if (!data.length) {
+    area.innerHTML = `<div class="no-res">Nessun impianto trovato a ${cap(activeComune)} per ${activeFuel}${activeSelf?' self service':''}.</div>`;
+    return;
+  }
+  const minP = data[0].prezzo, maxP = data[data.length-1].prezzo;
+  const unit = activeFuel === 'Metano' ? 'kg' : 'lt';
+  let html = `<div class="res-hdr fi">
+    <div class="res-title">${activeFuel} · ${cap(activeComune)}</div>
+    <div class="res-sub">min <span style="color:var(--gn)">${minP.toFixed(3)}</span> — max <span style="color:var(--rd)">${maxP.toFixed(3)}</span></div>
+  </div><div class="slist fi">`;
+  data.forEach((s, i) => {
+    const r = i+1, rc = r===1?'r1':r===2?'r2':r===3?'r3':'';
+    const pc = s.prezzo <= minP*1.005 ? 'cheap' : s.prezzo >= maxP*0.995 ? 'dear' : '';
+    html += `<div class="station">
+      <div class="st-rank ${rc}">${r}</div>
+      <div class="st-info">
+        <div class="st-name">${esc(s.nome)}</div>
+        <div class="st-addr">${esc(s.indirizzo)}</div>
+        <div class="st-tags">
+          ${s.bandiera ? `<span class="st-tag">${esc(s.bandiera)}</span>` : ''}
+          <span class="st-tag">${s.isSelf?'self':'servito'}</span>
+        </div>
+      </div>
+      <div class="st-p">
+        <div class="st-price ${pc}">${s.prezzo.toFixed(3)}</div>
+        <div class="st-unit">€/${unit}</div>
+        <div class="st-dt">${s.dtComu||''}</div>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+  if (data.length === 60) html += `<div style="font-size:.68rem;color:var(--mut);text-align:center;margin-top:-10px;margin-bottom:16px">Mostrati i 60 più economici</div>`;
+  area.innerHTML = html;
+}
+
+// ── Filters ───────────────────────────────────────────────────
+function setFuel(btn) {
+  activeFuel = btn.dataset.f;
+  document.querySelectorAll('.fb[data-f]').forEach(b => b.classList.toggle('on', b===btn));
+  if (activeComune) fetchStations();
+}
+
+function toggleSelf() {
+  activeSelf = !activeSelf;
+  const btn = document.getElementById('self-btn');
+  btn.classList.toggle('on', activeSelf);
+  btn.textContent = activeSelf ? '✓ Solo self' : 'Solo self';
+  if (activeComune) fetchStations();
+}
+
+function resetFilters() {
+  document.querySelectorAll('.fb[data-f]').forEach(b => b.classList.toggle('on', b.dataset.f==='Benzina'));
+  document.getElementById('self-btn').classList.remove('on');
+  document.getElementById('self-btn').textContent = 'Solo self';
+}
+
+// ── Utils ─────────────────────────────────────────────────────
+function setStatus(s, msg) {
+  const d = document.getElementById('sdot');
+  d.className = 'dot' + (s==='ld'?' ld':s==='ok'?' ok':s==='err'?' err':'');
+  document.getElementById('stxt').textContent = msg;
+}
+
+function updateTs() {
+  const n = new Date();
+  document.getElementById('ts-badge').textContent =
+    n.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+}
+
+function cap(s) { return s.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()); }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+</script>
+</body>
+</html>
