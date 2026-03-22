@@ -197,7 +197,7 @@ footer a{color:var(--mut);text-decoration:underline}
 <body>
 
 <!-- SETUP: inserisci URL del Worker -->
-<div id="setup">
+<div id="setup" style="display:none">
   <div class="setup-card">
     <div class="setup-logo">
       <div class="s-icon">
@@ -329,7 +329,7 @@ footer a{color:var(--mut);text-decoration:underline}
 </div>
 
 <script>
-let WORKER = '';
+let WORKER = 'https://osservaprezzi.gabrycois.workers.dev';
 let activeComune = null;
 let activeFuel = 'Benzina';
 let activeSelf = false;
@@ -337,8 +337,7 @@ let suggestTimer = null;
 
 // ── Init ──────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-  const saved = localStorage.getItem('opf_worker');
-  if (saved) { WORKER = saved; startApp(); }
+  startApp();
   updateTs();
   setInterval(updateTs, 30000);
   document.getElementById('qinput').addEventListener('input', onInput);
