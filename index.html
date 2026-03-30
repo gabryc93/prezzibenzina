@@ -248,14 +248,15 @@ footer a{color:var(--mut);text-decoration:underline}
 .bfb:hover,.bfb.on{color:var(--am);border-color:var(--am);background:var(--am-d)}
 
 /* ── Preferiti ── */
-.fav-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:2px 4px;line-height:1;opacity:.4;transition:opacity .15s;position:absolute;top:10px;right:10px}
-.fav-btn:hover,.fav-btn.on{opacity:1}
-.station{position:relative}
+.fav-btn{background:var(--surf2);border:1px solid var(--brd2);border-radius:6px;cursor:pointer;font-size:13px;padding:5px 8px;line-height:1;color:var(--mut);transition:all .15s;white-space:nowrap;flex-shrink:0}
+.fav-btn:hover{color:var(--am);border-color:var(--am);background:var(--am-d)}
+.fav-btn.on{color:var(--am);border-color:var(--am);background:var(--am-d)}
 
 /* ── Preferiti section ── */
 .fav-section{margin-bottom:20px}
 .fav-list{display:flex;flex-direction:column;gap:7px}
 .fav-empty{font-size:0.75rem;color:var(--mut);padding:4px 0}
+#fav-filter-btn.on{color:var(--am);border-color:var(--am);background:var(--am-d)}
 
 /* ── Distanza badge ── */
 .dist-badge{font-size:0.6rem;background:var(--bl);background:rgba(91,155,213,.15);color:var(--bl);padding:1px 6px;border-radius:3px}
@@ -462,6 +463,7 @@ footer a{color:var(--mut);text-decoration:underline}
       <button class="fb" data-f="GPL" onclick="setFuel(this)">GPL</button>
       <button class="fb" data-f="Metano" onclick="setFuel(this)">Metano</button>
       <button class="fb" id="self-btn" onclick="toggleSelf()">Solo self</button>
+      <button class="fb" id="fav-filter-btn" onclick="toggleFavFilter()" style="margin-left:auto">★ Preferiti</button>
     </div>
     <div class="bandiera-row" id="brow"></div>
 
@@ -470,16 +472,6 @@ footer a{color:var(--mut);text-decoration:underline}
       <span id="stxt">Pronto</span>
     </div>
 
-    <div class="fav-section" id="fav-section" style="display:none">
-      <div class="sect">Preferiti <span class="tag">salvati</span></div>
-      <div class="fav-sort-row">
-        <span class="fav-sort-label">Ordina:</span>
-        <button class="sort-btn on" data-sort="saved" onclick="setSortFav(this)">Aggiunti</button>
-        <button class="sort-btn" data-sort="price" onclick="setSortFav(this)">Prezzo</button>
-        <button class="sort-btn" data-sort="name" onclick="setSortFav(this)">Nome</button>
-      </div>
-      <div class="fav-list" id="fav-list"></div>
-    </div>
     <div id="results"></div>
   </main>
 
@@ -571,6 +563,7 @@ let _stationData = [];
 // ── Init ──────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   startApp();
+  document.getElementById('frow').style.display = 'flex';
   renderFavSection();
   updateTs();
   setInterval(updateTs, 30000);
@@ -969,12 +962,12 @@ function toggleFav(idx) {
 }
 
 function refreshFavStars() {
-  // Update all star buttons in current results list
   document.querySelectorAll('.fav-btn').forEach((btn, i) => {
     const s = _stationData[i];
     if (!s) return;
     const on = isFav(s.id);
-    btn.textContent = on ? '★' : '☆';
+    btn.textContent = on ? '★ Salvato' : '☆ Salva';
+    btn.title = on ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti';
     btn.classList.toggle('on', on);
   });
 }
@@ -983,7 +976,7 @@ function setSortFav(btn) {
   _favSort = btn.dataset.sort;
   document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
-  renderFavSection();
+  if (_favFilterActive) showFavResults();
 }
 
 function getSortedFavs() {
@@ -993,7 +986,84 @@ function getSortedFavs() {
   return favs;
 }
 
+let _favFilterActive = false;
+
+function toggleFavFilter() {
+  _favFilterActive = !_favFilterActive;
+  const btn = document.getElementById('fav-filter-btn');
+  btn.classList.toggle('on', _favFilterActive);
+  if (_favFilterActive) {
+    showFavResults();
+  } else {
+    document.getElementById('results').innerHTML = '';
+    setStatus('', 'Cerca un comune o usa la geolocalizzazione');
+  }
+}
+
+function showFavResults() {
+  const favs = getSortedFavs();
+  const area = document.getElementById('results');
+  if (!favs.length) {
+    area.innerHTML = `<div class="no-res">Nessun preferito salvato. Cerca un distributore e tocca ☆ Salva.</div>`;
+    setStatus('ok', '0 preferiti salvati');
+    return;
+  }
+  // Render sort row + fav cards
+  let html = `
+    <div class="res-hdr fi">
+      <div class="res-title">★ Preferiti</div>
+      <div class="res-sub">${favs.length} salvati</div>
+    </div>
+    <div class="fav-sort-row" style="margin-bottom:12px">
+      <span class="fav-sort-label">Ordina:</span>
+      <button class="sort-btn ${_favSort==='saved'?'on':''}" data-sort="saved" onclick="setSortFav(this)">Aggiunti</button>
+      <button class="sort-btn ${_favSort==='price'?'on':''}" data-sort="price" onclick="setSortFav(this)">Prezzo</button>
+      <button class="sort-btn ${_favSort==='name'?'on':''}" data-sort="name" onclick="setSortFav(this)">Nome</button>
+    </div>
+    <div class="slist fi">
+  `;
+  favs.forEach(s => {
+    const displayName = s.customName || s.nome;
+    const unit = (s.carburante||'').toLowerCase().includes('metano') ? 'kg' : 'lt';
+    html += `<div class="station" onclick="openModal(${JSON.stringify(s).replace(/'/g,'&#39;')})">
+      <div class="st-rank" style="color:var(--am)">★</div>
+      <div class="st-info">
+        <div class="st-name">${esc(displayName)}
+          <button class="fav-edit-btn" onclick="event.stopPropagation();openFavModal('${s.id}')" title="Modifica">✏</button>
+        </div>
+        ${s.note ? `<div class="fav-note">${esc(s.note)}</div>` : `<div class="st-addr">${esc(s.indirizzo)} · ${esc(s.comune)}</div>`}
+        <div class="st-tags">
+          ${s.bandiera?`<span class="st-tag">${esc(s.bandiera)}</span>`:''}
+          <span class="st-tag">${s.isSelf?'self':'servito'}</span>
+          <span class="st-tag">${esc(s.carburante||'')}</span>
+        </div>
+      </div>
+      <div class="st-p">
+        <div class="st-price">${s.prezzo.toFixed(3)}</div>
+        <div class="st-unit">€/${unit}</div>
+        <div class="st-dt">${s.dtComu||''}</div>
+        <button class="fav-btn on" onclick="event.stopPropagation();removeFavAndRefresh('${s.id}')">★ Salvato</button>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+  area.innerHTML = html;
+  setStatus('ok', `${favs.length} preferiti`);
+}
+
+function removeFavAndRefresh(id) {
+  saveFavs(loadFavs().filter(f => f.id !== id));
+  refreshFavStars();
+  if (_favFilterActive) showFavResults();
+}
+
 function renderFavSection() {
+  // No longer renders a separate section — favorites are shown via toggleFavFilter
+  // Just update stars in current results
+  refreshFavStars();
+  // If fav filter is active, refresh the view
+  if (_favFilterActive) showFavResults();
+  return;
   const favs = getSortedFavs();
   const sec  = document.getElementById('fav-section');
   const list = document.getElementById('fav-list');
