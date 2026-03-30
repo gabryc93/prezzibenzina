@@ -192,6 +192,49 @@ footer a{color:var(--mut);text-decoration:underline}
 @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .fi{animation:fadeIn .25s ease both}
 .hidden{display:none!important}
+
+/* ── MODAL ────────────────────────────────────────────────── */
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:50;
+  display:flex;align-items:flex-end;justify-content:center;
+  animation:fadeIn .2s ease;
+  backdrop-filter:blur(2px);
+}
+@media(min-width:600px){.overlay{align-items:center}}
+.modal{
+  background:var(--surf);border:1px solid var(--brd2);
+  border-radius:14px 14px 0 0;width:100%;max-width:560px;
+  padding:20px 20px calc(20px + var(--safe-bottom));
+  animation:slideUp .25s ease;
+}
+@media(min-width:600px){.modal{border-radius:14px;margin:16px}}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
+.modal-handle{width:36px;height:3px;background:var(--brd2);border-radius:2px;margin:0 auto 16px}
+.modal-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+.modal-title{font-family:var(--fd);font-weight:700;font-size:1.05rem;color:var(--tx);line-height:1.3}
+.modal-close{background:var(--surf2);border:1px solid var(--brd2);color:var(--tx2);font-size:1rem;width:30px;height:30px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1}
+.modal-close:hover{color:var(--tx)}
+.modal-price-row{display:flex;align-items:baseline;gap:8px;margin-bottom:16px;padding:12px 14px;background:var(--surf2);border-radius:8px}
+.modal-price{font-family:var(--fd);font-size:2rem;font-weight:700;color:var(--am);letter-spacing:-.02em}
+.modal-price-meta{font-size:0.72rem;color:var(--mut)}
+.modal-rows{display:flex;flex-direction:column;gap:0;margin-bottom:18px;border:1px solid var(--brd);border-radius:8px;overflow:hidden}
+.modal-row{display:flex;gap:12px;padding:10px 14px;border-bottom:1px solid var(--brd)}
+.modal-row:last-child{border-bottom:none}
+.modal-row-icon{font-size:14px;flex-shrink:0;margin-top:1px;opacity:.7}
+.modal-row-content{}
+.modal-row-label{font-size:0.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-bottom:2px}
+.modal-row-val{font-size:0.82rem;color:var(--tx);line-height:1.4}
+.modal-btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn-maps{
+  flex:1;background:var(--am);color:#0d0e0f;border:none;
+  font-family:var(--fm);font-size:0.82rem;font-weight:500;
+  padding:11px 16px;border-radius:8px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:opacity .15s;text-decoration:none;
+}
+.btn-maps:hover{opacity:.88}
+.btn-maps-apple{background:var(--surf2);color:var(--tx);border:1px solid var(--brd2)}
+.btn-maps-apple:hover{background:var(--surf3);opacity:1}
 </style>
 </head>
 <body>
@@ -326,6 +369,68 @@ footer a{color:var(--mut);text-decoration:underline}
     Dati: <a href="https://www.mimit.gov.it/it/open-data/elenco-dataset/carburanti-prezzi-praticati-e-anagrafica-degli-impianti" target="_blank">Open data MIMIT</a>
     · aggiornamento giornaliero ore 08:00 · Licenza IODL 2.0
   </footer>
+  <!-- MODAL DETTAGLIO -->
+  <div class="overlay hidden" id="modal-overlay" onclick="closeModal(event)">
+    <div class="modal" id="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <div class="modal-title" id="modal-nome">—</div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-price-row">
+        <div class="modal-price" id="modal-prezzo">—</div>
+        <div class="modal-price-meta" id="modal-price-meta">€/litro · —</div>
+      </div>
+      <div class="modal-rows">
+        <div class="modal-row">
+          <div class="modal-row-icon">📍</div>
+          <div class="modal-row-content">
+            <div class="modal-row-label">Indirizzo</div>
+            <div class="modal-row-val" id="modal-addr">—</div>
+          </div>
+        </div>
+        <div class="modal-row">
+          <div class="modal-row-icon">⛽</div>
+          <div class="modal-row-content">
+            <div class="modal-row-label">Gestore · Bandiera</div>
+            <div class="modal-row-val" id="modal-gestore">—</div>
+          </div>
+        </div>
+        <div class="modal-row">
+          <div class="modal-row-icon">🔧</div>
+          <div class="modal-row-content">
+            <div class="modal-row-label">Modalità</div>
+            <div class="modal-row-val" id="modal-mode">—</div>
+          </div>
+        </div>
+        <div class="modal-row">
+          <div class="modal-row-icon">🕐</div>
+          <div class="modal-row-content">
+            <div class="modal-row-label">Orari</div>
+            <div class="modal-row-val" id="modal-orari" style="color:var(--mut)">Non disponibili nei dati MIMIT — verifica su Maps</div>
+          </div>
+        </div>
+        <div class="modal-row">
+          <div class="modal-row-icon">📅</div>
+          <div class="modal-row-content">
+            <div class="modal-row-label">Ultimo aggiornamento prezzo</div>
+            <div class="modal-row-val" id="modal-dt">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-btns">
+        <a class="btn-maps" id="btn-gmaps" href="#" target="_blank">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Apri in Google Maps
+        </a>
+        <a class="btn-maps btn-maps-apple" id="btn-apple" href="#" target="_blank">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Apple Maps
+        </a>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -520,7 +625,7 @@ function renderStations(data) {
   data.forEach((s, i) => {
     const r = i+1, rc = r===1?'r1':r===2?'r2':r===3?'r3':'';
     const pc = s.prezzo <= minP*1.005 ? 'cheap' : s.prezzo >= maxP*0.995 ? 'dear' : '';
-    html += `<div class="station">
+    html += `<div class="station" onclick='openModal(${JSON.stringify(s)})' style="cursor:pointer">
       <div class="st-rank ${rc}">${r}</div>
       <div class="st-info">
         <div class="st-name">${esc(s.nome)}</div>
@@ -579,6 +684,46 @@ function updateTs() {
 function cap(s) { return s.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()); }
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── Modal ─────────────────────────────────────────────────────
+function openModal(s) {
+  document.getElementById('modal-nome').textContent = s.nome || 'Impianto ' + s.id;
+  document.getElementById('modal-prezzo').textContent = s.prezzo.toFixed(3);
+  const unit = s.carburante && s.carburante.toLowerCase().includes('metano') ? 'kg' : 'litro';
+  document.getElementById('modal-price-meta').textContent = '€/' + unit + ' · ' + (s.isSelf ? 'self service' : 'servito');
+  document.getElementById('modal-addr').textContent = [s.indirizzo, s.comune, s.provincia].filter(Boolean).join(', ');
+  document.getElementById('modal-gestore').textContent = [s.gestore, s.bandiera].filter(Boolean).join(' · ') || 'Non disponibile';
+  document.getElementById('modal-mode').textContent = s.isSelf ? 'Self service' : 'Servito';
+  document.getElementById('modal-dt').textContent = s.dtComu || 'Non disponibile';
+
+  // Maps URLs
+  const addr = encodeURIComponent([s.nome, s.indirizzo, s.comune].filter(Boolean).join(', '));
+  const coord = (s.lat && s.lng && !isNaN(s.lat) && !isNaN(s.lng))
+    ? s.lat + ',' + s.lng : null;
+
+  const gmaps = coord
+    ? `https://www.google.com/maps/search/?api=1&query=${coord}`
+    : `https://www.google.com/maps/search/?api=1&query=${addr}`;
+  const apple = coord
+    ? `https://maps.apple.com/?ll=${coord}&q=${addr}`
+    : `https://maps.apple.com/?q=${addr}`;
+
+  document.getElementById('btn-gmaps').href = gmaps;
+  document.getElementById('btn-apple').href = apple;
+
+  document.getElementById('modal-overlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modal-overlay')) return;
+  document.getElementById('modal-overlay').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+// Close on ESC
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeModal(); });
+
 </script>
 </body>
 </html>
