@@ -235,6 +235,30 @@ footer a{color:var(--mut);text-decoration:underline}
 .btn-maps:hover{opacity:.88}
 .btn-maps-apple{background:var(--surf2);color:var(--tx);border:1px solid var(--brd2)}
 .btn-maps-apple:hover{background:var(--surf3);opacity:1}
+
+/* ── GPS btn ── */
+.btn-gps{background:var(--surf);border:1px solid var(--brd2);color:var(--tx2);font-family:var(--fm);font-size:0.8rem;padding:10px 14px;border-radius:7px;cursor:pointer;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.btn-gps:hover{color:var(--tx);border-color:var(--am);background:var(--am-d)}
+.btn-gps.active{color:var(--am);border-color:var(--am);background:var(--am-d)}
+.btn-gps svg{flex-shrink:0}
+
+/* ── Bandiera filter ── */
+.bandiera-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;display:none}
+.bfb{background:var(--surf);border:1px solid var(--brd2);color:var(--tx2);font-family:var(--fm);font-size:0.65rem;padding:4px 9px;border-radius:5px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.bfb:hover,.bfb.on{color:var(--am);border-color:var(--am);background:var(--am-d)}
+
+/* ── Preferiti ── */
+.fav-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:2px 4px;line-height:1;opacity:.4;transition:opacity .15s;position:absolute;top:10px;right:10px}
+.fav-btn:hover,.fav-btn.on{opacity:1}
+.station{position:relative}
+
+/* ── Preferiti section ── */
+.fav-section{margin-bottom:20px}
+.fav-list{display:flex;flex-direction:column;gap:7px}
+.fav-empty{font-size:0.75rem;color:var(--mut);padding:4px 0}
+
+/* ── Distanza badge ── */
+.dist-badge{font-size:0.6rem;background:var(--bl);background:rgba(91,155,213,.15);color:var(--bl);padding:1px 6px;border-radius:3px}
 </style>
 </head>
 <body>
@@ -346,22 +370,34 @@ footer a{color:var(--mut);text-decoration:underline}
         <input type="text" id="qinput" placeholder="Comune — es. Abbiategrasso, Milano…" autocomplete="off" autocorrect="off" autocapitalize="words" />
       </div>
       <button class="btn-go" id="sbtn" onclick="doSearch()">Cerca</button>
+      <button class="btn-gps" id="gps-btn" onclick="doGPS()" title="Usa la mia posizione">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7" stroke-dasharray="2 2" opacity=".4"/></svg>
+        Vicino a me
+      </button>
     </div>
     <div class="sug" id="sug"></div>
 
     <div class="filter-row" id="frow">
       <button class="fb on" data-f="Benzina" onclick="setFuel(this)">Benzina</button>
       <button class="fb" data-f="Gasolio" onclick="setFuel(this)">Gasolio</button>
+      <button class="fb" data-f="Benzina Speciale" onclick="setFuel(this)">Benzina Spec.</button>
+      <button class="fb" data-f="Gasolio Speciale" onclick="setFuel(this)">Diesel Spec.</button>
+      <button class="fb" data-f="HVO" onclick="setFuel(this)">HVO</button>
       <button class="fb" data-f="GPL" onclick="setFuel(this)">GPL</button>
       <button class="fb" data-f="Metano" onclick="setFuel(this)">Metano</button>
       <button class="fb" id="self-btn" onclick="toggleSelf()">Solo self</button>
     </div>
+    <div class="bandiera-row" id="brow"></div>
 
     <div class="status">
       <div class="dot" id="sdot"></div>
       <span id="stxt">Pronto</span>
     </div>
 
+    <div class="fav-section" id="fav-section" style="display:none">
+      <div class="sect">Preferiti <span class="tag">salvati</span></div>
+      <div class="fav-list" id="fav-list"></div>
+    </div>
     <div id="results"></div>
   </main>
 
@@ -444,6 +480,7 @@ let _stationData = [];
 // ── Init ──────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   startApp();
+  renderFavSection();
   updateTs();
   setInterval(updateTs, 30000);
   document.getElementById('qinput').addEventListener('input', onInput);
@@ -642,11 +679,14 @@ function renderStations(data) {
         <div class="st-unit">€/${unit}</div>
         <div class="st-dt">${s.dtComu||''}</div>
       </div>
+      <button class="fav-btn ${isFav(s.id)?'on':''}" onclick="event.stopPropagation();toggleFav(${i})" title="Aggiungi ai preferiti">${isFav(s.id)?'★':'☆'}</button>
     </div>`;
   });
   html += '</div>';
   if (data.length === 60) html += `<div style="font-size:.68rem;color:var(--mut);text-align:center;margin-top:-10px;margin-bottom:16px">Mostrati i 60 più economici</div>`;
   area.innerHTML = html;
+  buildBandieraFilter(data);
+  renderFavSection();
 }
 
 // ── Filters ───────────────────────────────────────────────────
@@ -668,6 +708,8 @@ function resetFilters() {
   document.querySelectorAll('.fb[data-f]').forEach(b => b.classList.toggle('on', b.dataset.f==='Benzina'));
   document.getElementById('self-btn').classList.remove('on');
   document.getElementById('self-btn').textContent = 'Solo self';
+  activeBandiera = null;
+  document.getElementById('brow').style.display = 'none';
 }
 
 // ── Utils ─────────────────────────────────────────────────────
@@ -686,6 +728,134 @@ function updateTs() {
 function cap(s) { return s.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()); }
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+
+// ── GPS ────────────────────────────────────────────────────────
+async function doGPS() {
+  if (!navigator.geolocation) { setStatus('err', 'Geolocalizzazione non supportata'); return; }
+  const btn = document.getElementById('gps-btn');
+  btn.classList.add('active');
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg> Localizzazione…`;
+  navigator.geolocation.getCurrentPosition(
+    async pos => {
+      const { latitude: lat, longitude: lng } = pos.coords;
+      document.getElementById('qinput').value = '';
+      activeComune = null;
+      document.getElementById('frow').style.display = 'flex';
+      resetFilters();
+      setStatus('ld', 'Cerco distributori vicino a te…');
+      try {
+        const url = `/api/vicini?lat=${lat}&lng=${lng}&carburante=${encodeURIComponent(activeFuel)}&self=${activeSelf?1:0}&raggio=10`;
+        const data = await api(url);
+        renderStations(data, { gps: true, lat, lng });
+        setStatus('ok', `${data.length} impianti entro 10 km`);
+      } catch(e) { setStatus('err', 'Errore: ' + e.message); }
+      btn.classList.remove('active');
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7" stroke-dasharray="2 2" opacity=".4"/></svg> Vicino a me`;
+    },
+    err => {
+      btn.classList.remove('active');
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7" stroke-dasharray="2 2" opacity=".4"/></svg> Vicino a me`;
+      setStatus('err', 'Posizione non disponibile — controlla i permessi');
+    },
+    { timeout: 10000 }
+  );
+}
+
+// ── Bandiera filter ────────────────────────────────────────────
+let activeBandiera = null;
+
+function buildBandieraFilter(data) {
+  const brands = [...new Set(data.map(s => s.bandiera).filter(Boolean))].sort();
+  const brow = document.getElementById('brow');
+  if (brands.length < 2) { brow.style.display = 'none'; return; }
+  brow.innerHTML = `<span style="font-size:.65rem;color:var(--mut);align-self:center;margin-right:2px">Marca:</span>`;
+  brands.forEach(b => {
+    const btn = document.createElement('button');
+    btn.className = 'bfb' + (activeBandiera === b ? ' on' : '');
+    btn.textContent = b;
+    btn.onclick = () => {
+      activeBandiera = activeBandiera === b ? null : b;
+      document.querySelectorAll('.bfb').forEach(x => x.classList.remove('on'));
+      if (activeBandiera) btn.classList.add('on');
+      applyBandieraFilter();
+    };
+    brow.appendChild(btn);
+  });
+  brow.style.display = 'flex';
+}
+
+function applyBandieraFilter() {
+  const stations = document.querySelectorAll('.station');
+  stations.forEach((el, i) => {
+    const s = _stationData[i];
+    const show = !activeBandiera || s.bandiera === activeBandiera;
+    el.style.display = show ? '' : 'none';
+  });
+}
+
+// ── Preferiti ──────────────────────────────────────────────────
+function loadFavs() { try { return JSON.parse(localStorage.getItem('opf_favs') || '[]'); } catch(e) { return []; } }
+function saveFavs(favs) { localStorage.setItem('opf_favs', JSON.stringify(favs)); }
+function isFav(id) { return loadFavs().some(f => f.id === id); }
+
+function toggleFav(idx) {
+  const s = _stationData[idx];
+  let favs = loadFavs();
+  const i = favs.findIndex(f => f.id === s.id);
+  if (i >= 0) favs.splice(i, 1);
+  else favs.unshift({ ...s, savedAt: new Date().toISOString() });
+  saveFavs(favs);
+  // update star button
+  const btns = document.querySelectorAll('.fav-btn');
+  if (btns[idx]) { btns[idx].textContent = isFav(s.id) ? '★' : '☆'; btns[idx].classList.toggle('on', isFav(s.id)); }
+  renderFavSection();
+}
+
+function renderFavSection() {
+  const favs = loadFavs();
+  const sec = document.getElementById('fav-section');
+  const list = document.getElementById('fav-list');
+  if (!favs.length) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  list.innerHTML = '';
+  favs.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'station';
+    div.style.cursor = 'pointer';
+    div.onclick = () => openModal(s);
+    div.innerHTML = `
+      <div class="st-rank" style="color:var(--am)">★</div>
+      <div class="st-info">
+        <div class="st-name">${esc(s.nome)}</div>
+        <div class="st-addr">${esc(s.indirizzo)} · ${esc(s.comune)}</div>
+        <div class="st-tags">
+          ${s.bandiera ? `<span class="st-tag">${esc(s.bandiera)}</span>` : ''}
+          <span class="st-tag">${s.isSelf?'self':'servito'}</span>
+          <span class="st-tag">${esc(s.carburante||'')}</span>
+        </div>
+      </div>
+      <div class="st-p">
+        <div class="st-price">${s.prezzo.toFixed(3)}</div>
+        <div class="st-unit">€/${s.carburante&&s.carburante.toLowerCase().includes('metano')?'kg':'lt'}</div>
+        <div class="st-dt">${s.dtComu||''}</div>
+      </div>
+      <button class="fav-btn on" onclick="event.stopPropagation();removeFav('${s.id}')" title="Rimuovi dai preferiti">★</button>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function removeFav(id) {
+  let favs = loadFavs();
+  saveFavs(favs.filter(f => f.id !== id));
+  renderFavSection();
+  // update stars in results if visible
+  document.querySelectorAll('.fav-btn').forEach((btn, i) => {
+    const s = _stationData[i];
+    if (s && s.id === id) { btn.textContent = '☆'; btn.classList.remove('on'); }
+  });
+}
 
 // ── Modal ─────────────────────────────────────────────────────
 function openModalIdx(i) {
