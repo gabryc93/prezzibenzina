@@ -336,7 +336,7 @@ footer a{color:var(--mut);text-decoration:underline}
         </div>
       </div>
       <div class="card c-go">
-        <div class="clabel">Gasolio</div>
+        <div class="clabel">Diesel</div>
         <div class="cprice" id="avg-go">—</div>
         <div class="cunit">€/litro</div>
         <div class="cmode">
@@ -379,8 +379,7 @@ footer a{color:var(--mut);text-decoration:underline}
 
     <div class="filter-row" id="frow">
       <button class="fb on" data-f="Benzina" onclick="setFuel(this)">Benzina</button>
-      <button class="fb" data-f="Gasolio" onclick="setFuel(this)">Gasolio</button>
-      <button class="fb" data-f="Gasolio Speciale" onclick="setFuel(this)">Gasolio Spec.</button>
+      <button class="fb" data-f="Diesel" onclick="setFuel(this)">Diesel</button>
       <button class="fb" data-f="Benzina Premium" onclick="setFuel(this)">Benzina Prem.</button>
       <button class="fb" data-f="Diesel Premium" onclick="setFuel(this)">Diesel Prem.</button>
       <button class="fb" data-f="HVO" onclick="setFuel(this)">HVO</button>
@@ -566,7 +565,7 @@ async function api(path) {
 
 // ── Medie nazionali ───────────────────────────────────────────
 function renderMedie(data) {
-  const map = { bz:'Benzina', go:'Gasolio', gpl:'GPL', met:'Metano' };
+  const map = { bz:'Benzina', go:'Diesel', gpl:'GPL', met:'Metano' };
   for (const [k, fuel] of Object.entries(map)) {
     const d = data[fuel] || {};
     const avg = document.getElementById('avg-' + k);
