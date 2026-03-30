@@ -259,6 +259,30 @@ footer a{color:var(--mut);text-decoration:underline}
 
 /* ── Distanza badge ── */
 .dist-badge{font-size:0.6rem;background:var(--bl);background:rgba(91,155,213,.15);color:var(--bl);padding:1px 6px;border-radius:3px}
+
+/* ── Update bar ── */
+.update-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--surf);border:1px solid var(--brd);border-radius:8px;
+  padding:9px 14px;margin-bottom:18px;gap:10px;flex-wrap:wrap;
+}
+.update-col{display:flex;flex-direction:column;gap:2px}
+.update-label{font-size:0.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+.update-val{font-size:0.78rem;color:var(--tx);font-family:var(--fm)}
+.update-val.fresh{color:var(--gn)}
+.update-val.stale{color:var(--am)}
+.update-divider{width:1px;height:32px;background:var(--brd);flex-shrink:0}
+
+/* ── New data banner ── */
+.new-data-banner{
+  background:var(--am-d);border:1px solid var(--am-b);border-radius:8px;
+  padding:10px 14px;margin-bottom:14px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  animation:fadeIn .3s ease;
+}
+.banner-text{font-size:0.78rem;color:var(--am);display:flex;align-items:center;gap:7px}
+.btn-refresh{background:var(--am);color:#0d0e0f;border:none;font-family:var(--fm);font-size:0.72rem;font-weight:500;padding:6px 13px;border-radius:5px;cursor:pointer;white-space:nowrap}
+.btn-refresh:hover{opacity:.88}
 </style>
 </head>
 <body>
@@ -362,6 +386,33 @@ footer a{color:var(--mut);text-decoration:underline}
           <span class="mb mb-v" id="v-met">serv. —</span>
         </div>
       </div>
+    </div>
+
+    <!-- UPDATE BAR -->
+    <div class="update-bar" id="update-bar">
+      <div class="update-col">
+        <div class="update-label">Ultimo aggiornamento dati</div>
+        <div class="update-val" id="last-update">—</div>
+      </div>
+      <div class="update-divider"></div>
+      <div class="update-col">
+        <div class="update-label">Prossimo aggiornamento</div>
+        <div class="update-val" id="next-update">—</div>
+      </div>
+      <div class="update-divider"></div>
+      <div class="update-col">
+        <div class="update-label">Fonte</div>
+        <div class="update-val" style="color:var(--mut)">MIMIT · ogni 4 ore</div>
+      </div>
+    </div>
+
+    <!-- NEW DATA BANNER -->
+    <div class="new-data-banner hidden" id="new-data-banner">
+      <div class="banner-text">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        Nuovi dati disponibili
+      </div>
+      <button class="btn-refresh" onclick="doRefresh()">↻ Aggiorna ora</button>
     </div>
 
     <div class="sect">Cerca impianti</div>
@@ -565,6 +616,7 @@ async function api(path) {
 
 // ── Medie nazionali ───────────────────────────────────────────
 function renderMedie(data) {
+  if (data._cachedAt && data._nextUpdate) renderUpdateBar(data._cachedAt, data._nextUpdate);
   const map = { bz:'Benzina', go:'Diesel', gpl:'GPL', met:'Metano' };
   for (const [k, fuel] of Object.entries(map)) {
     const d = data[fuel] || {};
@@ -729,6 +781,66 @@ function cap(s) { return s.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
+
+
+// ── Update bar & polling ───────────────────────────────────────
+let _lastCachedAt = null;
+
+function renderUpdateBar(cachedAt, nextUpdate) {
+  _lastCachedAt = cachedAt;
+
+  const cached = new Date(cachedAt);
+  const next   = new Date(nextUpdate);
+  const now    = new Date();
+  const ageMin = Math.round((now - cached) / 60000);
+
+  const lastEl = document.getElementById('last-update');
+  const nextEl = document.getElementById('next-update');
+
+  // Format last update
+  const dateStr = cached.toLocaleDateString('it-IT', { day:'2-digit', month:'2-digit', year:'numeric' });
+  const timeStr = cached.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
+  const ageStr  = ageMin < 60
+    ? `${ageMin} min fa`
+    : ageMin < 1440
+      ? `${Math.round(ageMin/60)} ore fa`
+      : `${Math.round(ageMin/1440)} giorni fa`;
+
+  lastEl.textContent = `${dateStr} ${timeStr} (${ageStr})`;
+  lastEl.className   = 'update-val ' + (ageMin < 240 ? 'fresh' : 'stale');
+
+  // Format next update
+  const minsToNext = Math.round((next - now) / 60000);
+  if (minsToNext <= 0) {
+    nextEl.textContent = 'Disponibile ora';
+    nextEl.className   = 'update-val fresh';
+  } else {
+    const h = Math.floor(minsToNext / 60), m = minsToNext % 60;
+    nextEl.textContent = h > 0 ? `tra ${h}h ${m}min` : `tra ${m} min`;
+    nextEl.className   = 'update-val';
+  }
+
+  // Update countdown every minute
+  setTimeout(() => { if (_lastCachedAt === cachedAt) renderUpdateBar(cachedAt, nextUpdate); }, 60000);
+}
+
+async function checkForNewData() {
+  if (!_lastCachedAt) return;
+  try {
+    const data = await api('/');
+    if (data.cachedAt && data.cachedAt !== _lastCachedAt) {
+      document.getElementById('new-data-banner').classList.remove('hidden');
+    }
+  } catch(e) {}
+}
+
+async function doRefresh() {
+  document.getElementById('new-data-banner').classList.add('hidden');
+  await loadMedie();
+}
+
+// Poll for new data every 15 minutes
+setInterval(checkForNewData, 15 * 60 * 1000);
 
 // ── GPS ────────────────────────────────────────────────────────
 async function doGPS() {
