@@ -710,7 +710,7 @@ function renderStations(data) {
   const minP = data[0].prezzo, maxP = data[data.length-1].prezzo;
   const unit = activeFuel === 'Metano' ? 'kg' : 'lt';
   let html = `<div class="res-hdr fi">
-    <div class="res-title">${activeFuel} · ${cap(activeComune)}</div>
+    <div class="res-title">${activeFuel} · ${activeComune ? cap(activeComune) : "Vicino a te"}</div>
     <div class="res-sub">min <span style="color:var(--gn)">${minP.toFixed(3)}</span> — max <span style="color:var(--rd)">${maxP.toFixed(3)}</span></div>
   </div><div class="slist fi">`;
   data.forEach((s, i) => {
@@ -777,7 +777,7 @@ function updateTs() {
     n.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
 }
 
-function cap(s) { return s.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()); }
+function cap(s) { return s ? s.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()) : ''; }
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
