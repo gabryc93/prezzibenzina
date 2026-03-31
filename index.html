@@ -166,7 +166,7 @@ main{max-width:700px;margin:0 auto;padding:16px 14px calc(24px + var(--safe-bott
 .station{
   background:var(--surf);border:1px solid var(--brd);border-radius:8px;
   padding:11px 14px;display:grid;grid-template-columns:28px 1fr auto;
-  gap:6px 12px;align-items:center;transition:border-color .15s;
+  gap:6px 12px;align-items:start;transition:border-color .15s;
 }
 .station:hover{border-color:var(--brd2)}
 .st-rank{font-family:var(--fd);font-size:1.15rem;font-weight:700;color:var(--mut);text-align:center;line-height:1}
@@ -177,7 +177,7 @@ main{max-width:700px;margin:0 auto;padding:16px 14px calc(24px + var(--safe-bott
 .st-addr{font-size:0.68rem;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .st-tags{display:flex;gap:5px;margin-top:3px;flex-wrap:wrap}
 .st-tag{font-size:0.58rem;background:var(--surf2);color:var(--tx2);padding:1px 5px;border-radius:3px}
-.st-p{text-align:right}
+.st-p{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
 .st-price{font-family:var(--fd);font-size:1.3rem;font-weight:700;color:var(--tx);white-space:nowrap}
 .cheap{color:var(--gn)}
 .dear{color:var(--rd)}
@@ -248,7 +248,7 @@ footer a{color:var(--mut);text-decoration:underline}
 .bfb:hover,.bfb.on{color:var(--am);border-color:var(--am);background:var(--am-d)}
 
 /* ── Preferiti ── */
-.fav-btn{background:var(--surf2);border:1px solid var(--brd2);border-radius:6px;cursor:pointer;font-size:13px;padding:5px 8px;line-height:1;color:var(--mut);transition:all .15s;white-space:nowrap;flex-shrink:0}
+.fav-btn{background:var(--surf2);border:1px solid var(--brd2);border-radius:5px;cursor:pointer;font-size:0.62rem;padding:3px 7px;line-height:1.4;color:var(--mut);transition:all .15s;white-space:nowrap;flex-shrink:0;margin-top:4px}
 .fav-btn:hover{color:var(--am);border-color:var(--am);background:var(--am-d)}
 .fav-btn.on{color:var(--am);border-color:var(--am);background:var(--am-d)}
 
