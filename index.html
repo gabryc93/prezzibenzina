@@ -338,6 +338,20 @@ footer a{color:var(--mut);text-decoration:underline}
 .card-toggle.hidden-fuel{opacity:.45;text-decoration:line-through}
 .card-toggle-label{font-size:0.6rem;color:var(--mut);align-self:center;letter-spacing:.06em}
 .price-card.card-hidden{display:none}
+
+/* ── GPS location badge ── */
+.gps-location{
+  display:none;align-items:center;gap:8px;
+  background:var(--surf);border:1px solid var(--brd);border-radius:7px;
+  padding:8px 13px;margin-bottom:10px;font-size:0.78rem;color:var(--tx2);
+}
+.gps-location.visible{display:flex}
+.gps-pin{color:var(--am);flex-shrink:0;font-size:14px}
+.gps-loc-text{flex:1}
+.gps-loc-name{color:var(--tx);font-weight:500}
+.gps-loc-coords{font-size:0.65rem;color:var(--mut);margin-top:1px}
+.gps-loc-close{background:none;border:none;color:var(--mut);cursor:pointer;font-size:14px;padding:2px;line-height:1}
+.gps-loc-close:hover{color:var(--tx)}
 </style>
 </head>
 <body>
@@ -480,6 +494,14 @@ footer a{color:var(--mut);text-decoration:underline}
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7" stroke-dasharray="2 2" opacity=".4"/></svg>
         Vicino a me
       </button>
+    </div>
+    <div class="gps-location" id="gps-location">
+      <span class="gps-pin">📍</span>
+      <div class="gps-loc-text">
+        <div class="gps-loc-name" id="gps-loc-name">—</div>
+        <div class="gps-loc-coords" id="gps-loc-coords"></div>
+      </div>
+      <button class="gps-loc-close" onclick="clearGPSLocation()" title="Chiudi">✕</button>
     </div>
     <div class="sug" id="sug"></div>
 
@@ -735,6 +757,7 @@ async function fetchSuggest(q) {
 
 // ── Cerca ─────────────────────────────────────────────────────
 async function doSearch() {
+  clearGPSLocation();
   const q = document.getElementById('qinput').value.trim();
   if (!q) { document.getElementById('qinput').focus(); return; }
 
@@ -993,6 +1016,41 @@ function toggleCard(btn) {
   applyCardVisibility();
 }
 
+
+// ── GPS Location badge ────────────────────────────────────────
+async function showGPSLocation(lat, lng) {
+  const badge  = document.getElementById('gps-location');
+  const name   = document.getElementById('gps-loc-name');
+  const coords = document.getElementById('gps-loc-coords');
+
+  // Show coords immediately
+  coords.textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  name.textContent = 'Localizzazione in corso…';
+  badge.classList.add('visible');
+
+  // Reverse geocode via Nominatim (OpenStreetMap, gratuito)
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=it`,
+      { headers: { 'User-Agent': 'OsservaPrezziCarburanti/1.0' } }
+    );
+    const data = await res.json();
+    const addr = data.address || {};
+    const parts = [
+      addr.village || addr.town || addr.city || addr.municipality || addr.county,
+      addr.state_district || addr.province,
+      addr.postcode,
+    ].filter(Boolean);
+    name.textContent = parts.length ? parts.join(' · ') : 'Posizione rilevata';
+  } catch(e) {
+    name.textContent = 'Posizione rilevata';
+  }
+}
+
+function clearGPSLocation() {
+  document.getElementById('gps-location').classList.remove('visible');
+}
+
 // ── GPS ────────────────────────────────────────────────────────
 async function doGPS() {
   if (!navigator.geolocation) { setStatus('err', 'Geolocalizzazione non supportata'); return; }
@@ -1007,6 +1065,8 @@ async function doGPS() {
       document.getElementById('frow').style.display = 'flex';
       resetFilters();
       setStatus('ld', 'Cerco distributori vicino a te…');
+      // Show location badge immediately with coords, then reverse geocode
+      showGPSLocation(lat, lng);
       try {
         const url = `/api/vicini?lat=${lat}&lng=${lng}&carburante=${encodeURIComponent(activeFuel)}&self=${activeSelf?1:0}&raggio=10`;
         const data = await api(url);
