@@ -473,7 +473,7 @@ footer a{color:var(--mut);text-decoration:underline}
     <div class="sect">Cerca impianti</div>
     <div class="search-box">
       <div class="search-wrap">
-        <input type="text" id="qinput" placeholder="Comune — es. Abbiategrasso, Milano…" autocomplete="off" autocorrect="off" autocapitalize="words" />
+        <input type="text" id="qinput" placeholder="Comune o CAP — es. Abbiategrasso, 20081…" autocomplete="off" autocorrect="off" autocapitalize="words" inputmode="text" />
       </div>
       <button class="btn-go" id="sbtn" onclick="doSearch()">Cerca</button>
       <button class="btn-gps" id="gps-btn" onclick="doGPS()" title="Usa la mia posizione">
@@ -701,6 +701,11 @@ function onInput() {
   clearTimeout(suggestTimer);
   const q = document.getElementById('qinput').value.trim();
   if (q.length < 2) { document.getElementById('sug').style.display = 'none'; return; }
+  // CAP: no autocomplete, just wait for search
+  if (/^\d+$/.test(q)) {
+    document.getElementById('sug').style.display = 'none';
+    return;
+  }
   suggestTimer = setTimeout(() => fetchSuggest(q), 280);
 }
 
@@ -713,9 +718,9 @@ async function fetchSuggest(q) {
     results.forEach(r => {
       const div = document.createElement('div');
       div.className = 'sug-row';
-      div.innerHTML = `<span>${cap(r.nome)}</span><span class="sug-prov">${r.provincia} · ${r.count} imp.</span>`;
+      div.innerHTML = `<span>${capFn(r.nome)}</span><span class="sug-prov">${r.provincia} · ${r.count} imp.</span>`;
       div.onclick = () => {
-        document.getElementById('qinput').value = cap(r.nome);
+        document.getElementById('qinput').value = capFn(r.nome);
         sug.style.display = 'none';
         activeComune = r.nome;
         activeFuel = 'Benzina'; activeSelf = false;
@@ -730,37 +735,82 @@ async function fetchSuggest(q) {
 
 // ── Cerca ─────────────────────────────────────────────────────
 async function doSearch() {
-  const q = document.getElementById('qinput').value.trim().toUpperCase();
+  const q = document.getElementById('qinput').value.trim();
   if (!q) { document.getElementById('qinput').focus(); return; }
-  // Try exact match via suggest
+
+  // Detect CAP (5 digits)
+  if (/^\d{5}$/.test(q)) {
+    await searchByCAP(q);
+    return;
+  }
+
+  const qu = q.toUpperCase();
   try {
-    const res = await api('/api/comuni?q=' + encodeURIComponent(q));
+    const res = await api('/api/comuni?q=' + encodeURIComponent(qu));
     if (res.length > 0) {
-      const exact = res.find(r => r.nome === q) || res[0];
+      const exact = res.find(r => r.nome === qu) || res[0];
       activeComune = exact.nome;
-      document.getElementById('qinput').value = cap(exact.nome);
+      document.getElementById('qinput').value = capFn(exact.nome);
       activeFuel = 'Benzina'; activeSelf = false;
       resetFilters();
       fetchStations();
     } else {
       setStatus('err', 'Comune non trovato');
-      document.getElementById('results').innerHTML = `<div class="no-res">Nessun comune trovato per "${cap(q)}"</div>`;
+      document.getElementById('results').innerHTML = `<div class="no-res">Nessun comune trovato per "${cap(qu)}"</div>`;
     }
   } catch(e) {
     setStatus('err', e.message);
   }
 }
 
+async function searchByCAP(cap_code) {
+  setStatus('ld', 'Risolvo il CAP ' + cap_code + '…');
+  document.getElementById('sbtn').disabled = true;
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?postalcode=${cap_code}&country=Italy&format=json&limit=5&addressdetails=1`;
+    const res = await fetch(url, { headers: { 'Accept-Language': 'it' } });
+    if (!res.ok) throw new Error('Nominatim HTTP ' + res.status);
+    const data = await res.json();
+    if (!data.length) {
+      setStatus('err', 'CAP non trovato');
+      document.getElementById('results').innerHTML = `<div class="no-res">CAP ${cap_code} non trovato. Prova a inserire il nome del comune.</div>`;
+      return;
+    }
+    // Extract comune from result
+    const addr = data[0].address || {};
+    const comuneName = (addr.village || addr.town || addr.city || addr.municipality || '').toUpperCase();
+    if (!comuneName) throw new Error('Impossibile determinare il comune dal CAP');
+
+    // Try to find in MIMIT index
+    const res2 = await api('/api/comuni?q=' + encodeURIComponent(comuneName.slice(0, 6)));
+    const match = res2.find(r => r.nome === comuneName) || res2[0];
+    if (!match) {
+      setStatus('err', 'Comune non trovato nel database MIMIT');
+      document.getElementById('results').innerHTML = `<div class="no-res">CAP ${cap_code} corrisponde a <strong>${cap(comuneName)}</strong>, ma non è presente nel database MIMIT.</div>`;
+      return;
+    }
+    activeComune = match.nome;
+    document.getElementById('qinput').value = capFn(match.nome) + ' (' + cap_code + ')';
+    activeFuel = 'Benzina'; activeSelf = false;
+    resetFilters();
+    fetchStations();
+  } catch(e) {
+    setStatus('err', 'Errore CAP: ' + e.message);
+  } finally {
+    document.getElementById('sbtn').disabled = false;
+  }
+}
+
 async function fetchStations() {
   if (!activeComune) return;
   document.getElementById('frow').style.display = 'flex';
-  setStatus('ld', 'Cerco impianti a ' + cap(activeComune) + '…');
+  setStatus('ld', 'Cerco impianti a ' + capFn(activeComune) + '…');
   document.getElementById('sbtn').disabled = true;
   try {
     const url = `/api/cerca?comune=${encodeURIComponent(activeComune)}&carburante=${encodeURIComponent(activeFuel)}&self=${activeSelf?1:0}`;
     const data = await api(url);
     renderStations(data);
-    setStatus('ok', `${data.length} impianti trovati · ${cap(activeComune)}`);
+    setStatus('ok', `${data.length} impianti trovati · ${capFn(activeComune)}`);
   } catch(e) {
     setStatus('err', 'Errore: ' + e.message);
   } finally {
@@ -771,14 +821,14 @@ async function fetchStations() {
 function renderStations(data) {
   const area = document.getElementById('results');
   if (!data.length) {
-    area.innerHTML = `<div class="no-res">Nessun impianto trovato a ${cap(activeComune)} per ${activeFuel}${activeSelf?' self service':''}.</div>`;
+    area.innerHTML = `<div class="no-res">Nessun impianto trovato a ${capFn(activeComune)} per ${activeFuel}${activeSelf?' self service':''}.</div>`;
     return;
   }
   _stationData = data;
   const minP = data[0].prezzo, maxP = data[data.length-1].prezzo;
   const unit = activeFuel === 'Metano' ? 'kg' : 'lt';
   let html = `<div class="res-hdr fi">
-    <div class="res-title">${activeFuel} · ${activeComune ? cap(activeComune) : "Vicino a te"}</div>
+    <div class="res-title">${activeFuel} · ${activeComune ? capFn(activeComune) : "Vicino a te"}</div>
     <div class="res-sub">min <span style="color:var(--gn)">${minP.toFixed(3)}</span> — max <span style="color:var(--rd)">${maxP.toFixed(3)}</span></div>
   </div><div class="slist fi">`;
   data.forEach((s, i) => {
@@ -845,7 +895,7 @@ function updateTs() {
     n.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
 }
 
-function cap(s) { return s ? s.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()) : ''; }
+function capFn(s) { return s ? s.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()) : ''; }
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
