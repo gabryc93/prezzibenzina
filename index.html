@@ -265,7 +265,7 @@ footer a{color:var(--mut);text-decoration:underline}
 #fav-filter-btn.on{color:var(--am);border-color:var(--am);background:var(--am-d)}
 
 /* ── Distanza badge ── */
-.dist-badge{font-size:0.6rem;background:var(--bl);background:rgba(91,155,213,.15);color:var(--bl);padding:1px 6px;border-radius:3px}
+.dist-badge{font-size:0.58rem;color:var(--bl);text-align:right;opacity:.85;margin-top:1px}
 
 /* ── Update bar ── */
 .update-bar{
@@ -882,8 +882,9 @@ function renderStations(data) {
         <div class="st-price ${pc}">${s.prezzo.toFixed(3)}</div>
         <div class="st-unit">€/${unit}</div>
         <div class="st-dt">${s.dtComu||''}</div>
+        ${s.distanza!=null?`<div class="dist-badge">📍 ${s.distanza} km</div>`:''}
+        <button class="fav-btn ${isFav(s.id)?'on':''}" onclick="event.stopPropagation();toggleFav(${i})" title="${isFav(s.id)?'Rimuovi':'Salva'}">${isFav(s.id)?'★ Salvato':'☆ Salva'}</button>
       </div>
-      <button class="fav-btn ${isFav(s.id)?'on':''}" onclick="event.stopPropagation();toggleFav(${i})" title="Aggiungi ai preferiti">${isFav(s.id)?'★':'☆'}</button>
     </div>`;
   });
   html += '</div>';
