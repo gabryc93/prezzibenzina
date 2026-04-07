@@ -514,6 +514,7 @@ footer a{color:var(--mut);text-decoration:underline}
       <button class="fb" data-f="GPL" onclick="setFuel(this)">GPL</button>
       <button class="fb" data-f="Metano" onclick="setFuel(this)">Metano</button>
       <button class="fb" id="self-btn" onclick="toggleSelf()">Solo self</button>
+      <button class="fb" id="sort-dist-btn" onclick="toggleSortDist()" style="display:none">↕ Distanza</button>
     </div>
     <div class="bandiera-row" id="brow"></div>
 
@@ -583,6 +584,13 @@ footer a{color:var(--mut);text-decoration:underline}
           <div class="modal-row-content">
             <div class="modal-row-label">Modalità</div>
             <div class="modal-row-val" id="modal-mode">—</div>
+          </div>
+        </div>
+        <div class="modal-row" id="modal-dist-row" style="display:none">
+          <div class="modal-row-icon">📍</div>
+          <div class="modal-row-content">
+            <div class="modal-row-label">Distanza</div>
+            <div class="modal-row-val" id="modal-dist-val">—</div>
           </div>
         </div>
         <div class="modal-row">
@@ -758,6 +766,9 @@ async function fetchSuggest(q) {
 // ── Cerca ─────────────────────────────────────────────────────
 async function doSearch() {
   clearGPSLocation();
+  _gpsActive = false;
+  _sortByDist = false;
+  document.getElementById('sort-dist-btn').style.display = 'none';
   const q = document.getElementById('qinput').value.trim();
   if (!q) { document.getElementById('qinput').focus(); return; }
 
@@ -903,6 +914,9 @@ function resetFilters() {
   document.getElementById('self-btn').textContent = 'Solo self';
   activeBandiera = null;
   document.getElementById('brow').style.display = 'none';
+  _sortByDist = false;
+  const sdb = document.getElementById('sort-dist-btn');
+  if (sdb) { sdb.classList.remove('on'); sdb.textContent = '↕ Distanza'; }
 }
 
 // ── Utils ─────────────────────────────────────────────────────
@@ -1062,10 +1076,14 @@ async function doGPS() {
       const { latitude: lat, longitude: lng } = pos.coords;
       document.getElementById('qinput').value = '';
       activeComune = null;
+      _gpsActive = true;
+      _sortByDist = false;
       document.getElementById('frow').style.display = 'flex';
+      document.getElementById('sort-dist-btn').style.display = '';
+      document.getElementById('sort-dist-btn').classList.remove('on');
+      document.getElementById('sort-dist-btn').textContent = '↕ Distanza';
       resetFilters();
       setStatus('ld', 'Cerco distributori vicino a te…');
-      // Show location badge immediately with coords, then reverse geocode
       showGPSLocation(lat, lng);
       try {
         const url = `/api/vicini?lat=${lat}&lng=${lng}&carburante=${encodeURIComponent(activeFuel)}&self=${activeSelf?1:0}&raggio=10`;
@@ -1165,6 +1183,22 @@ function getSortedFavs() {
 }
 
 let _favFilterActive = false;
+let _gpsActive = false;
+let _sortByDist = false;
+
+function toggleSortDist() {
+  _sortByDist = !_sortByDist;
+  const btn = document.getElementById('sort-dist-btn');
+  btn.classList.toggle('on', _sortByDist);
+  btn.textContent = _sortByDist ? '↕ Prezzo' : '↕ Distanza';
+  if (_gpsActive && _stationData.length) {
+    const sorted = _sortByDist
+      ? [..._stationData].sort((a,b) => (a.distanza||999) - (b.distanza||999))
+      : [..._stationData].sort((a,b) => a.prezzo - b.prezzo);
+    _stationData = sorted;
+    renderStations(sorted);
+  }
+}
 
 function toggleFavFilter() {
   _favFilterActive = !_favFilterActive;
@@ -1340,6 +1374,11 @@ function openModal(s) {
   document.getElementById('modal-addr').textContent = [s.indirizzo, s.comune, s.provincia].filter(Boolean).join(', ');
   document.getElementById('modal-gestore').textContent = [s.gestore, s.bandiera].filter(Boolean).join(' · ') || 'Non disponibile';
   document.getElementById('modal-mode').textContent = s.isSelf ? 'Self service' : 'Servito';
+  const distRow = document.getElementById('modal-dist-row');
+  if (s.distanza != null && distRow) {
+    distRow.style.display = '';
+    document.getElementById('modal-dist-val').textContent = s.distanza + ' km da te';
+  } else if (distRow) { distRow.style.display = 'none'; }
   document.getElementById('modal-dt').textContent = s.dtComu || 'Non disponibile';
 
   // Maps URLs
