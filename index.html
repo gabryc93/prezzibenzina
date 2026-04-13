@@ -8,6 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Carburanti">
 <meta name="theme-color" content="#0f1012">
+<link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEi0lEQVR4nMWXXYhVVRTHf2vvc7/GmTuj4zCZ0EMl+KQVlZGOPghFbyJoSNqH0FvRg4EUfqQFQfhQ+VSEYQSRTVA9aFGEWERYZEb14ps2fs3MnY/7MXfOPXuvHs6dcWa8595rDrRgcznn7rPXf6/9X/+9lgDoQYwcwl87vmZDJrAvRV4HnKdPFcMimAjeGoYDIz9MR+6d/mf++HHGp+iJbVa2f+auHFt7OJsxrwRWgmqoOK+L4XvWrBGyaSFyGlWn/Zsrdp8/oCe2WQEYOrb20J296QPXxmpeVRURIyCLCUBBUfUiIv1LU+byaHh45e7zB+Xqhw88EgT6k/fqnMeKJDvWhKAoYNqEq4pagzNGbBTJo4GK35tJGSlNeRGRxGW8QiYQGs0QoFpTaCNsIojzKrmMkZrzewOBjdXQIyI26SPnoTMrDBUiIgfG1Ldd916LlLuWp6g5RZWGIOeDEFsNPQIbA2CZ88mTnYfeLsOpcxV2Hb1CJfRYI7GjeEeEoeflLb28/mQvExWP0joSdZ/LgmaTvMY7//pcme1HLnP/PVl2rO+iHCpGYk5kU8Jfl0KOfD6CAK9uXUY11LYpnAhA62d+aTTiqXev8tCqLIN7VtLXbYmczguzFWF53vLW4AirV6bZsb6LsbLDSGPOzLVEoVEgMFCsespVz+7NPSzPG4YKNQolx0jRMVp0XJ9wlKqenRu7kLShWPWzTtMJpG0LwAwIIyAGqqESOUhZwRohMPVfGzspT8cE7MqZWSJeHotJ2wxEW1I7s2DThSQeZy9MkUsLo0XPwIGLfPVrka6cSVTWpiS8FXMO8h2G906O05cPeH5zN+Nlz0jRxYRN+K5tAKrzx03vgcjBg6tzvDE4ylAhIt9hMC1I0DaAlBUyqXjYObrrFTIpIZcWSlOeF5/o4eJIxP6PhyGoz21yr7UFQATGKo5/ChHjZYedsysP5FLC9ckIBCYqnn27+rhwJeSj78axLVjWEoBzkM8aXvt0hH2fxGIzd0MzzykLOKUrazj9S4mTv5XBCK1u9ZYAjIGpmrJ1XRcP35uhUlfBGVON8/36hOPoqTFO/13hy+Ml7ugJqISKc81VsSUAEQhryuP3LeHZx7qpFKObOJBLG/68OM0H309w/NtxNq3t5O3n+tiw/1Kz428PQIwCSlVPaSKKJXYBgI60Z3IqVsyBNUsY3LOC4UlHuRjRqrJpOwuMQFBXwYURCIwQ2DhST2/qpmeJpTKtvP/CCtatylGq6jzi/icAbZnAdE2pRUoqgJ0DeSqhEkaaqKKLC4Abkq0KY2UfH8HtkPB2rJUG3BIArxC5uFzXhe/9bIVzy9ZWGgJ0Zg2d3QHG0DANl066ljdmEoCCNY3rQgFqUZwB3/xeZqwUJQrRcNGhUVygtoPBGnCeQqBwJps2W0pTzs2tjIU4tPmc4e7+FF+cLTL4c7GpFHd2GLo7TMvjUFWXTVtbqvozTRuTmbKsUPJUQ8VaGt9scuNK7s/bpuq3sDFp2ZopkDIS9wItTImPIOG/xq1ZO81pUkvWyJJI2LQ5/T/b838BFFBhr8vWE6IAAAAASUVORK5CYII=">
 <link rel="icon" type="image/png" sizes="192x192" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAFBklEQVR4nO3dvXXbWBSF0SutKUKpg8ldkiqYYlyBS1LuYFJ3YQcUJf6KAAEQeO/sHc5aliHP+fBAUbKfaiN+//z+Z+1r4HFeXt+e1r6GqqrVLsLgObRWEA/9TY2eIR4Zw+K/kdEzxdIxLPbBDZ85LRXC7B/U8FnS3CE8z/nBjJ+lzb2xWWoyfNYwx2kw+QQwftYyx/YmBWD8rG3qBu86QgyfLbrnkWj0CWD8bNU92xwVgPGzdWM3OjgA46cVY7Y66/sA0JpBAbj705qhm70ZgPHTqiHb/TIA46d1tzbsNQDRrgbg7k8vvtryxQCMn95c27RHIKKdBeDuT68ubdsJQLSjANz96d3pxp0ARBMA0T4C8PhDisOtOwGIJgCiPVd5/CHPfvNOAKIJgGgCINqT53+SOQGI9s/aF7BF//73/9qXcNWvH9/WvoSueAQ6sOXhnxLCPDwCvWtp/FXtXe9WCaDaHVOr170l8QG0PqLWr39t0QH0Mp5ePo81xAbQ22h6+3weJTKAXsfS6+e1pLgAeh9J75/f3KLeB7hnHFv4enur192CmBOg5RHdcx1OgmEiAmh5/HsiWEb3AfQw/j0RzK/rAHoa/54I5tV1AGNtffx7rVxnC7oNYOxdr7VRjb1ep8Bl3QYwRmvj32v1urckPoDWR9T69a8tOoBextPL57GG6ABAAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDR/O3QjHb4rdWtfx+SABjs0s8U7P9bqyF4BCKaAIJM+amwW7+21Z84E0CYVoe6FAEEEsEnAYQSwY4AgolAAPHSIxAA0REIgKrKjUAAfEiMQAAcSYtAAJxJikAAXJQSgQC4KiECAQTxj2ucE0AYERwTQKBWf3hlCQIIJYIdAQQTgQDipUcgAKIjEABVlRuBAPiQGIEAOJIWgQA4kxSBALgoJQIBcFVCBALgqp6/B2gv+i/HTfgffK+UPxsnAGdSxl8lAE4kjb9KABxIG3+VAHiXOP4qAVC5468SQLzk8VcJIFr6+KsEEMv4d6LfCOvprf4xgzb+T06AMPeMv6cbxSkBBDH+cwLgqt7HXyUArkgYf5UAuCBl/FUC4ETS+KsEwIG08VcJgHeJ468SAJU7/ioBxEsef5UAoqWPv0oAsYx/RwCBjP+TAMIY/zEBBJky/lu/ttWwBEC06B+IYZz9Xf7w26pbvfPvCYDRWh/9IY9ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANGeX17fnta+CFjDy+vbkxOAaNH/SN7hv3ZIJicA0Z6rds9Ca18IPNJ+804AogmAaB8BeAwixeHWuz0Bfv34tvYlbIo/j8u6DQCGOHvs+f3z+581LmRJyV/vd+c/dvqoH/FGmBFwzdkjkBfD9OrStr0GINrFAJwC9Obapq+eACKgF19t2SMQ0b4MwClA625t+OYJIAJaNWS7gx6BREBrhm7WawCiDQ7AKUArxmx11AkgArZu7EZHPwKJgK26Z5uTxtzjd47Snik35Ukvgp0GrG3qBid/FUgErGWO7c06Xo9EPMKcN91Z3wdwGrC0uTe22GCdBsxpqZvr4ndsITDF0k8VD31kEQNDPPJRerVndjFwaK3Xj5t50SqILFv5gslfyy6BfAIvJcwAAAAASUVORK5CYII=">
 <link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAFBklEQVR4nO3dvXXbWBSF0SutKUKpg8ldkiqYYlyBS1LuYFJ3YQcUJf6KAAEQeO/sHc5aliHP+fBAUbKfaiN+//z+Z+1r4HFeXt+e1r6GqqrVLsLgObRWEA/9TY2eIR4Zw+K/kdEzxdIxLPbBDZ85LRXC7B/U8FnS3CE8z/nBjJ+lzb2xWWoyfNYwx2kw+QQwftYyx/YmBWD8rG3qBu86QgyfLbrnkWj0CWD8bNU92xwVgPGzdWM3OjgA46cVY7Y66/sA0JpBAbj705qhm70ZgPHTqiHb/TIA46d1tzbsNQDRrgbg7k8vvtryxQCMn95c27RHIKKdBeDuT68ubdsJQLSjANz96d3pxp0ARBMA0T4C8PhDisOtOwGIJgCiPVd5/CHPfvNOAKIJgGgCINqT53+SOQGI9s/aF7BF//73/9qXcNWvH9/WvoSueAQ6sOXhnxLCPDwCvWtp/FXtXe9WCaDaHVOr170l8QG0PqLWr39t0QH0Mp5ePo81xAbQ22h6+3weJTKAXsfS6+e1pLgAeh9J75/f3KLeB7hnHFv4enur192CmBOg5RHdcx1OgmEiAmh5/HsiWEb3AfQw/j0RzK/rAHoa/54I5tV1AGNtffx7rVxnC7oNYOxdr7VRjb1ep8Bl3QYwRmvj32v1urckPoDWR9T69a8tOoBextPL57GG6ABAAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDR/O3QjHb4rdWtfx+SABjs0s8U7P9bqyF4BCKaAIJM+amwW7+21Z84E0CYVoe6FAEEEsEnAYQSwY4AgolAAPHSIxAA0REIgKrKjUAAfEiMQAAcSYtAAJxJikAAXJQSgQC4KiECAQTxj2ucE0AYERwTQKBWf3hlCQIIJYIdAQQTgQDipUcgAKIjEABVlRuBAPiQGIEAOJIWgQA4kxSBALgoJQIBcFVCBALgqp6/B2gv+i/HTfgffK+UPxsnAGdSxl8lAE4kjb9KABxIG3+VAHiXOP4qAVC5468SQLzk8VcJIFr6+KsEEMv4d6LfCOvprf4xgzb+T06AMPeMv6cbxSkBBDH+cwLgqt7HXyUArkgYf5UAuCBl/FUC4ETS+KsEwIG08VcJgHeJ468SAJU7/ioBxEsef5UAoqWPv0oAsYx/RwCBjP+TAMIY/zEBBJky/lu/ttWwBEC06B+IYZz9Xf7w26pbvfPvCYDRWh/9IY9ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANGeX17fnta+CFjDy+vbkxOAaNH/SN7hv3ZIJicA0Z6rds9Ca18IPNJ+804AogmAaB8BeAwixeHWuz0Bfv34tvYlbIo/j8u6DQCGOHvs+f3z+581LmRJyV/vd+c/dvqoH/FGmBFwzdkjkBfD9OrStr0GINrFAJwC9Obapq+eACKgF19t2SMQ0b4MwClA625t+OYJIAJaNWS7gx6BREBrhm7WawCiDQ7AKUArxmx11AkgArZu7EZHPwKJgK26Z5uTxtzjd47Snik35Ukvgp0GrG3qBid/FUgErGWO7c06Xo9EPMKcN91Z3wdwGrC0uTe22GCdBsxpqZvr4ndsITDF0k8VD31kEQNDPPJRerVndjFwaK3Xj5t50SqILFv5gslfyy6BfAIvJcwAAAAASUVORK5CYII=">
@@ -424,6 +425,49 @@ footer a{color:var(--mut);text-decoration:underline}
   padding:8px;border-radius:6px;cursor:pointer;text-align:center;
   text-decoration:none;
 }
+
+/* ── Route search ── */
+.map-route-bar{
+  display:none;padding:10px 14px;border-bottom:1px solid var(--brd);
+  background:var(--bg);flex-shrink:0;gap:8px;flex-direction:column;
+}
+.map-route-bar.visible{display:flex}
+.route-row{display:flex;gap:7px;align-items:center}
+.route-icon{font-size:14px;flex-shrink:0;width:20px;text-align:center}
+.route-input{
+  flex:1;background:var(--surf);border:1px solid var(--brd2);color:var(--tx);
+  font-family:var(--fm);font-size:0.8rem;padding:8px 12px;border-radius:6px;
+  outline:none;transition:border-color .2s;
+}
+.route-input:focus{border-color:var(--am)}
+.route-input::placeholder{color:var(--mut)}
+.btn-route{background:var(--am);color:#0d0e0f;border:none;font-family:var(--fm);font-size:0.78rem;font-weight:500;padding:8px 14px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:opacity .15s}
+.btn-route:hover{opacity:.88}
+.btn-route:disabled{opacity:.4;cursor:not-allowed}
+.btn-route-cancel{background:var(--surf);color:var(--tx2);border:1px solid var(--brd2);font-family:var(--fm);font-size:0.78rem;padding:8px 12px;border-radius:6px;cursor:pointer}
+.route-suggest{background:var(--surf2);border:1px solid var(--brd2);border-radius:6px;overflow:hidden;margin-top:2px}
+.route-sug-item{padding:8px 12px;font-size:0.78rem;cursor:pointer;color:var(--tx);transition:background .1s;border-bottom:1px solid var(--brd)}
+.route-sug-item:last-child{border-bottom:none}
+.route-sug-item:hover{background:var(--surf3)}
+.route-sug-sub{font-size:0.65rem;color:var(--mut)}
+.route-legend{display:flex;align-items:center;gap:12px;font-size:0.68rem;color:var(--mut);padding-top:4px}
+.route-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* ── Install banner ── */
+.install-banner{
+  position:fixed;bottom:calc(16px + var(--safe-bottom));left:50%;
+  transform:translateX(-50%);
+  background:var(--surf);border:1px solid var(--am-b);border-radius:10px;
+  padding:12px 16px;display:none;align-items:center;gap:12px;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);z-index:300;
+  max-width:340px;width:calc(100% - 32px);
+  animation:slideUp .3s ease;
+}
+.install-banner.visible{display:flex}
+.install-banner-text{flex:1;font-size:0.78rem;color:var(--tx);line-height:1.4}
+.install-banner-text small{color:var(--mut);font-size:0.68rem;display:block;margin-top:2px}
+.btn-install{background:var(--am);color:#0d0e0f;border:none;font-family:var(--fm);font-size:0.75rem;font-weight:500;padding:7px 13px;border-radius:6px;cursor:pointer;white-space:nowrap}
+.btn-install-close{background:none;border:none;color:var(--mut);cursor:pointer;font-size:16px;padding:2px;line-height:1}
 </style>
 </head>
 <body>
@@ -621,8 +665,31 @@ footer a{color:var(--mut);text-decoration:underline}
         </div>
         <div class="map-title">Mappa distributori <small>Carburanti Italia</small></div>
       </div>
-      <button class="btn-close-map" onclick="closeMapView()">✕ Chiudi</button>
+      <div style="display:flex;gap:6px">
+        <button class="btn-close-map" id="btn-toggle-route" onclick="toggleRouteBar()" style="border-color:var(--brd2)">🛣 Percorso</button>
+        <button class="btn-close-map" onclick="closeMapView()">✕ Chiudi</button>
+      </div>
     </div>
+    <!-- ROUTE BAR -->
+    <div class="map-route-bar" id="map-route-bar">
+      <div class="route-row">
+        <span class="route-icon">🔵</span>
+        <input class="route-input" id="route-from" placeholder="Partenza (lascia vuoto per posizione attuale)" />
+      </div>
+      <div class="route-row">
+        <span class="route-icon">🔴</span>
+        <input class="route-input" id="route-to" placeholder="Destinazione — es. Roma, Via Nazionale 10…" />
+        <button class="btn-route" id="btn-calc-route" onclick="calcRoute()">Calcola</button>
+        <button class="btn-route-cancel" onclick="clearRoute()" title="Cancella percorso">✕</button>
+      </div>
+      <div id="route-suggest" style="display:none" class="route-suggest"></div>
+      <div class="route-legend" id="route-legend" style="display:none">
+        <div class="route-legend-dot" style="background:#4caf7d"></div>Economico
+        <div class="route-legend-dot" style="background:#e8a030"></div>Nella media
+        <div class="route-legend-dot" style="background:#e05a4a"></div>Caro
+      </div>
+    </div>
+
     <div class="map-fuel-row" id="map-fuel-row">
       <button class="fb on" data-mf="Benzina" onclick="setMapFuel(this)">Benzina</button>
       <button class="fb" data-mf="Diesel" onclick="setMapFuel(this)">Diesel</button>
@@ -640,6 +707,17 @@ footer a{color:var(--mut);text-decoration:underline}
         <button class="map-ctrl-btn" id="map-reload-btn" onclick="loadMapStations()" disabled>↻ Aggiorna area</button>
       </div>
     </div>
+  </div>
+
+
+  <!-- INSTALL BANNER -->
+  <div class="install-banner" id="install-banner">
+    <div class="install-banner-text">
+      Installa l'app
+      <small>Aggiungila alla schermata Home per usarla offline</small>
+    </div>
+    <button class="btn-install" id="btn-install">Installa</button>
+    <button class="btn-install-close" onclick="dismissInstall()">✕</button>
   </div>
 
   <!-- FAV EDIT MODAL -->
@@ -1045,6 +1123,199 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 
 
+
+
+// ── ROUTE ────────────────────────────────────────────────────
+let _routeLayer = null;
+let _routeMarkers = [];
+let _routeActive = false;
+let _suggestTimer2 = null;
+
+function toggleRouteBar() {
+  const bar = document.getElementById('map-route-bar');
+  const btn = document.getElementById('btn-toggle-route');
+  const visible = bar.classList.toggle('visible');
+  btn.style.background = visible ? 'var(--am)' : '';
+  btn.style.color = visible ? '#0d0e0f' : '';
+  if (!visible) clearRoute();
+}
+
+// Geocode via Nominatim
+async function geocode(q) {
+  const res = await fetch(
+    `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=5&accept-language=it`,
+    { headers: { 'User-Agent': 'OsservaPrezziCarburanti/1.0' } }
+  );
+  return res.json();
+}
+
+// Live suggest for destination
+document.addEventListener('DOMContentLoaded', () => {
+  const toInput = document.getElementById('route-to');
+  if (toInput) {
+    toInput.addEventListener('input', () => {
+      clearTimeout(_suggestTimer2);
+      const q = toInput.value.trim();
+      if (q.length < 3) { document.getElementById('route-suggest').style.display = 'none'; return; }
+      _suggestTimer2 = setTimeout(async () => {
+        const results = await geocode(q);
+        const box = document.getElementById('route-suggest');
+        if (!results.length) { box.style.display = 'none'; return; }
+        box.innerHTML = '';
+        results.slice(0, 4).forEach(r => {
+          const div = document.createElement('div');
+          div.className = 'route-sug-item';
+          div.innerHTML = `<div>${esc(r.display_name.split(',')[0])}</div><div class="route-sug-sub">${esc(r.display_name.split(',').slice(1,3).join(','))}</div>`;
+          div.onclick = () => {
+            toInput.value = r.display_name.split(',')[0];
+            toInput.dataset.lat = r.lat;
+            toInput.dataset.lng = r.lon;
+            box.style.display = 'none';
+          };
+          box.appendChild(div);
+        });
+        box.style.display = 'block';
+      }, 350);
+    });
+    toInput.addEventListener('keydown', e => { if(e.key === 'Enter') calcRoute(); });
+  }
+});
+
+async function calcRoute() {
+  const btn = document.getElementById('btn-calc-route');
+  btn.disabled = true;
+  btn.textContent = '⏳';
+  setMapStatus('Calcolo percorso…');
+  clearRoute(false);
+
+  try {
+    // Get start coords
+    let startLat, startLng;
+    const fromVal = document.getElementById('route-from').value.trim();
+    if (fromVal) {
+      const res = await geocode(fromVal);
+      if (!res.length) throw new Error('Partenza non trovata');
+      startLat = parseFloat(res[0].lat);
+      startLng = parseFloat(res[0].lon);
+    } else if (_mapCenter) {
+      startLat = _mapCenter.lat;
+      startLng = _mapCenter.lng;
+    } else {
+      // Try to geolocate
+      await new Promise((res, rej) => {
+        navigator.geolocation.getCurrentPosition(pos => {
+          startLat = pos.coords.latitude;
+          startLng = pos.coords.longitude;
+          _mapCenter = { lat: startLat, lng: startLng };
+          res();
+        }, rej, { timeout: 8000 });
+      });
+    }
+
+    // Get end coords
+    const toInput = document.getElementById('route-to');
+    let endLat, endLng;
+    if (toInput.dataset.lat) {
+      endLat = parseFloat(toInput.dataset.lat);
+      endLng = parseFloat(toInput.dataset.lng);
+    } else {
+      const res = await geocode(toInput.value.trim());
+      if (!res.length) throw new Error('Destinazione non trovata');
+      endLat = parseFloat(res[0].lat);
+      endLng = parseFloat(res[0].lon);
+    }
+
+    // Get route from OSRM (free, no key)
+    setMapStatus('Calcolo itinerario…');
+    const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${startLng},${startLat};${endLng},${endLat}?overview=full&geometries=geojson`;
+    const osrmRes = await fetch(osrmUrl);
+    const osrmData = await osrmRes.json();
+    if (!osrmData.routes || !osrmData.routes.length) throw new Error('Percorso non trovato');
+
+    const route = osrmData.routes[0];
+    const coords = route.geometry.coordinates; // [lng, lat]
+    const distKm = Math.round(route.distance / 1000);
+    const durMin = Math.round(route.duration / 60);
+
+    // Draw route on map
+    const latlngs = coords.map(c => [c[1], c[0]]);
+    _routeLayer = L.polyline(latlngs, {
+      color: '#e8a030', weight: 4, opacity: 0.8,
+      dashArray: null,
+    }).addTo(_map);
+    _map.fitBounds(_routeLayer.getBounds(), { padding: [40, 40] });
+
+    // Start/end markers
+    const startIcon = L.divIcon({ className: '', html: '<div style="background:#4caf7d;width:14px;height:14px;border-radius:50%;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.5)"></div>', iconAnchor:[7,7] });
+    const endIcon = L.divIcon({ className: '', html: '<div style="background:#e05a4a;width:14px;height:14px;border-radius:50%;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.5)"></div>', iconAnchor:[7,7] });
+    _routeMarkers.push(L.marker([startLat, startLng], { icon: startIcon }).addTo(_map).bindPopup('<div class="map-popup"><div class="map-popup-name">🔵 Partenza</div></div>'));
+    _routeMarkers.push(L.marker([endLat, endLng], { icon: endIcon }).addTo(_map).bindPopup(`<div class="map-popup"><div class="map-popup-name">🔴 Destinazione</div><div class="map-popup-unit">${distKm} km · ~${durMin} min</div></div>`));
+
+    // Find stations along route
+    setMapStatus('Cerco distributori lungo il percorso…');
+    const bounds = _routeLayer.getBounds();
+    // Expand bbox slightly
+    const pad = 0.05;
+    const stationsData = await api(
+      `/api/bbox?lat1=${bounds.getSouth()-pad}&lng1=${bounds.getWest()-pad}&lat2=${bounds.getNorth()+pad}&lng2=${bounds.getEast()+pad}&carburante=${encodeURIComponent(_mapFuel)}&self=${_mapSelf?1:0}`
+    );
+
+    // Filter to stations within 5km of route line
+    const nearRoute = stationsData.filter(s => distToPolyline(s.lat, s.lng, coords) <= 5);
+    renderMapMarkers(nearRoute, startLat, startLng);
+
+    _routeActive = true;
+    document.getElementById('route-legend').style.display = 'flex';
+    setMapStatus(`${nearRoute.length} distributori lungo i ${distKm} km del percorso`, nearRoute.length > 0);
+
+  } catch(e) {
+    setMapStatus('Errore: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Calcola';
+  }
+}
+
+// Distance from point to polyline (in km), coords = [[lng,lat],...]
+function distToPolyline(lat, lng, coords) {
+  let minDist = Infinity;
+  for (let i = 0; i < coords.length - 1; i++) {
+    const d = distToSegment(lat, lng, coords[i][1], coords[i][0], coords[i+1][1], coords[i+1][0]);
+    if (d < minDist) minDist = d;
+  }
+  return minDist;
+}
+
+function distToSegment(lat, lng, lat1, lng1, lat2, lng2) {
+  const dx = lat2 - lat1, dy = lng2 - lng1;
+  if (dx === 0 && dy === 0) return haversineClient(lat, lng, lat1, lng1);
+  let t = ((lat - lat1) * dx + (lng - lng1) * dy) / (dx*dx + dy*dy);
+  t = Math.max(0, Math.min(1, t));
+  return haversineClient(lat, lng, lat1 + t*dx, lng1 + t*dy);
+}
+
+function haversineClient(lat1, lng1, lat2, lng2) {
+  const R = 6371, dLat = (lat2-lat1)*Math.PI/180, dLng = (lng2-lng1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function clearRoute(resetUI = true) {
+  if (_routeLayer) { _routeLayer.remove(); _routeLayer = null; }
+  _routeMarkers.forEach(m => m.remove());
+  _routeMarkers = [];
+  _mapMarkers.forEach(m => m.remove());
+  _mapMarkers = [];
+  _routeActive = false;
+  document.getElementById('route-legend').style.display = 'none';
+  if (resetUI) {
+    document.getElementById('route-to').value = '';
+    document.getElementById('route-to').dataset.lat = '';
+    document.getElementById('route-to').dataset.lng = '';
+    document.getElementById('route-suggest').style.display = 'none';
+    setMapStatus('Percorso cancellato', true);
+  }
+}
 
 // ── MAP VIEW ──────────────────────────────────────────────────
 let _map = null;
@@ -1699,5 +1970,53 @@ document.getElementById('fav-edit-overlay').addEventListener('click', e => {
 
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(r => console.log('SW registrato:', r.scope))
+      .catch(e => console.log('SW fallito:', e));
+  });
+}
+// Handle shortcut ?action=gps
+const _urlParams = new URLSearchParams(window.location.search);
+if (_urlParams.get('action') === 'gps') {
+  window.addEventListener('DOMContentLoaded', () => setTimeout(doGPS, 800));
+}
+
+// ── PWA Install ────────────────────────────────────────────────
+let _installPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _installPrompt = e;
+  // Show banner after 3 seconds if not dismissed before
+  const dismissed = localStorage.getItem('opf_install_dismissed');
+  if (!dismissed) {
+    setTimeout(() => document.getElementById('install-banner').classList.add('visible'), 3000);
+  }
+});
+
+document.getElementById('btn-install')?.addEventListener('click', async () => {
+  if (!_installPrompt) return;
+  _installPrompt.prompt();
+  const { outcome } = await _installPrompt.userChoice;
+  if (outcome === 'accepted') {
+    document.getElementById('install-banner').classList.remove('visible');
+  }
+  _installPrompt = null;
+});
+
+function dismissInstall() {
+  document.getElementById('install-banner').classList.remove('visible');
+  localStorage.setItem('opf_install_dismissed', '1');
+}
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-banner').classList.remove('visible');
+  _installPrompt = null;
+});
+
+</script>
 </body>
 </html>
