@@ -1,0 +1,35 @@
+{
+  "name": "OsservaPrezzi Carburanti",
+  "short_name": "Carburanti",
+  "description": "Prezzi carburanti in tempo reale da MIMIT",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f1012",
+  "theme_color": "#e8a030",
+  "orientation": "portrait-primary",
+  "lang": "it",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "travel"],
+  "shortcuts": [
+    {
+      "name": "Vicino a me",
+      "short_name": "GPS",
+      "description": "Trova distributori vicino a te",
+      "url": "/?action=gps",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
