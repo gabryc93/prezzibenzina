@@ -45,33 +45,21 @@ body{
   position:fixed;inset:0;background:var(--bg);z-index:200;
   display:flex;align-items:center;justify-content:center;padding:24px;
 }
-.setup-card{
-  background:var(--surf);border:1px solid var(--brd2);
-  border-radius:14px;padding:32px 28px;max-width:440px;width:100%;
-}
-.setup-logo{display:flex;align-items:center;gap:12px;margin-bottom:24px}
-.s-icon{width:42px;height:42px;background:var(--am);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.setup-logo h1{font-family:var(--fd);font-weight:700;font-size:1.15rem;letter-spacing:-.02em;line-height:1.2}
-.setup-logo small{font-size:0.6rem;color:var(--mut);display:block;text-transform:uppercase;letter-spacing:.1em}
-.setup-card p{font-size:0.8rem;color:var(--tx2);margin-bottom:18px;line-height:1.7}
-.setup-card label{display:block;font-size:0.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
-.setup-card input{
-  width:100%;background:var(--surf2);border:1px solid var(--brd2);color:var(--tx);
-  font-family:var(--fm);font-size:0.82rem;padding:11px 14px;border-radius:7px;
-  outline:none;transition:border-color .2s;margin-bottom:8px;
-}
-.setup-card input:focus{border-color:var(--am)}
-.setup-hint{font-size:0.7rem;color:var(--mut);margin-bottom:20px}
-.setup-hint a{color:var(--am);text-decoration:none}
-.btn-full{
-  width:100%;background:var(--am);color:#0d0e0f;border:none;
-  font-family:var(--fm);font-size:0.85rem;font-weight:500;
-  padding:12px;border-radius:7px;cursor:pointer;
-  transition:opacity .2s;
-}
-.btn-full:hover{opacity:.88}
-.btn-full:disabled{opacity:.4;cursor:not-allowed}
-.setup-err{font-size:0.72rem;color:var(--rd);margin-top:8px;text-align:center;min-height:16px}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* ── LOADER ───────────────────────────────────────────────── */
 #loader{
@@ -508,30 +496,6 @@ footer a{color:var(--mut);text-decoration:underline}
 </head>
 <body>
 
-<!-- SETUP: inserisci URL del Worker -->
-<div id="setup" style="display:none">
-  <div class="setup-card">
-    <div class="setup-logo">
-      <div class="s-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0d0e0f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 22V4a2 2 0 012-2h6a2 2 0 012 2v18"/><path d="M5 12h10"/>
-          <path d="M15 7l4 4-4 4"/><path d="M19 7v8"/>
-        </svg>
-      </div>
-      <div><h1>OsservaPrezzi</h1><small>Carburanti Italia</small></div>
-    </div>
-    <p>Inserisci l'URL del tuo Cloudflare Worker. Viene salvato solo su questo dispositivo.</p>
-    <label for="worker-url">URL Cloudflare Worker</label>
-    <input type="url" id="worker-url" placeholder="https://opf.TUO-NOME.workers.dev" autocomplete="off" />
-    <div class="setup-hint">
-      Segui le istruzioni nel file <strong>ISTRUZIONI.txt</strong> per creare il Worker gratis su
-      <a href="https://workers.cloudflare.com" target="_blank">workers.cloudflare.com</a>
-    </div>
-    <button class="btn-full" onclick="saveWorkerUrl()">Connetti →</button>
-    <div class="setup-err" id="setup-err"></div>
-  </div>
-</div>
-
 <!-- LOADER -->
 <div id="loader">
   <div class="ld-logo">
@@ -564,7 +528,7 @@ footer a{color:var(--mut);text-decoration:underline}
     <div class="hdr-r">
       <span class="data-badge" id="data-badge">—</span>
       <span class="ts-badge" id="ts-badge">—</span>
-      <button class="btn-xs" id="btn-open-favs" onclick="openFavView()" title="Preferiti" style="font-size:15px;padding:4px 8px">★<span id="fav-hdr-count" style="font-size:0.6rem;vertical-align:top"></span></button>
+      <button class="btn-xs" id="btn-open-favs" onclick="openFavView()" title="Preferiti">★<span id="fav-hdr-count" style="font-size:0.6rem;vertical-align:super;line-height:0"></span></button>
       <button class="btn-xs" onclick="openMapView()">🗺 Mappa</button>
     </div>
   </header>
@@ -714,6 +678,13 @@ footer a{color:var(--mut);text-decoration:underline}
         <button class="btn-close-map" onclick="closeMapView()">✕ Chiudi</button>
       </div>
     </div>
+    <!-- MAP PLACE SEARCH -->
+    <div class="map-search-bar">
+      <input type="text" id="map-place-input" placeholder="🔍  Cerca un posto…" autocomplete="off" autocorrect="off" />
+      <button class="btn-route" id="btn-map-place" onclick="mapSearchPlace()">Vai</button>
+      <div class="map-place-sug" id="map-place-sug" style="display:none"></div>
+    </div>
+
     <div class="map-fuel-row" id="map-fuel-row">
       <button class="fb on" data-mf="Benzina" onclick="setMapFuel(this)">Benzina</button>
       <button class="fb" data-mf="Diesel" onclick="setMapFuel(this)">Diesel</button>
@@ -861,39 +832,8 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('qinput').addEventListener('input', onInput);
   document.getElementById('qinput').addEventListener('keydown', e => { if(e.key==='Enter'){ document.getElementById('sug').style.display='none'; doSearch(); } });
   document.addEventListener('click', e => { if(!e.target.closest('#sug') && !e.target.closest('#qinput')) document.getElementById('sug').style.display='none'; });
-  document.getElementById('worker-url').addEventListener('keydown', e => { if(e.key==='Enter') saveWorkerUrl(); });
 });
 
-// ── Setup ─────────────────────────────────────────────────────
-async function saveWorkerUrl() {
-  const url = document.getElementById('worker-url').value.trim().replace(/\/$/, '');
-  const err = document.getElementById('setup-err');
-  err.textContent = '';
-  if (!url.startsWith('https://')) { err.textContent = "L'URL deve iniziare con https://"; return; }
-  const btn = document.querySelector('#setup .btn-full');
-  btn.disabled = true; btn.textContent = 'Verifico…';
-  try {
-    const res = await fetch(url + '/');
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    await res.json();
-    WORKER = url;
-    localStorage.setItem('opf_worker', url);
-    document.getElementById('setup').style.display = 'none';
-    startApp();
-  } catch(e) {
-    err.textContent = 'Worker non raggiungibile: ' + e.message;
-    btn.disabled = false; btn.textContent = 'Connetti →';
-  }
-}
-
-function resetWorker() {
-  if (!confirm('Cambiare Worker URL?')) return;
-  localStorage.removeItem('opf_worker');
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('setup').style.display = 'flex';
-  document.getElementById('worker-url').value = WORKER;
-  WORKER = '';
-}
 
 // ── App start ─────────────────────────────────────────────────
 function startApp() {
