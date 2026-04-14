@@ -443,6 +443,9 @@ footer a{color:var(--mut);text-decoration:underline}
 }
 .map-search-bar input:focus{border-color:var(--am)}
 .map-search-bar input::placeholder{color:var(--mut)}
+.btn-route{background:var(--am);color:#0d0e0f;border:none;font-family:var(--fm);font-size:0.78rem;font-weight:500;padding:8px 14px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:opacity .15s}
+.btn-route:hover{opacity:.88}
+.btn-route:disabled{opacity:.4;cursor:not-allowed}
 .map-search-bar .btn-route{padding:8px 13px}
 .map-place-sug{
   position:absolute;top:100%;left:14px;right:14px;z-index:2000;
@@ -1121,8 +1124,14 @@ function openMapView() {
   document.getElementById('map-view').classList.add('visible');
   document.body.style.overflow = 'hidden';
   if (!_mapInitialized) {
-    initMap();
-    _mapInitialized = true;
+    // Wait one frame so the div is visible before Leaflet measures it
+    requestAnimationFrame(() => {
+      initMap();
+      _mapInitialized = true;
+    });
+  } else if (_map) {
+    // Leaflet needs to recalculate size when view becomes visible again
+    setTimeout(() => _map.invalidateSize(), 50);
   }
 }
 
