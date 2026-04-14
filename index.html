@@ -468,6 +468,55 @@ footer a{color:var(--mut);text-decoration:underline}
 .install-banner-text small{color:var(--mut);font-size:0.68rem;display:block;margin-top:2px}
 .btn-install{background:var(--am);color:#0d0e0f;border:none;font-family:var(--fm);font-size:0.75rem;font-weight:500;padding:7px 13px;border-radius:6px;cursor:pointer;white-space:nowrap}
 .btn-install-close{background:none;border:none;color:var(--mut);cursor:pointer;font-size:16px;padding:2px;line-height:1}
+
+/* ── Map place search ── */
+.map-search-bar{
+  display:flex;gap:7px;padding:10px 14px;border-bottom:1px solid var(--brd);
+  background:var(--bg);flex-shrink:0;position:relative;
+}
+.map-search-bar input{
+  flex:1;background:var(--surf);border:1px solid var(--brd2);color:var(--tx);
+  font-family:var(--fm);font-size:0.8rem;padding:8px 12px;border-radius:6px;
+  outline:none;transition:border-color .2s;
+}
+.map-search-bar input:focus{border-color:var(--am)}
+.map-search-bar input::placeholder{color:var(--mut)}
+.map-search-bar .btn-route{padding:8px 13px}
+.map-place-sug{
+  position:absolute;top:100%;left:14px;right:14px;z-index:2000;
+  background:var(--surf2);border:1px solid var(--brd2);border-radius:7px;
+  overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.5);
+}
+
+/* ── Fav compare ── */
+.compare-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:70;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px);animation:fadeIn .2s ease}
+@media(min-width:600px){.compare-modal-overlay{align-items:center}}
+.compare-modal{background:var(--surf);border:1px solid var(--brd2);border-radius:14px 14px 0 0;width:100%;max-width:520px;padding:20px 20px calc(20px + var(--safe-bottom));animation:slideUp .25s ease;max-height:85vh;overflow-y:auto}
+@media(min-width:600px){.compare-modal{border-radius:14px;margin:16px}}
+.compare-modal h3{font-family:var(--fd);font-weight:700;font-size:1rem;margin-bottom:4px;color:var(--tx)}
+.compare-modal p{font-size:0.75rem;color:var(--mut);margin-bottom:16px}
+.radius-row{display:flex;align-items:center;gap:12px;margin-bottom:20px;background:var(--surf2);border-radius:8px;padding:12px 14px}
+.radius-row label{font-size:0.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);white-space:nowrap}
+.radius-row input[type=range]{flex:1}
+.radius-val{font-family:var(--fd);font-size:1.1rem;font-weight:700;color:var(--am);min-width:40px;text-align:right}
+.btn-compare-go{width:100%;background:var(--am);color:#0d0e0f;border:none;font-family:var(--fm);font-size:0.85rem;font-weight:500;padding:12px;border-radius:7px;cursor:pointer;margin-bottom:16px;transition:opacity .15s}
+.btn-compare-go:hover{opacity:.88}
+.btn-compare-go:disabled{opacity:.4;cursor:not-allowed}
+.compare-results{display:flex;flex-direction:column;gap:8px}
+.compare-card{background:var(--surf2);border:1px solid var(--brd);border-radius:8px;padding:11px 14px;display:grid;grid-template-columns:28px 1fr auto;gap:6px 10px;align-items:center}
+.compare-card.best{border-color:var(--gn);background:var(--gn-d)}
+.compare-card.fav-ref{border-color:var(--am);background:var(--am-d)}
+.compare-rank{font-family:var(--fd);font-size:1.1rem;font-weight:700;color:var(--mut);text-align:center}
+.compare-rank.r1{color:var(--gn)}
+.compare-info .compare-name{font-size:0.8rem;font-weight:500;color:var(--tx)}
+.compare-info .compare-addr{font-size:0.68rem;color:var(--mut)}
+.compare-info .compare-dist{font-size:0.65rem;color:var(--bl);margin-top:2px}
+.compare-price-col{text-align:right}
+.compare-price{font-family:var(--fd);font-size:1.25rem;font-weight:700;color:var(--tx)}
+.compare-price.best-p{color:var(--gn)}
+.compare-saving{font-size:0.65rem;color:var(--gn);margin-top:2px;text-align:right}
+.compare-label{font-size:0.6rem;background:var(--am-d);color:var(--am);border:1px solid var(--am-b);padding:1px 6px;border-radius:3px;display:inline-block;margin-top:3px}
+.compare-close{background:var(--surf2);border:1px solid var(--brd2);color:var(--tx2);font-family:var(--fm);font-size:0.8rem;padding:10px;border-radius:7px;cursor:pointer;width:100%;margin-top:8px}
 </style>
 </head>
 <body>
@@ -529,7 +578,6 @@ footer a{color:var(--mut);text-decoration:underline}
       <span class="data-badge" id="data-badge">—</span>
       <span class="ts-badge" id="ts-badge">—</span>
       <button class="btn-xs" onclick="openMapView()">🗺 Mappa</button>
-      <button class="btn-xs" onclick="resetWorker()">⚙</button>
     </div>
   </header>
 
@@ -690,6 +738,13 @@ footer a{color:var(--mut);text-decoration:underline}
       </div>
     </div>
 
+    <!-- MAP PLACE SEARCH -->
+    <div class="map-search-bar">
+      <input type="text" id="map-place-input" placeholder="🔍  Cerca un posto sulla mappa…" autocomplete="off" />
+      <button class="btn-route" id="btn-map-place" onclick="mapSearchPlace()">Vai</button>
+      <div class="map-place-sug" id="map-place-sug" style="display:none"></div>
+    </div>
+
     <div class="map-fuel-row" id="map-fuel-row">
       <button class="fb on" data-mf="Benzina" onclick="setMapFuel(this)">Benzina</button>
       <button class="fb" data-mf="Diesel" onclick="setMapFuel(this)">Diesel</button>
@@ -718,6 +773,24 @@ footer a{color:var(--mut);text-decoration:underline}
     </div>
     <button class="btn-install" id="btn-install">Installa</button>
     <button class="btn-install-close" onclick="dismissInstall()">✕</button>
+  </div>
+
+
+  <!-- COMPARE MODAL -->
+  <div class="compare-modal-overlay hidden" id="compare-overlay">
+    <div class="compare-modal">
+      <h3>Confronta con i distributori vicini</h3>
+      <p id="compare-subtitle">Confronta il tuo preferito con quelli nell'area</p>
+      <div class="radius-row">
+        <label>Raggio</label>
+        <input type="range" id="compare-radius" min="5" max="20" step="1" value="10"
+          oninput="document.getElementById('compare-radius-val').textContent=this.value+' km'" />
+        <span class="radius-val" id="compare-radius-val">10 km</span>
+      </div>
+      <button class="btn-compare-go" id="btn-compare-go" onclick="runComparison()">Confronta</button>
+      <div class="compare-results" id="compare-results"></div>
+      <button class="compare-close" onclick="closeCompare()">Chiudi</button>
+    </div>
   </div>
 
   <!-- FAV EDIT MODAL -->
@@ -1251,22 +1324,37 @@ async function calcRoute() {
     _routeMarkers.push(L.marker([startLat, startLng], { icon: startIcon }).addTo(_map).bindPopup('<div class="map-popup"><div class="map-popup-name">🔵 Partenza</div></div>'));
     _routeMarkers.push(L.marker([endLat, endLng], { icon: endIcon }).addTo(_map).bindPopup(`<div class="map-popup"><div class="map-popup-name">🔴 Destinazione</div><div class="map-popup-unit">${distKm} km · ~${durMin} min</div></div>`));
 
-    // Find stations along route
+    // Find stations along route — sample points every ~20km for large routes
     setMapStatus('Cerco distributori lungo il percorso…');
     const bounds = _routeLayer.getBounds();
-    // Expand bbox slightly
-    const pad = 0.05;
-    const stationsData = await api(
-      `/api/bbox?lat1=${bounds.getSouth()-pad}&lng1=${bounds.getWest()-pad}&lat2=${bounds.getNorth()+pad}&lng2=${bounds.getEast()+pad}&carburante=${encodeURIComponent(_mapFuel)}&self=${_mapSelf?1:0}`
-    );
+    const pad = 0.08; // ~8km padding on each side
+    let stationsData = [];
+    try {
+      stationsData = await api(
+        `/api/bbox?lat1=${bounds.getSouth()-pad}&lng1=${bounds.getWest()-pad}&lat2=${bounds.getNorth()+pad}&lng2=${bounds.getEast()+pad}&carburante=${encodeURIComponent(_mapFuel)}&self=${_mapSelf?1:0}`
+      );
+    } catch(e) {
+      setMapStatus('Errore nel recupero stazioni: ' + e.message);
+    }
 
-    // Filter to stations within 5km of route line
-    const nearRoute = stationsData.filter(s => distToPolyline(s.lat, s.lng, coords) <= 5);
+    // Sample route coords (max 200 points for perf)
+    const step = Math.max(1, Math.floor(coords.length / 200));
+    const sampledCoords = coords.filter((_, i) => i % step === 0);
+
+    // Filter stations within 5km of any sampled route point
+    const nearRoute = stationsData.filter(s => {
+      if (!s.lat || !s.lng || isNaN(s.lat) || isNaN(s.lng)) return false;
+      return distToPolyline(s.lat, s.lng, sampledCoords) <= 5;
+    });
+
     renderMapMarkers(nearRoute, startLat, startLng);
-
     _routeActive = true;
     document.getElementById('route-legend').style.display = 'flex';
-    setMapStatus(`${nearRoute.length} distributori lungo i ${distKm} km del percorso`, nearRoute.length > 0);
+    const msg = nearRoute.length
+      ? `${nearRoute.length} distributori · ${distKm} km · ~${durMin} min`
+      : `Nessun distributore trovato entro 5km dal percorso`;
+    setMapStatus(msg, nearRoute.length > 0);
+    if (!nearRoute.length) setTimeout(() => setMapStatus(msg), 100);
 
   } catch(e) {
     setMapStatus('Errore: ' + e.message);
@@ -1340,6 +1428,56 @@ function closeMapView() {
   document.body.style.overflow = '';
 }
 
+
+// ── Map place search ─────────────────────────────────────────
+let _mapPlaceSugTimer = null;
+
+function initMapPlaceSearch() {
+  const inp = document.getElementById('map-place-input');
+  if (!inp || inp._inited) return;
+  inp._inited = true;
+  inp.addEventListener('input', () => {
+    clearTimeout(_mapPlaceSugTimer);
+    const q = inp.value.trim();
+    const sug = document.getElementById('map-place-sug');
+    if (q.length < 2) { sug.style.display = 'none'; return; }
+    _mapPlaceSugTimer = setTimeout(async () => {
+      const res = await geocode(q);
+      if (!res.length) { sug.style.display = 'none'; return; }
+      sug.innerHTML = '';
+      res.slice(0, 5).forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'route-sug-item';
+        div.innerHTML = `<div>${esc(r.display_name.split(',')[0])}</div><div class="route-sug-sub">${esc(r.display_name.split(',').slice(1,3).join(','))}</div>`;
+        div.onclick = () => {
+          inp.value = r.display_name.split(',')[0];
+          sug.style.display = 'none';
+          const lat = parseFloat(r.lat), lng = parseFloat(r.lon);
+          _map.setView([lat, lng], 14);
+          loadMapStations();
+        };
+        sug.appendChild(div);
+      });
+      sug.style.display = 'block';
+    }, 320);
+  });
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') mapSearchPlace(); });
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.map-search-bar')) document.getElementById('map-place-sug').style.display = 'none';
+  });
+}
+
+async function mapSearchPlace() {
+  const q = document.getElementById('map-place-input').value.trim();
+  if (!q) return;
+  const res = await geocode(q);
+  if (!res.length) { setMapStatus('Posto non trovato'); return; }
+  const lat = parseFloat(res[0].lat), lng = parseFloat(res[0].lon);
+  _map.setView([lat, lng], 14);
+  document.getElementById('map-place-sug').style.display = 'none';
+  loadMapStations();
+}
+
 function initMap() {
   _map = L.map('leaflet-map', {
     center: [41.9, 12.5], // Centro Italia
@@ -1362,6 +1500,7 @@ function initMap() {
   });
 
   // Auto-locate on open
+  initMapPlaceSearch();
   mapLocateMe();
 }
 
@@ -1962,8 +2101,130 @@ function closeModal(e) {
 
 // Close on ESC
 document.addEventListener('keydown', e => {
-  if(e.key === 'Escape') { closeModal(); closeFavModal(); }
+  if(e.key === 'Escape') { closeModal(); closeFavModal(); closeCompare(); }
 });
+
+// ── Fav comparison ─────────────────────────────────────────────
+let _compareFav = null;
+
+function openCompare(fav) {
+  if (!fav) return;
+  _compareFav = fav;
+  const name = fav.customName || fav.nome;
+  document.getElementById('compare-subtitle').textContent =
+    `Confronta "${name}" con i distributori per ${fav.carburante || 'Benzina'} nell'area`;
+  document.getElementById('compare-results').innerHTML = '';
+  document.getElementById('btn-compare-go').disabled = false;
+  document.getElementById('compare-overlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCompare() {
+  document.getElementById('compare-overlay').classList.add('hidden');
+  document.body.style.overflow = '';
+  _compareFav = null;
+}
+
+async function runComparison() {
+  if (!_compareFav) return;
+  const fav = _compareFav;
+  const radius = parseInt(document.getElementById('compare-radius').value);
+  const btn = document.getElementById('btn-compare-go');
+  btn.disabled = true;
+  btn.textContent = '⏳ Cerco…';
+  const resultsEl = document.getElementById('compare-results');
+  resultsEl.innerHTML = '<div style="color:var(--mut);font-size:.78rem;padding:8px 0">Cerco distributori nelle vicinanze…</div>';
+
+  try {
+    if (!fav.lat || !fav.lng || isNaN(fav.lat) || isNaN(fav.lng)) {
+      throw new Error('Coordinate non disponibili per questo preferito — riprova aggiungendolo di nuovo dai risultati GPS');
+    }
+    const carb = fav.carburante || 'Benzina';
+    const url = `/api/vicini?lat=${fav.lat}&lng=${fav.lng}&carburante=${encodeURIComponent(carb)}&self=0&raggio=${radius}`;
+    const stations = await api(url);
+
+    if (!stations.length) {
+      resultsEl.innerHTML = `<div style="color:var(--mut);font-size:.78rem;padding:8px 0">Nessun distributore trovato entro ${radius} km.</div>`;
+      return;
+    }
+
+    // Sort by price
+    stations.sort((a, b) => a.prezzo - b.prezzo);
+    const minPrice = stations[0].prezzo;
+    const favPrice = fav.prezzo;
+    const unit = carb.toLowerCase().includes('metano') ? 'kg' : 'litro';
+
+    // Find fav in list (by id or nearest price)
+    const favInList = stations.find(s => s.id === fav.id);
+
+    let html = '';
+
+    // Reference fav card (always shown first)
+    const favSaving = favPrice > minPrice ? ((favPrice - minPrice) * 50).toFixed(2) : null;
+    html += `<div class="compare-card fav-ref">
+      <div class="compare-rank" style="color:var(--am)">★</div>
+      <div class="compare-info">
+        <div class="compare-name">${esc(fav.customName || fav.nome)}</div>
+        <div class="compare-addr">${esc(fav.indirizzo || '')}</div>
+        <div class="compare-label">Il tuo preferito</div>
+      </div>
+      <div class="compare-price-col">
+        <div class="compare-price ${favPrice === minPrice ? 'best-p' : ''}">${favPrice.toFixed(3)}</div>
+        <div style="font-size:.6rem;color:var(--mut)">€/${unit}</div>
+        ${favSaving ? `<div class="compare-saving" style="color:var(--rd)">+${favSaving}€/50L</div>` : '<div style="font-size:.65rem;color:var(--gn)">Il più economico!</div>'}
+      </div>
+    </div>`;
+
+    // Top competitors (show up to 5, skip fav itself)
+    const others = stations.filter(s => s.id !== fav.id).slice(0, 5);
+    others.forEach((s, i) => {
+      const rank = i + 1;
+      const isBest = rank === 1;
+      const saving = favPrice > s.prezzo ? ((favPrice - s.prezzo) * 50).toFixed(2) : null;
+      const extra = s.prezzo > favPrice ? ((s.prezzo - favPrice) * 50).toFixed(2) : null;
+      html += `<div class="compare-card ${isBest ? 'best' : ''}">
+        <div class="compare-rank ${isBest ? 'r1' : ''}">${rank}</div>
+        <div class="compare-info">
+          <div class="compare-name">${esc(s.nome)}</div>
+          <div class="compare-addr">${esc(s.indirizzo)}</div>
+          ${s.distanza != null ? `<div class="compare-dist">📍 ${s.distanza} km</div>` : ''}
+          ${s.bandiera ? `<div style="font-size:.6rem;color:var(--mut)">${esc(s.bandiera)} · ${s.isSelf?'self':'servito'}</div>` : ''}
+        </div>
+        <div class="compare-price-col">
+          <div class="compare-price ${isBest ? 'best-p' : ''}">${s.prezzo.toFixed(3)}</div>
+          <div style="font-size:.6rem;color:var(--mut)">€/${unit}</div>
+          ${saving ? `<div class="compare-saving">risparmi ${saving}€/50L</div>` : ''}
+          ${extra ? `<div style="font-size:.65rem;color:var(--rd);text-align:right">+${extra}€/50L</div>` : ''}
+        </div>
+      </div>`;
+    });
+
+    // Summary
+    if (favPrice > minPrice) {
+      const totalSaving = ((favPrice - minPrice) * 50).toFixed(2);
+      html += `<div style="background:var(--gn-d);border:1px solid rgba(76,175,125,.3);border-radius:8px;padding:10px 14px;font-size:.78rem;color:var(--gn);margin-top:4px">
+        💡 Andando al distributore più economico risparmi <strong>${totalSaving}€</strong> ogni pieno da 50 litri
+      </div>`;
+    } else {
+      html += `<div style="background:var(--gn-d);border:1px solid rgba(76,175,125,.3);border-radius:8px;padding:10px 14px;font-size:.78rem;color:var(--gn);margin-top:4px">
+        ✅ Il tuo preferito è già il più economico nell'area!
+      </div>`;
+    }
+
+    resultsEl.innerHTML = html;
+  } catch(e) {
+    resultsEl.innerHTML = `<div style="color:var(--rd);font-size:.78rem;padding:8px 0">${e.message}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Confronta';
+  }
+}
+
+// Close compare on overlay click / ESC
+document.getElementById('compare-overlay')?.addEventListener('click', e => {
+  if (e.target === document.getElementById('compare-overlay')) closeCompare();
+});
+
 document.getElementById('fav-edit-overlay').addEventListener('click', e => {
   if (e.target === document.getElementById('fav-edit-overlay')) closeFavModal();
 });
