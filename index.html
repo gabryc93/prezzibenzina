@@ -650,6 +650,15 @@ footer a{color:var(--mut);text-decoration:underline}
     Dati: <a href="https://www.mimit.gov.it/it/open-data/elenco-dataset/carburanti-prezzi-praticati-e-anagrafica-degli-impianti" target="_blank">Open data MIMIT</a>
     · aggiornamento giornaliero ore 08:00 · Licenza IODL 2.0
   </footer>
+
+    <button class="btn-install" id="btn-install">Installa</button>
+    <button class="btn-install-close" onclick="dismissInstall()">✕</button>
+  </div>
+
+
+
+</div>
+
   <!-- FAV VIEW -->
   <div id="fav-view">
     <div class="fav-view-header">
@@ -708,17 +717,6 @@ footer a{color:var(--mut);text-decoration:underline}
   </div>
 
 
-  <!-- INSTALL BANNER -->
-  <div class="install-banner" id="install-banner">
-    <div class="install-banner-text">
-      Installa l'app
-      <small>Aggiungila alla schermata Home per usarla offline</small>
-    </div>
-    <button class="btn-install" id="btn-install">Installa</button>
-    <button class="btn-install-close" onclick="dismissInstall()">✕</button>
-  </div>
-
-
   <!-- COMPARE MODAL -->
   <div class="compare-modal-overlay hidden" id="compare-overlay">
     <div class="compare-modal">
@@ -736,6 +734,7 @@ footer a{color:var(--mut);text-decoration:underline}
     </div>
   </div>
 
+
   <!-- FAV EDIT MODAL -->
   <div class="fav-modal-overlay hidden" id="fav-edit-overlay">
     <div class="fav-modal">
@@ -751,6 +750,15 @@ footer a{color:var(--mut);text-decoration:underline}
       </div>
     </div>
   </div>
+
+
+  <!-- INSTALL BANNER -->
+  <div class="install-banner" id="install-banner">
+    <div class="install-banner-text">
+      Installa l'app
+      <small>Aggiungila alla schermata Home per usarla offline</small>
+    </div>
+
 
   <!-- MODAL DETTAGLIO -->
   <div class="overlay hidden" id="modal-overlay" onclick="closeModal(event)">
@@ -814,7 +822,6 @@ footer a{color:var(--mut);text-decoration:underline}
     </div>
   </div>
 
-</div>
 
 <script>
 let WORKER = 'https://osservaprezzi.gabrycois.workers.dev';
@@ -1124,14 +1131,12 @@ function openMapView() {
   document.getElementById('map-view').classList.add('visible');
   document.body.style.overflow = 'hidden';
   if (!_mapInitialized) {
-    // Wait one frame so the div is visible before Leaflet measures it
-    requestAnimationFrame(() => {
+    setTimeout(() => {
       initMap();
       _mapInitialized = true;
-    });
+    }, 150);
   } else if (_map) {
-    // Leaflet needs to recalculate size when view becomes visible again
-    setTimeout(() => _map.invalidateSize(), 50);
+    setTimeout(() => _map.invalidateSize(), 100);
   }
 }
 
