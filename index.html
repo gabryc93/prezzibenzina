@@ -1363,15 +1363,21 @@ let _evMapMarkers = [];
 
 async function fetchEV(lat, lng, radiusKm) {
   const r = radiusKm * 1000;
-  // nwr = nodes+ways+relations; out center gives coords for non-node types
   const query = '[out:json][timeout:30];nwr[amenity=charging_station](around:' + r + ',' + lat + ',' + lng + ');out center 60;';
+  console.log('[EV] query:', query);
   const res = await fetch('https://overpass-api.de/api/interpreter', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: 'data=' + encodeURIComponent(query)
   });
-  if (!res.ok) throw new Error('Overpass ' + res.status);
+  console.log('[EV] response status:', res.status, res.ok);
+  if (!res.ok) {
+    const txt = await res.text();
+    console.log('[EV] error body:', txt.slice(0, 200));
+    throw new Error('Overpass ' + res.status);
+  }
   const json = await res.json();
+  console.log('[EV] json elements:', (json.elements||[]).length);
   return (json.elements || []).filter(e => e.lat || (e.center && e.center.lat));
 }
 
@@ -1405,10 +1411,12 @@ async function loadEVHome(lat, lng, radius) {
   const box = document.getElementById('ev-results');
   box.classList.remove('hidden');
   box.innerHTML = '<div style="color:var(--mut);font-size:.78rem;padding:12px 0;text-align:center">Carico colonnine...</div>';
+  console.log('[EV] loadEVHome called:', lat, lng, 'radius:', radius);
   try {
     const nodes = await fetchEV(lat, lng, radius);
+    console.log('[EV] fetchEV returned', nodes.length, 'nodes', nodes.slice(0,2));
     if (!nodes.length) {
-      box.innerHTML = '<div style="color:var(--mut);font-size:.78rem;padding:12px 0;text-align:center">Nessuna colonnina trovata nell\'area.</div>';
+      box.innerHTML = '<div style="color:var(--mut);font-size:.78rem;padding:12px 0;text-align:center">Nessuna colonnina trovata nell'area.</div>';
       return;
     }
     const stations = nodes.map(n => parseEV(n, lat, lng)).sort((a,b) => (a.dist||999)-(b.dist||999));
@@ -1434,7 +1442,8 @@ async function loadEVHome(lat, lng, radius) {
       if (el) el.addEventListener('click', () => openEVModal(s));
     });
   } catch(e) {
-    box.innerHTML = '<div style="color:var(--rd);font-size:.78rem;padding:12px 0">' + esc(e.message) + '</div>';
+    console.log('[EV] ERROR:', e);
+    box.innerHTML = '<div style="color:var(--rd);font-size:.78rem;padding:12px 0">Errore: ' + esc(e.message) + '</div>';
   }
 }
 
