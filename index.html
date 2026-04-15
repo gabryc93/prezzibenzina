@@ -1396,18 +1396,34 @@ async function fetchEV(lat, lng, radiusKm) {
 
 function parseEV(node, userLat, userLng) {
   const t = node.tags || {};
-  const lat = node.lat || (node.center && node.center.lat);
-  const lng = node.lon || (node.center && node.center.lon);
+  const lat = node.lat ?? (node.center && node.center.lat);
+  const lng = node.lon ?? (node.center && node.center.lon);
   const name = t.name || t.operator || t.brand || 'Colonnina EV';
   const addr = [t['addr:street'], t['addr:housenumber']].filter(Boolean).join(' ');
   const city = t['addr:city'] || t['addr:municipality'] || '';
-  const sockets = parseInt(t.capacity) || parseInt(t['socket:count']) || 1;
-  const maxKW = parseFloat(t.maxpower || t['socket:type2_combo:power'] || t['socket:type2:power'] || 0);
-  const isFast = maxKW >= 50 || t.charging_mode === 'fast';
-  // Collect connector types
-  const connKeys = ['socket:type2_combo','socket:type2','socket:chademo','socket:tesla_supercharger','socket:type1'];
-  const connNames = {'socket:type2_combo':'CCS','socket:type2':'Type 2','socket:chademo':'CHAdeMO','socket:tesla_supercharger':'Tesla','socket:type1':'Type 1'};
-  const types = connKeys.filter(k => t[k] && t[k] !== 'no').map(k => connNames[k]);
+  // Total sockets: sum individual connector counts if available
+  const connKeys = ['socket:type2_combo','socket:type2','socket:chademo','socket:tesla_supercharger','socket:type1','socket:schuko'];
+  const connNames = {'socket:type2_combo':'CCS','socket:type2':'Type 2','socket:chademo':'CHAdeMO','socket:tesla_supercharger':'Tesla SC','socket:type1':'Type 1','socket:schuko':'Schuko'};
+  const connDetail = {}; // {name: count}
+  let totalSockets = 0;
+  connKeys.forEach(k => {
+    if (t[k] && t[k] !== 'no') {
+      const cnt = parseInt(t[k]) || 1;
+      connDetail[connNames[k]] = cnt;
+      totalSockets += cnt;
+    }
+  });
+  if (!totalSockets) totalSockets = parseInt(t.capacity) || parseInt(t['charging_station:output']) || 1;
+  // Power
+  const maxKW = parseFloat(
+    t['socket:type2_combo:output'] || t['socket:type2_combo:power'] ||
+    t['socket:type2:output'] || t['socket:type2:power'] ||
+    t.maxpower || t['charging_station:output'] || 0
+  );
+  const isFast = maxKW >= 50 || t.charging_mode === 'fast' || t['motorcar:conditional'] === 'yes';
+  const types = Object.keys(connDetail);
+  const access = t.access || t.fee || '';
+  const network = t.network || t.operator || '';
   let dist = null;
   if (userLat && lat) {
     const dLat=(lat-userLat)*Math.PI/180, dLng=(lng-userLng)*Math.PI/180;
@@ -1415,8 +1431,8 @@ function parseEV(node, userLat, userLng) {
     dist = Math.round(6371*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))*10)/10;
   }
   return { id: 'ev' + node.id, nome: name, indirizzo: addr, comune: city,
-    lat, lng, maxKW, types, numPrese: sockets, isFast,
-    operatore: t.operator || t.brand || '', dist };
+    lat, lng, maxKW, types, connDetail, numPrese: totalSockets, isFast,
+    operatore: network, access, dist };
 }
 
 // ── HOME: show EV list when EV filter active ──────────────────
