@@ -37,7 +37,7 @@ body{
 
 /* ── SETUP ────────────────────────────────────────────────── */
 #setup{
-  position:fixed;inset:0;background:var(--bg);z-index:200;
+  position:fixed;top:0;right:0;bottom:0;left:0;background:var(--bg);z-index:200;
   display:flex;align-items:center;justify-content:center;padding:24px;
 }
 
@@ -58,7 +58,7 @@ body{
 
 /* ── LOADER ───────────────────────────────────────────────── */
 #loader{
-  position:fixed;inset:0;background:var(--bg);z-index:100;
+  position:fixed;top:0;right:0;bottom:0;left:0;background:var(--bg);z-index:100;
   display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;
 }
 .ld-logo{display:flex;align-items:center;gap:10px}
@@ -186,7 +186,7 @@ footer a{color:var(--mut);text-decoration:underline}
 
 /* ── MODAL ────────────────────────────────────────────────── */
 .overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:50;
+  position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,0.6);z-index:50;
   display:flex;align-items:flex-end;justify-content:center;
   animation:fadeIn .2s ease;
   backdrop-filter:blur(2px);
@@ -277,7 +277,7 @@ footer a{color:var(--mut);text-decoration:underline}
 .btn-refresh:hover{opacity:.88}
 
 /* ── Fav modal ── */
-.fav-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:60;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(2px);animation:fadeIn .2s ease}
+.fav-modal-overlay{position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,0.6);z-index:60;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .2s ease}
 @media(min-width:600px){.fav-modal-overlay{align-items:center}}
 .fav-modal{background:var(--surf);border:1px solid var(--brd2);border-radius:14px 14px 0 0;width:100%;max-width:480px;padding:20px 20px calc(20px + var(--safe-bottom));animation:slideUp .25s ease}
 @media(min-width:600px){.fav-modal{border-radius:14px;margin:16px}}
@@ -340,7 +340,7 @@ footer a{color:var(--mut);text-decoration:underline}
 
 /* ── Map view ── */
 #map-view{
-  display:none;position:fixed;inset:0;background:var(--bg);z-index:50;
+  display:none;position:fixed;top:0;right:0;bottom:0;left:0;background:var(--bg);z-index:50;
   flex-direction:column;
 }
 #map-view.visible{display:flex}
@@ -434,7 +434,7 @@ footer a{color:var(--mut);text-decoration:underline}
 }
 
 /* ── Fav compare ── */
-.compare-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:70;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px);animation:fadeIn .2s ease}
+.compare-modal-overlay{position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,0.65);z-index:70;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .2s ease}
 @media(min-width:600px){.compare-modal-overlay{align-items:center}}
 .compare-modal{background:var(--surf);border:1px solid var(--brd2);border-radius:14px 14px 0 0;width:100%;max-width:520px;padding:20px 20px calc(20px + var(--safe-bottom));animation:slideUp .25s ease;max-height:85vh;overflow-y:auto}
 @media(min-width:600px){.compare-modal{border-radius:14px;margin:16px}}
@@ -465,7 +465,7 @@ footer a{color:var(--mut);text-decoration:underline}
 
 /* ── Fav view ── */
 #fav-view{
-  display:none;position:fixed;inset:0;background:var(--bg);z-index:50;
+  display:none;position:fixed;top:0;right:0;bottom:0;left:0;background:var(--bg);z-index:50;
   flex-direction:column;
 }
 #fav-view.visible{display:flex}
@@ -660,9 +660,6 @@ footer a{color:var(--mut);text-decoration:underline}
     · aggiornamento giornaliero ore 08:00 · Licenza IODL 2.0
   </footer>
 
-    <button class="btn-install" id="btn-install">Installa</button>
-    <button class="btn-install-close" onclick="dismissInstall()">✕</button>
-  </div>
 
 
 
@@ -850,6 +847,13 @@ let suggestTimer = null;
 let _stationData = [];
 
 // ── Init ──────────────────────────────────────────────────────
+// Unregister any old service workers
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    regs.forEach(reg => reg.unregister());
+  });
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   startApp();
   document.getElementById('frow').style.display = 'flex';
@@ -1166,22 +1170,29 @@ function openMapView() {
   document.body.style.overflow = 'hidden';
 
   // Wait for layout to settle, then measure and init
-  setTimeout(() => {
+  function _doInitMap() {
     const mc = document.getElementById('map-container');
     const mapEl = document.getElementById('leaflet-map');
-    // Explicitly set pixel dimensions - the only reliable cross-browser approach
     const h = mc.clientHeight || (window.innerHeight - 155);
     const w = mc.clientWidth  || window.innerWidth;
-    mapEl.style.width  = w + 'px';
-    mapEl.style.height = h + 'px';
-
+    if (h > 0) {
+      mapEl.style.width  = w + 'px';
+      mapEl.style.height = h + 'px';
+    } else {
+      // Fallback: use viewport minus fixed elements
+      mapEl.style.width  = window.innerWidth + 'px';
+      mapEl.style.height = (window.innerHeight - 155) + 'px';
+    }
     if (!_mapInitialized) {
       initMap();
       _mapInitialized = true;
     } else if (_map) {
       _map.invalidateSize(true);
     }
-  }, 200);
+  }
+  // Try immediately, then again after layout settles
+  setTimeout(_doInitMap, 100);
+  setTimeout(() => { if (_map) _map.invalidateSize(true); }, 500);
 }
 
 function closeMapView() {
