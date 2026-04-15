@@ -339,23 +339,27 @@ footer a{color:var(--mut);text-decoration:underline}
 .gps-loc-close:hover{color:var(--tx)}
 
 /* ── Map view ── */
+/* MAP VIEW - zero flex dependency, pure absolute positioning */
 #map-view{
-  display:none;position:fixed;top:0;right:0;bottom:0;left:0;background:var(--bg);z-index:50;
-  flex-direction:column;
+  display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+  background:var(--bg);z-index:50;overflow:hidden;
 }
-#map-view.visible{display:flex}
 .map-header{
+  position:absolute;top:0;left:0;right:0;height:50px;
   display:flex;align-items:center;justify-content:space-between;
-  padding:12px 16px;border-bottom:1px solid var(--brd);
-  background:var(--bg);flex-shrink:0;gap:10px;flex-wrap:wrap;
+  padding:0 16px;border-bottom:1px solid var(--brd);
+  background:var(--bg);gap:10px;z-index:10;
 }
 .map-header-left{display:flex;align-items:center;gap:10px}
 .map-title{font-family:var(--fd);font-weight:700;font-size:.95rem;letter-spacing:-.02em}
 .map-title small{font-size:0.55rem;color:var(--mut);display:block;text-transform:uppercase;letter-spacing:.1em}
 .btn-close-map{background:var(--surf);border:1px solid var(--brd2);color:var(--tx2);font-family:var(--fm);font-size:0.72rem;padding:5px 11px;border-radius:5px;cursor:pointer;white-space:nowrap}
 .btn-close-map:hover{color:var(--tx);background:var(--surf2)}
-#map-container{flex:1;position:relative;min-height:0;overflow:hidden}
-#leaflet-map{width:100%;height:100%;min-height:200px}
+#map-container{display:none}/* unused */
+#leaflet-map{
+  position:absolute;top:154px;left:0;right:0;bottom:0;
+  width:auto;height:auto;
+}
 .map-controls{
   position:absolute;bottom:20px;left:50%;transform:translateX(-50%);
   display:flex;gap:8px;z-index:1000;flex-wrap:wrap;justify-content:center;
@@ -378,9 +382,9 @@ footer a{color:var(--mut);text-decoration:underline}
 }
 .map-status.hidden{opacity:0}
 .map-fuel-row{
-  display:flex;gap:6px;padding:10px 14px;border-bottom:1px solid var(--brd);
-  background:var(--bg);flex-shrink:0;overflow-x:auto;
-  scrollbar-width:none;
+  position:absolute;top:104px;left:0;right:0;height:50px;
+  display:flex;gap:6px;padding:8px 14px;border-bottom:1px solid var(--brd);
+  background:var(--bg);overflow-x:auto;scrollbar-width:none;z-index:10;
 }
 .map-fuel-row::-webkit-scrollbar{display:none}
 /* Leaflet popup custom style */
@@ -413,8 +417,9 @@ footer a{color:var(--mut);text-decoration:underline}
 
 /* ── Map place search ── */
 .map-search-bar{
-  display:flex;gap:7px;padding:10px 14px;border-bottom:1px solid var(--brd);
-  background:var(--bg);flex-shrink:0;position:relative;
+  position:absolute;top:50px;left:0;right:0;height:54px;
+  display:flex;gap:7px;padding:8px 14px;border-bottom:1px solid var(--brd);
+  background:var(--bg);z-index:10;
 }
 .map-search-bar input{
   flex:1;background:var(--surf);border:1px solid var(--brd2);color:var(--tx);
@@ -1165,36 +1170,25 @@ let _suggestTimer2 = null;
 
 
 function openMapView() {
-  const view = document.getElementById('map-view');
-  // Set display directly — more reliable than class toggle on Safari
-  view.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
+  const v = document.getElementById('map-view');
+  v.style.display = 'block';
+  // Force synchronous reflow so #leaflet-map has real dimensions
+  void v.offsetHeight;
   initMapPlaceSearch();
-
-  // Double rAF: guarantees TWO paint cycles before we measure/init
-  // First rAF: browser applies display:flex
-  // Second rAF: browser finishes layout calculations
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    const w = view.clientWidth  || window.innerWidth;
-    const h = view.clientHeight || window.innerHeight;
-    // Calculate actual map area (subtract header + search + fuel row)
-    const uiH = (view.querySelector('.map-header')?.clientHeight || 54)
-              + (view.querySelector('.map-search-bar')?.clientHeight || 50)
-              + (view.querySelector('.map-fuel-row')?.clientHeight || 44);
-    const mapH = Math.max(200, h - uiH);
-    const mapEl = document.getElementById('leaflet-map');
-    mapEl.style.width  = w + 'px';
-    mapEl.style.height = mapH + 'px';
-
-    if (!_mapInitialized) {
+  if (!_mapInitialized) {
+    // setTimeout ensures browser has painted before Leaflet measures
+    setTimeout(() => {
       initMap();
       _mapInitialized = true;
-    } else if (_map) {
-      _map.invalidateSize(true);
-    }
-    // Extra safety: invalidate again after 300ms for slow devices
-    setTimeout(() => { if (_map) _map.invalidateSize(true); }, 300);
-  }));
+    }, 100);
+  } else if (_map) {
+    setTimeout(() => _map.invalidateSize(true), 100);
+  }
+}
+
+function closeMapView() {
+  document.getElementById('map-view').style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 function closeMapView() {
@@ -1203,14 +1197,7 @@ function closeMapView() {
 }
 
 window.addEventListener('resize', () => {
-  const view = document.getElementById('map-view');
-  if (_map && view.style.display === 'flex') {
-    const mapEl = document.getElementById('leaflet-map');
-    mapEl.style.width  = view.clientWidth + 'px';
-    const uiH = (view.querySelector('.map-header')?.clientHeight || 54)
-              + (view.querySelector('.map-search-bar')?.clientHeight || 50)
-              + (view.querySelector('.map-fuel-row')?.clientHeight || 44);
-    mapEl.style.height = Math.max(200, view.clientHeight - uiH) + 'px';
+  if (_map && document.getElementById('map-view').style.display !== 'none') {
     _map.invalidateSize(true);
   }
 });
@@ -1276,17 +1263,16 @@ async function geocode(q) {
 
 function initMap() {
   _map = L.map('leaflet-map', {
-    center: [41.9, 12.5], // Centro Italia
+    center: [41.9, 12.5],
     zoom: 6,
     zoomControl: true,
+    preferCanvas: true,
   });
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors © CARTO',
-    subdomains: 'abcd',
+  // OSM tiles - no API key, no CSP issues, works on all browsers
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a>',
     maxZoom: 19,
-    crossOrigin: true,
-    detectRetina: false,
   }).addTo(_map);
 
   _map.on('moveend', () => {
