@@ -496,6 +496,37 @@ footer a{color:var(--mut);text-decoration:underline}
 .ev-kw-lbl{font-size:0.6rem;color:var(--mut);text-align:right}
 .ev-dist{font-size:0.62rem;color:var(--bl);text-align:right;margin-top:4px}
 .ev-map-dot{width:11px;height:11px;border-radius:50%;background:#7dd4fc;border:2px solid rgba(255,255,255,.35);box-shadow:0 2px 6px rgba(0,0,0,.5)}
+
+/* ── Map search bar ── */
+.map-search-bar{
+  display:flex;gap:7px;padding:8px 12px;border-bottom:1px solid var(--brd);
+  background:var(--bg);flex-shrink:0;position:relative;
+}
+.map-search-input{
+  flex:1;background:var(--surf);border:1px solid var(--brd2);color:var(--tx);
+  font-family:var(--fm);font-size:0.8rem;padding:7px 12px;border-radius:6px;
+  outline:none;transition:border-color .2s;
+}
+.map-search-input:focus{border-color:var(--am)}
+.map-search-input::placeholder{color:var(--mut)}
+.map-search-btn{
+  background:var(--am);color:#0d0e0f;border:none;font-family:var(--fm);
+  font-size:0.78rem;font-weight:500;padding:7px 13px;border-radius:6px;
+  cursor:pointer;white-space:nowrap;
+}
+.map-search-btn:hover{opacity:.88}
+.map-search-sug{
+  position:absolute;top:100%;left:12px;right:12px;z-index:2000;
+  background:var(--surf2);border:1px solid var(--brd2);border-radius:7px;
+  overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.5);
+}
+.map-sug-item{
+  padding:9px 13px;font-size:0.78rem;cursor:pointer;color:var(--tx);
+  border-bottom:1px solid var(--brd);transition:background .1s;
+}
+.map-sug-item:last-child{border-bottom:none}
+.map-sug-item:hover{background:var(--surf3)}
+.map-sug-sub{font-size:0.65rem;color:var(--mut);margin-top:1px}
 </style>
 </head>
 <body>
@@ -690,6 +721,15 @@ footer a{color:var(--mut);text-decoration:underline}
       </div>
       <button class="btn-close-map" onclick="closeMapView()">✕ Chiudi</button>
     </div>
+    <!-- MAP SEARCH -->
+    <div class="map-search-bar" id="map-search-bar">
+      <input class="map-search-input" id="map-search-input"
+        type="text" placeholder="🔍 Cerca una città o indirizzo…"
+        autocomplete="off" autocorrect="off" autocapitalize="off" />
+      <button class="map-search-btn" onclick="mapGoToPlace()">Vai</button>
+      <div class="map-search-sug hidden" id="map-search-sug"></div>
+    </div>
+
     <div class="map-fuel-row" id="map-fuel-row">
       <button class="fb on" data-mf="Benzina" onclick="setMapFuel(this)">Benzina</button>
       <button class="fb" data-mf="Diesel" onclick="setMapFuel(this)">Diesel</button>
@@ -1205,6 +1245,7 @@ let _mapInitialized = false;
 function openMapView() {
   document.getElementById('map-view').classList.add('visible');
   document.body.style.overflow = 'hidden';
+  initMapSearch();
   if (!_mapInitialized) {
     initMap();
     _mapInitialized = true;
@@ -1214,6 +1255,80 @@ function openMapView() {
 function closeMapView() {
   document.getElementById('map-view').classList.remove('visible');
   document.body.style.overflow = '';
+}
+
+
+// ── Map place search ──────────────────────────────────────────
+let _mapSearchTimer = null;
+
+function initMapSearch() {
+  const inp = document.getElementById('map-search-input');
+  if (!inp || inp._inited) return;
+  inp._inited = true;
+
+  inp.addEventListener('input', () => {
+    clearTimeout(_mapSearchTimer);
+    const q = inp.value.trim();
+    const sug = document.getElementById('map-search-sug');
+    if (q.length < 2) { sug.classList.add('hidden'); return; }
+    _mapSearchTimer = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) +
+          '&format=json&limit=5&accept-language=it&countrycodes=it'
+        );
+        const data = await res.json();
+        if (!data.length) { sug.classList.add('hidden'); return; }
+        sug.innerHTML = '';
+        data.forEach(r => {
+          const parts = r.display_name.split(',');
+          const div = document.createElement('div');
+          div.className = 'map-sug-item';
+          div.innerHTML = '<div>' + esc(parts[0]) + '</div><div class="map-sug-sub">' + esc(parts.slice(1,3).join(',')) + '</div>';
+          div.addEventListener('click', () => {
+            inp.value = parts[0];
+            sug.classList.add('hidden');
+            const lat = parseFloat(r.lat), lng = parseFloat(r.lon);
+            _mapCenter = { lat, lng };
+            _map.setView([lat, lng], 14);
+            loadMapStations();
+          });
+          sug.appendChild(div);
+        });
+        sug.classList.remove('hidden');
+      } catch(e) {}
+    }, 320);
+  });
+
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { mapGoToPlace(); }
+    if (e.key === 'Escape') { document.getElementById('map-search-sug').classList.add('hidden'); }
+  });
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.map-search-bar')) {
+      document.getElementById('map-search-sug').classList.add('hidden');
+    }
+  });
+}
+
+async function mapGoToPlace() {
+  const q = document.getElementById('map-search-input').value.trim();
+  if (!q) return;
+  document.getElementById('map-search-sug').classList.add('hidden');
+  setMapStatus('Cerco ' + q + '…');
+  try {
+    const res = await fetch(
+      'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) +
+      '&format=json&limit=1&accept-language=it&countrycodes=it'
+    );
+    const data = await res.json();
+    if (!data.length) { setMapStatus('Posto non trovato'); return; }
+    const lat = parseFloat(data[0].lat), lng = parseFloat(data[0].lon);
+    _mapCenter = { lat, lng };
+    _map.setView([lat, lng], 14);
+    loadMapStations();
+  } catch(e) { setMapStatus('Errore: ' + e.message); }
 }
 
 function initMap() {
