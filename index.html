@@ -1349,60 +1349,68 @@ function renderMapMarkers(stations, userLat, userLng) {
 }
 
 
-// ══════════════════════════════════════════════════════════════
-// EV — OpenChargeMap
-// ══════════════════════════════════════════════════════════════
-const OCM = 'https://api.openchargemap.io/v3/poi/';
+// ============================================================
+// EV — Overpass API (OpenStreetMap, no key needed)
+// ============================================================
 let _evMapMarkers = [];
 
-async function fetchEV(lat, lng, radius) {
-  const p = new URLSearchParams({
-    output:'json', latitude:lat, longitude:lng,
-    distance:radius, distanceunit:'km',
-    maxresults:50, countrycode:'IT',
-    compact:true, verbose:false
+async function fetchEV(lat, lng, radiusKm) {
+  const r = radiusKm * 1000; // convert to meters
+  const query = '[out:json][timeout:25];node[amenity=charging_station](around:' + r + ',' + lat + ',' + lng + ');out body 60;';
+  const res = await fetch('https://overpass-api.de/api/interpreter', {
+    method: 'POST',
+    body: 'data=' + encodeURIComponent(query)
   });
-  const r = await fetch(OCM + '?' + p);
-  if (!r.ok) throw new Error('OpenChargeMap ' + r.status);
-  return r.json();
+  if (!res.ok) throw new Error('Overpass API ' + res.status);
+  const json = await res.json();
+  return json.elements || [];
 }
 
-function parseEV(s, userLat, userLng) {
-  const ai = s.AddressInfo || {};
-  const conns = s.Connections || [];
-  const maxKW = Math.max(0, ...conns.map(c => c.PowerKW || 0));
-  const types = [...new Set(conns.map(c => (c.ConnectionType||{}).Title||'').filter(Boolean))].slice(0,3);
-  const status = (conns[0]||{}).StatusType||{};
-  const isFast = maxKW >= 50;
-  const lat = ai.Latitude, lng = ai.Longitude;
+function parseEV(node, userLat, userLng) {
+  const t = node.tags || {};
+  const lat = node.lat, lng = node.lon;
+  const name = t.name || t.operator || t.brand || 'Colonnina EV';
+  const addr = [t['addr:street'], t['addr:housenumber']].filter(Boolean).join(' ');
+  const city = t['addr:city'] || t['addr:municipality'] || '';
+  const sockets = parseInt(t.capacity) || parseInt(t['socket:count']) || 1;
+  const maxKW = parseFloat(t.maxpower || t['socket:type2_combo:power'] || t['socket:type2:power'] || 0);
+  const isFast = maxKW >= 50 || t.charging_mode === 'fast';
+  // Collect connector types
+  const connKeys = ['socket:type2_combo','socket:type2','socket:chademo','socket:tesla_supercharger','socket:type1'];
+  const connNames = {'socket:type2_combo':'CCS','socket:type2':'Type 2','socket:chademo':'CHAdeMO','socket:tesla_supercharger':'Tesla','socket:type1':'Type 1'};
+  const types = connKeys.filter(k => t[k] && t[k] !== 'no').map(k => connNames[k]);
   let dist = null;
   if (userLat && lat) {
     const dLat=(lat-userLat)*Math.PI/180, dLng=(lng-userLng)*Math.PI/180;
     const a=Math.sin(dLat/2)**2+Math.cos(userLat*Math.PI/180)*Math.cos(lat*Math.PI/180)*Math.sin(dLng/2)**2;
     dist = Math.round(6371*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))*10)/10;
   }
-  return { id:s.ID, nome:ai.Title||'Colonnina', indirizzo:ai.AddressLine1||'',
-    comune:ai.Town||'', lat, lng, maxKW, types, numPrese:conns.length,
-    isFast, statusTitle:(status.Title||''), operatore:(s.OperatorInfo||{}).Title||'', dist };
+  return { id: 'ev' + node.id, nome: name, indirizzo: addr, comune: city,
+    lat, lng, maxKW, types, numPrese: sockets, isFast,
+    operatore: t.operator || t.brand || '', dist };
 }
 
-// ── HOME: show EV list when EV filter is active ────────────────
+// ── HOME: show EV list when EV filter active ──────────────────
 async function loadEVHome(lat, lng, radius) {
   const box = document.getElementById('ev-results');
   box.classList.remove('hidden');
-  box.innerHTML = '<div style="color:var(--mut);font-size:.78rem;padding:12px 0;text-align:center">Carico colonnine…</div>';
+  box.innerHTML = '<div style="color:var(--mut);font-size:.78rem;padding:12px 0;text-align:center">Carico colonnine...</div>';
   try {
-    const data = await fetchEV(lat, lng, radius);
-    if (!data.length) { box.innerHTML = '<div style="color:var(--mut);font-size:.78rem;padding:12px 0;text-align:center">Nessuna colonnina trovata.</div>'; return; }
-    const stations = data.map(s => parseEV(s, lat, lng)).sort((a,b) => (a.dist||999)-(b.dist||999));
-    let html = '<div class="res-hdr fi"><div class="res-title">⚡ Colonnine elettriche</div><div class="res-sub">' + stations.length + ' trovate · OpenChargeMap</div></div>';
+    const nodes = await fetchEV(lat, lng, radius);
+    if (!nodes.length) {
+      box.innerHTML = '<div style="color:var(--mut);font-size:.78rem;padding:12px 0;text-align:center">Nessuna colonnina trovata nell\'area.</div>';
+      return;
+    }
+    const stations = nodes.map(n => parseEV(n, lat, lng)).sort((a,b) => (a.dist||999)-(b.dist||999));
+    let html = '<div class="res-hdr fi"><div class="res-title">&#9889; Colonnine elettriche</div>'
+      + '<div class="res-sub">' + stations.length + ' trovate &middot; OpenStreetMap</div></div>';
     stations.forEach(s => {
       html += '<div class="ev-card" id="evc-' + s.id + '">'
-        + '<div class="ev-icon">⚡</div>'
+        + '<div class="ev-icon">&#9889;</div>'
         + '<div><div class="ev-name">' + esc(s.nome) + '</div>'
-        + '<div class="ev-addr">' + esc(s.indirizzo) + (s.comune ? ' · ' + esc(s.comune) : '') + '</div>'
+        + '<div class="ev-addr">' + esc(s.indirizzo) + (s.comune ? ' &middot; ' + esc(s.comune) : '') + '</div>'
         + '<div class="ev-tags">'
-        + (s.isFast ? '<span class="ev-tag fast">⚡ Fast ' + s.maxKW + ' kW</span>' : (s.maxKW > 0 ? '<span class="ev-tag">' + s.maxKW + ' kW</span>' : ''))
+        + (s.maxKW > 0 ? '<span class="ev-tag ' + (s.isFast ? 'fast' : '') + '">' + s.maxKW + ' kW</span>' : '')
         + s.types.map(t => '<span class="ev-tag">' + esc(t) + '</span>').join('')
         + '<span class="ev-tag">' + s.numPrese + ' prese</span>'
         + (s.operatore ? '<span class="ev-tag">' + esc(s.operatore) + '</span>' : '')
@@ -1420,56 +1428,56 @@ async function loadEVHome(lat, lng, radius) {
   }
 }
 
-// ── EV detail modal (reuses existing .overlay/.modal structure) ─
+// ── EV detail modal ────────────────────────────────────────────
 function openEVModal(s) {
   document.getElementById('modal-nome').textContent = s.nome;
   document.getElementById('modal-prezzo').textContent = s.maxKW > 0 ? s.maxKW + ' kW' : '—';
-  document.getElementById('modal-price-meta').textContent = s.isFast ? 'Ricarica rapida' : 'Ricarica lenta';
-  document.getElementById('modal-addr').textContent = [s.indirizzo, s.comune].filter(Boolean).join(', ');
+  document.getElementById('modal-price-meta').textContent = s.isFast ? 'Ricarica rapida' : 'AC lenta';
+  document.getElementById('modal-addr').textContent = [s.indirizzo, s.comune].filter(Boolean).join(', ') || 'Non disponibile';
   document.getElementById('modal-gestore').textContent = s.operatore || 'Non disponibile';
-  document.getElementById('modal-mode').textContent = s.types.join(' · ') || 'Non specificato';
+  document.getElementById('modal-mode').textContent = s.types.length ? s.types.join(', ') : 'Non specificato';
   const distRow = document.getElementById('modal-dist-row');
-  if (s.dist != null && distRow) { distRow.style.display=''; document.getElementById('modal-dist-val').textContent = s.dist + ' km da te'; }
+  if (s.dist != null && distRow) { distRow.style.display = ''; document.getElementById('modal-dist-val').textContent = s.dist + ' km da te'; }
   else if (distRow) distRow.style.display = 'none';
-  document.getElementById('modal-dt').textContent = s.statusTitle || 'Non disponibile';
-  const coord = (s.lat && s.lng) ? s.lat + ',' + s.lng : null;
+  document.getElementById('modal-dt').textContent = s.numPrese + ' prese';
+  const coord = s.lat + ',' + s.lng;
   const addr = encodeURIComponent([s.nome, s.indirizzo, s.comune].filter(Boolean).join(', '));
-  document.getElementById('btn-gmaps').href = coord ? 'https://www.google.com/maps/search/?api=1&query=' + coord : 'https://www.google.com/maps/search/?api=1&query=' + addr;
-  document.getElementById('btn-apple').href = coord ? 'https://maps.apple.com/?ll=' + coord + '&q=' + addr : 'https://maps.apple.com/?q=' + addr;
+  document.getElementById('btn-gmaps').href = 'https://www.google.com/maps/search/?api=1&query=' + coord;
+  document.getElementById('btn-apple').href = 'https://maps.apple.com/?ll=' + coord + '&q=' + addr;
   document.getElementById('modal-overlay').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
 }
 
-// ── MAP EV layer ────────────────────────────────────────────────
+// ── Map EV layer ───────────────────────────────────────────────
 async function loadEVMap() {
   const center = _map.getCenter();
   const zoom = _map.getZoom();
   const radius = zoom >= 14 ? 3 : zoom >= 12 ? 8 : 15;
-  setMapStatus('Carico colonnine EV…');
+  setMapStatus('Carico colonnine EV...');
   try {
-    const data = await fetchEV(center.lat, center.lng, radius);
+    const nodes = await fetchEV(center.lat, center.lng, radius);
     clearEVMapMarkers();
-    data.map(s => parseEV(s, center.lat, center.lng)).forEach(s => {
+    nodes.map(n => parseEV(n, center.lat, center.lng)).forEach(s => {
       if (!s.lat || !s.lng || isNaN(s.lat) || isNaN(s.lng)) return;
-      const icon = L.divIcon({ className:'', html:'<div class="ev-map-dot"></div>', iconAnchor:[5,5] });
-      const unit = s.maxKW > 0 ? s.maxKW + ' kW' : '—';
-      const m = L.marker([s.lat, s.lng], {icon}).addTo(_map).bindPopup(
-        '<div class="map-popup">'
-        + '<div class="map-popup-price" style="color:#7dd4fc">' + unit + '</div>'
-        + '<div class="map-popup-unit">' + (s.isFast ? 'Ricarica rapida' : 'Ricarica lenta') + ' · ' + s.numPrese + ' prese</div>'
+      const icon = L.divIcon({ className: '', html: '<div class="ev-map-dot"></div>', iconAnchor: [5,5] });
+      const el = document.createElement('div');
+      el.className = 'map-popup';
+      el.innerHTML = '<div class="map-popup-price" style="color:#7dd4fc">' + (s.maxKW > 0 ? s.maxKW + ' kW' : '—') + '</div>'
+        + '<div class="map-popup-unit">' + (s.isFast ? 'Ricarica rapida' : 'AC lenta') + ' &middot; ' + s.numPrese + ' prese</div>'
         + '<div class="map-popup-name">' + esc(s.nome) + '</div>'
         + '<div class="map-popup-addr">' + esc(s.indirizzo) + '</div>'
-        + '<a class="map-popup-btn" style="background:rgba(125,212,252,.2);color:#7dd4fc;border:1px solid rgba(125,212,252,.3)" href="https://www.google.com/maps/search/?api=1&query=' + s.lat + ',' + s.lng + '" target="_blank">Apri in Maps →</a>'
-        + '</div>', {maxWidth:240});
+        + '<div style="display:flex;gap:6px;margin-top:8px">'
+        + '<a class="map-popup-btn" style="flex:1;text-align:center;background:rgba(125,212,252,.15);color:#7dd4fc;border:1px solid rgba(125,212,252,.3)" href="https://www.google.com/maps/search/?api=1&query=' + s.lat + ',' + s.lng + '" target="_blank">Maps</a>'
+        + '<button class="map-popup-btn" style="flex:1;border:none;cursor:pointer">Scheda</button>'
+        + '</div>';
+      el.querySelector('button').addEventListener('click', (function(st) {
+        return function() { _map.closePopup(); openEVModal(st); };
+      })(s));
+      const m = L.marker([s.lat, s.lng], { icon }).addTo(_map).bindPopup(el, { maxWidth: 240 });
       _evMapMarkers.push(m);
     });
-    setMapStatus(_evMapMarkers.length + ' colonnine EV · ' + radius + ' km', true);
+    setMapStatus(_evMapMarkers.length + ' colonnine EV', true);
   } catch(e) { setMapStatus('Errore EV: ' + e.message); }
-}
-
-function openMapStation(id) {
-  const s = _mapStationById[id];
-  if (s) { if (_map) _map.closePopup(); openModal(s); }
 }
 
 function clearEVMapMarkers() {
