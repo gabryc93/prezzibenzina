@@ -1,70 +1,2037 @@
-const CACHE = 'opf-v1';
-const STATIC = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png',
-  'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css',
-  'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js',
-  'https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,300;9..144,700&display=swap',
-];
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0f1012">
+<link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEi0lEQVR4nMWXXYhVVRTHf2vvc7/GmTuj4zCZ0EMl+KQVlZGOPghFbyJoSNqH0FvRg4EUfqQFQfhQ+VSEYQSRTVA9aFGEWERYZEb14ps2fs3MnY/7MXfOPXuvHs6dcWa8595rDrRgcznn7rPXf6/9X/+9lgDoQYwcwl87vmZDJrAvRV4HnKdPFcMimAjeGoYDIz9MR+6d/mf++HHGp+iJbVa2f+auHFt7OJsxrwRWgmqoOK+L4XvWrBGyaSFyGlWn/Zsrdp8/oCe2WQEYOrb20J296QPXxmpeVRURIyCLCUBBUfUiIv1LU+byaHh45e7zB+Xqhw88EgT6k/fqnMeKJDvWhKAoYNqEq4pagzNGbBTJo4GK35tJGSlNeRGRxGW8QiYQGs0QoFpTaCNsIojzKrmMkZrzewOBjdXQIyI26SPnoTMrDBUiIgfG1Ldd916LlLuWp6g5RZWGIOeDEFsNPQIbA2CZ88mTnYfeLsOpcxV2Hb1CJfRYI7GjeEeEoeflLb28/mQvExWP0joSdZ/LgmaTvMY7//pcme1HLnP/PVl2rO+iHCpGYk5kU8Jfl0KOfD6CAK9uXUY11LYpnAhA62d+aTTiqXev8tCqLIN7VtLXbYmczguzFWF53vLW4AirV6bZsb6LsbLDSGPOzLVEoVEgMFCsespVz+7NPSzPG4YKNQolx0jRMVp0XJ9wlKqenRu7kLShWPWzTtMJpG0LwAwIIyAGqqESOUhZwRohMPVfGzspT8cE7MqZWSJeHotJ2wxEW1I7s2DThSQeZy9MkUsLo0XPwIGLfPVrka6cSVTWpiS8FXMO8h2G906O05cPeH5zN+Nlz0jRxYRN+K5tAKrzx03vgcjBg6tzvDE4ylAhIt9hMC1I0DaAlBUyqXjYObrrFTIpIZcWSlOeF5/o4eJIxP6PhyGoz21yr7UFQATGKo5/ChHjZYedsysP5FLC9ckIBCYqnn27+rhwJeSj78axLVjWEoBzkM8aXvt0hH2fxGIzd0MzzykLOKUrazj9S4mTv5XBCK1u9ZYAjIGpmrJ1XRcP35uhUlfBGVON8/36hOPoqTFO/13hy+Ml7ugJqISKc81VsSUAEQhryuP3LeHZx7qpFKObOJBLG/68OM0H309w/NtxNq3t5O3n+tiw/1Kz428PQIwCSlVPaSKKJXYBgI60Z3IqVsyBNUsY3LOC4UlHuRjRqrJpOwuMQFBXwYURCIwQ2DhST2/qpmeJpTKtvP/CCtatylGq6jzi/icAbZnAdE2pRUoqgJ0DeSqhEkaaqKKLC4Abkq0KY2UfH8HtkPB2rJUG3BIArxC5uFzXhe/9bIVzy9ZWGgJ0Zg2d3QHG0DANl066ljdmEoCCNY3rQgFqUZwB3/xeZqwUJQrRcNGhUVygtoPBGnCeQqBwJps2W0pTzs2tjIU4tPmc4e7+FF+cLTL4c7GpFHd2GLo7TMvjUFWXTVtbqvozTRuTmbKsUPJUQ8VaGt9scuNK7s/bpuq3sDFp2ZopkDIS9wItTImPIOG/xq1ZO81pUkvWyJJI2LQ5/T/b838BFFBhr8vWE6IAAAAASUVORK5CYII=">
+<link rel="icon" type="image/png" sizes="192x192" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAFBklEQVR4nO3dvXXbWBSF0SutKUKpg8ldkiqYYlyBS1LuYFJ3YQcUJf6KAAEQeO/sHc5aliHP+fBAUbKfaiN+//z+Z+1r4HFeXt+e1r6GqqrVLsLgObRWEA/9TY2eIR4Zw+K/kdEzxdIxLPbBDZ85LRXC7B/U8FnS3CE8z/nBjJ+lzb2xWWoyfNYwx2kw+QQwftYyx/YmBWD8rG3qBu86QgyfLbrnkWj0CWD8bNU92xwVgPGzdWM3OjgA46cVY7Y66/sA0JpBAbj705qhm70ZgPHTqiHb/TIA46d1tzbsNQDRrgbg7k8vvtryxQCMn95c27RHIKKdBeDuT68ubdsJQLSjANz96d3pxp0ARBMA0T4C8PhDisOtOwGIJgCiPVd5/CHPfvNOAKIJgGgCINqT53+SOQGI9s/aF7BF//73/9qXcNWvH9/WvoSueAQ6sOXhnxLCPDwCvWtp/FXtXe9WCaDaHVOr170l8QG0PqLWr39t0QH0Mp5ePo81xAbQ22h6+3weJTKAXsfS6+e1pLgAeh9J75/f3KLeB7hnHFv4enur192CmBOg5RHdcx1OgmEiAmh5/HsiWEb3AfQw/j0RzK/rAHoa/54I5tV1AGNtffx7rVxnC7oNYOxdr7VRjb1ep8Bl3QYwRmvj32v1urckPoDWR9T69a8tOoBextPL57GG6ABAAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDR/O3QjHb4rdWtfx+SABjs0s8U7P9bqyF4BCKaAIJM+amwW7+21Z84E0CYVoe6FAEEEsEnAYQSwY4AgolAAPHSIxAA0REIgKrKjUAAfEiMQAAcSYtAAJxJikAAXJQSgQC4KiECAQTxj2ucE0AYERwTQKBWf3hlCQIIJYIdAQQTgQDipUcgAKIjEABVlRuBAPiQGIEAOJIWgQA4kxSBALgoJQIBcFVCBALgqp6/B2gv+i/HTfgffK+UPxsnAGdSxl8lAE4kjb9KABxIG3+VAHiXOP4qAVC5468SQLzk8VcJIFr6+KsEEMv4d6LfCOvprf4xgzb+T06AMPeMv6cbxSkBBDH+cwLgqt7HXyUArkgYf5UAuCBl/FUC4ETS+KsEwIG08VcJgHeJ468SAJU7/ioBxEsef5UAoqWPv0oAsYx/RwCBjP+TAMIY/zEBBJky/lu/ttWwBEC06B+IYZz9Xf7w26pbvfPvCYDRWh/9IY9ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANGeX17fnta+CFjDy+vbkxOAaNH/SN7hv3ZIJicA0Z6rds9Ca18IPNJ+804AogmAaB8BeAwixeHWuz0Bfv34tvYlbIo/j8u6DQCGOHvs+f3z+581LmRJyV/vd+c/dvqoH/FGmBFwzdkjkBfD9OrStr0GINrFAJwC9Obapq+eACKgF19t2SMQ0b4MwClA625t+OYJIAJaNWS7gx6BREBrhm7WawCiDQ7AKUArxmx11AkgArZu7EZHPwKJgK26Z5uTxtzjd47Snik35Ukvgp0GrG3qBid/FUgErGWO7c06Xo9EPMKcN91Z3wdwGrC0uTe22GCdBsxpqZvr4ndsITDF0k8VD31kEQNDPPJRerVndjFwaK3Xj5t50SqILFv5gslfyy6BfAIvJcwAAAAASUVORK5CYII=">
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAFBklEQVR4nO3dvXXbWBSF0SutKUKpg8ldkiqYYlyBS1LuYFJ3YQcUJf6KAAEQeO/sHc5aliHP+fBAUbKfaiN+//z+Z+1r4HFeXt+e1r6GqqrVLsLgObRWEA/9TY2eIR4Zw+K/kdEzxdIxLPbBDZ85LRXC7B/U8FnS3CE8z/nBjJ+lzb2xWWoyfNYwx2kw+QQwftYyx/YmBWD8rG3qBu86QgyfLbrnkWj0CWD8bNU92xwVgPGzdWM3OjgA46cVY7Y66/sA0JpBAbj705qhm70ZgPHTqiHb/TIA46d1tzbsNQDRrgbg7k8vvtryxQCMn95c27RHIKKdBeDuT68ubdsJQLSjANz96d3pxp0ARBMA0T4C8PhDisOtOwGIJgCiPVd5/CHPfvNOAKIJgGgCINqT53+SOQGI9s/aF7BF//73/9qXcNWvH9/WvoSueAQ6sOXhnxLCPDwCvWtp/FXtXe9WCaDaHVOr170l8QG0PqLWr39t0QH0Mp5ePo81xAbQ22h6+3weJTKAXsfS6+e1pLgAeh9J75/f3KLeB7hnHFv4enur192CmBOg5RHdcx1OgmEiAmh5/HsiWEb3AfQw/j0RzK/rAHoa/54I5tV1AGNtffx7rVxnC7oNYOxdr7VRjb1ep8Bl3QYwRmvj32v1urckPoDWR9T69a8tOoBextPL57GG6ABAAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDR/O3QjHb4rdWtfx+SABjs0s8U7P9bqyF4BCKaAIJM+amwW7+21Z84E0CYVoe6FAEEEsEnAYQSwY4AgolAAPHSIxAA0REIgKrKjUAAfEiMQAAcSYtAAJxJikAAXJQSgQC4KiECAQTxj2ucE0AYERwTQKBWf3hlCQIIJYIdAQQTgQDipUcgAKIjEABVlRuBAPiQGIEAOJIWgQA4kxSBALgoJQIBcFVCBALgqp6/B2gv+i/HTfgffK+UPxsnAGdSxl8lAE4kjb9KABxIG3+VAHiXOP4qAVC5468SQLzk8VcJIFr6+KsEEMv4d6LfCOvprf4xgzb+T06AMPeMv6cbxSkBBDH+cwLgqt7HXyUArkgYf5UAuCBl/FUC4ETS+KsEwIG08VcJgHeJ468SAJU7/ioBxEsef5UAoqWPv0oAsYx/RwCBjP+TAMIY/zEBBJky/lu/ttWwBEC06B+IYZz9Xf7w26pbvfPvCYDRWh/9IY9ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANGeX17fnta+CFjDy+vbkxOAaNH/SN7hv3ZIJicA0Z6rds9Ca18IPNJ+804AogmAaB8BeAwixeHWuz0Bfv34tvYlbIo/j8u6DQCGOHvs+f3z+581LmRJyV/vd+c/dvqoH/FGmBFwzdkjkBfD9OrStr0GINrFAJwC9Obapq+eACKgF19t2SMQ0b4MwClA625t+OYJIAJaNWS7gx6BREBrhm7WawCiDQ7AKUArxmx11AkgArZu7EZHPwKJgK26Z5uTxtzjd47Snik35Ukvgp0GrG3qBid/FUgErGWO7c06Xo9EPMKcN91Z3wdwGrC0uTe22GCdBsxpqZvr4ndsITDF0k8VD31kEQNDPPJRerVndjFwaK3Xj5t50SqILFv5gslfyy6BfAIvJcwAAAAASUVORK5CYII=">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAFBklEQVR4nO3dvXXbWBSF0SutKUKpg8ldkiqYYlyBS1LuYFJ3YQcUJf6KAAEQeO/sHc5aliHP+fBAUbKfaiN+//z+Z+1r4HFeXt+e1r6GqqrVLsLgObRWEA/9TY2eIR4Zw+K/kdEzxdIxLPbBDZ85LRXC7B/U8FnS3CE8z/nBjJ+lzb2xWWoyfNYwx2kw+QQwftYyx/YmBWD8rG3qBu86QgyfLbrnkWj0CWD8bNU92xwVgPGzdWM3OjgA46cVY7Y66/sA0JpBAbj705qhm70ZgPHTqiHb/TIA46d1tzbsNQDRrgbg7k8vvtryxQCMn95c27RHIKKdBeDuT68ubdsJQLSjANz96d3pxp0ARBMA0T4C8PhDisOtOwGIJgCiPVd5/CHPfvNOAKIJgGgCINqT53+SOQGI9s/aF7BF//73/9qXcNWvH9/WvoSueAQ6sOXhnxLCPDwCvWtp/FXtXe9WCaDaHVOr170l8QG0PqLWr39t0QH0Mp5ePo81xAbQ22h6+3weJTKAXsfS6+e1pLgAeh9J75/f3KLeB7hnHFv4enur192CmBOg5RHdcx1OgmEiAmh5/HsiWEb3AfQw/j0RzK/rAHoa/54I5tV1AGNtffx7rVxnC7oNYOxdr7VRjb1ep8Bl3QYwRmvj32v1urckPoDWR9T69a8tOoBextPL57GG6ABAAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDR/O3QjHb4rdWtfx+SABjs0s8U7P9bqyF4BCKaAIJM+amwW7+21Z84E0CYVoe6FAEEEsEnAYQSwY4AgolAAPHSIxAA0REIgKrKjUAAfEiMQAAcSYtAAJxJikAAXJQSgQC4KiECAQTxj2ucE0AYERwTQKBWf3hlCQIIJYIdAQQTgQDipUcgAKIjEABVlRuBAPiQGIEAOJIWgQA4kxSBALgoJQIBcFVCBALgqp6/B2gv+i/HTfgffK+UPxsnAGdSxl8lAE4kjb9KABxIG3+VAHiXOP4qAVC5468SQLzk8VcJIFr6+KsEEMv4d6LfCOvprf4xgzb+T06AMPeMv6cbxSkBBDH+cwLgqt7HXyUArkgYf5UAuCBl/FUC4ETS+KsEwIG08VcJgHeJ468SAJU7/ioBxEsef5UAoqWPv0oAsYx/RwCBjP+TAMIY/zEBBJky/lu/ttWwBEC06B+IYZz9Xf7w26pbvfPvCYDRWh/9IY9ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANGeX17fnta+CFjDy+vbkxOAaNH/SN7hv3ZIJicA0Z6rds9Ca18IPNJ+804AogmAaB8BeAwixeHWuz0Bfv34tvYlbIo/j8u6DQCGOHvs+f3z+581LmRJyV/vd+c/dvqoH/FGmBFwzdkjkBfD9OrStr0GINrFAJwC9Obapq+eACKgF19t2SMQ0b4MwClA625t+OYJIAJaNWS7gx6BREBrhm7WawCiDQ7AKUArxmx11AkgArZu7EZHPwKJgK26Z5uTxtzjd47Snik35Ukvgp0GrG3qBid/FUgErGWO7c06Xo9EPMKcN91Z3wdwGrC0uTe22GCdBsxpqZvr4ndsITDF0k8VD31kEQNDPPJRerVndjFwaK3Xj5t50SqILFv5gslfyy6BfAIvJcwAAAAASUVORK5CYII=">
+<meta name="msapplication-TileImage" content="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAFBklEQVR4nO3dvXXbWBSF0SutKUKpg8ldkiqYYlyBS1LuYFJ3YQcUJf6KAAEQeO/sHc5aliHP+fBAUbKfaiN+//z+Z+1r4HFeXt+e1r6GqqrVLsLgObRWEA/9TY2eIR4Zw+K/kdEzxdIxLPbBDZ85LRXC7B/U8FnS3CE8z/nBjJ+lzb2xWWoyfNYwx2kw+QQwftYyx/YmBWD8rG3qBu86QgyfLbrnkWj0CWD8bNU92xwVgPGzdWM3OjgA46cVY7Y66/sA0JpBAbj705qhm70ZgPHTqiHb/TIA46d1tzbsNQDRrgbg7k8vvtryxQCMn95c27RHIKKdBeDuT68ubdsJQLSjANz96d3pxp0ARBMA0T4C8PhDisOtOwGIJgCiPVd5/CHPfvNOAKIJgGgCINqT53+SOQGI9s/aF7BF//73/9qXcNWvH9/WvoSueAQ6sOXhnxLCPDwCvWtp/FXtXe9WCaDaHVOr170l8QG0PqLWr39t0QH0Mp5ePo81xAbQ22h6+3weJTKAXsfS6+e1pLgAeh9J75/f3KLeB7hnHFv4enur192CmBOg5RHdcx1OgmEiAmh5/HsiWEb3AfQw/j0RzK/rAHoa/54I5tV1AGNtffx7rVxnC7oNYOxdr7VRjb1ep8Bl3QYwRmvj32v1urckPoDWR9T69a8tOoBextPL57GG6ABAAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDR/O3QjHb4rdWtfx+SABjs0s8U7P9bqyF4BCKaAIJM+amwW7+21Z84E0CYVoe6FAEEEsEnAYQSwY4AgolAAPHSIxAA0REIgKrKjUAAfEiMQAAcSYtAAJxJikAAXJQSgQC4KiECAQTxj2ucE0AYERwTQKBWf3hlCQIIJYIdAQQTgQDipUcgAKIjEABVlRuBAPiQGIEAOJIWgQA4kxSBALgoJQIBcFVCBALgqp6/B2gv+i/HTfgffK+UPxsnAGdSxl8lAE4kjb9KABxIG3+VAHiXOP4qAVC5468SQLzk8VcJIFr6+KsEEMv4d6LfCOvprf4xgzb+T06AMPeMv6cbxSkBBDH+cwLgqt7HXyUArkgYf5UAuCBl/FUC4ETS+KsEwIG08VcJgHeJ468SAJU7/ioBxEsef5UAoqWPv0oAsYx/RwCBjP+TAMIY/zEBBJky/lu/ttWwBEC06B+IYZz9Xf7w26pbvfPvCYDRWh/9IY9ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANGeX17fnta+CFjDy+vbkxOAaNH/SN7hv3ZIJicA0Z6rds9Ca18IPNJ+804AogmAaB8BeAwixeHWuz0Bfv34tvYlbIo/j8u6DQCGOHvs+f3z+581LmRJyV/vd+c/dvqoH/FGmBFwzdkjkBfD9OrStr0GINrFAJwC9Obapq+eACKgF19t2SMQ0b4MwClA625t+OYJIAJaNWS7gx6BREBrhm7WawCiDQ7AKUArxmx11AkgArZu7EZHPwKJgK26Z5uTxtzjd47Snik35Ukvgp0GrG3qBid/FUgErGWO7c06Xo9EPMKcN91Z3wdwGrC0uTe22GCdBsxpqZvr4ndsITDF0k8VD31kEQNDPPJRerVndjFwaK3Xj5t50SqILFv5gslfyy6BfAIvJcwAAAAASUVORK5CYII=">
+<meta name="msapplication-TileColor" content="#e8a030">
+<title>OsservaPrezzi Carburanti</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1012;--surf:#181a1c;--surf2:#202224;--surf3:#282a2d;
+  --brd:rgba(255,255,255,0.08);--brd2:rgba(255,255,255,0.15);
+  --tx:#edeae4;--tx2:#a8a49e;--mut:#6e6c67;
+  --am:#e8a030;--am-d:rgba(232,160,48,0.13);--am-b:rgba(232,160,48,0.28);
+  --gn:#4caf7d;--gn-d:rgba(76,175,125,0.12);
+  --rd:#e05a4a;--rd-d:rgba(224,90,74,0.12);
+  --bl:#5b9bd5;--pu:#c97fd4;
+  --fm:'DM Mono',monospace;--fd:'Fraunces',Georgia,serif;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+body{
+  background:var(--bg);color:var(--tx);font-family:var(--fm);
+  font-size:14px;min-height:100vh;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
 
-// Install: cache static assets
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(STATIC.map(u => new Request(u, { mode: 'no-cors' }))))
-      .catch(() => {}) // non bloccare se qualcosa fallisce
-  );
-  self.skipWaiting();
+/* ── SETUP ────────────────────────────────────────────────── */
+#setup{
+  position:fixed;inset:0;background:var(--bg);z-index:200;
+  display:flex;align-items:center;justify-content:center;padding:24px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ── LOADER ───────────────────────────────────────────────── */
+#loader{
+  position:fixed;inset:0;background:var(--bg);z-index:100;
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+}
+.ld-logo{display:flex;align-items:center;gap:10px}
+.ld-icon{width:38px;height:38px;background:var(--am);border-radius:9px;display:flex;align-items:center;justify-content:center}
+.ld-logo h2{font-family:var(--fd);font-weight:700;font-size:1rem;letter-spacing:-.02em}
+.ld-bar-w{width:200px;height:3px;background:var(--surf2);border-radius:2px;overflow:hidden}
+.ld-bar{height:100%;background:var(--am);width:0%;transition:width .4s ease;border-radius:2px}
+.ld-msg{font-size:0.72rem;color:var(--mut);letter-spacing:.03em}
+.ld-err{font-size:0.78rem;color:var(--rd);text-align:center;max-width:300px;line-height:1.6;display:none}
+.btn-retry{background:var(--am);color:#0d0e0f;border:none;font-family:var(--fm);font-size:0.78rem;font-weight:500;padding:8px 18px;border-radius:6px;cursor:pointer;display:none;margin-top:4px}
+
+/* ── APP ──────────────────────────────────────────────────── */
+#app{display:none}
+header{
+  border-bottom:1px solid var(--brd);padding:12px 16px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  position:sticky;top:0;background:var(--bg);z-index:10;
+}
+.logo{display:flex;align-items:center;gap:9px}
+.h-icon{width:30px;height:30px;background:var(--am);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo h1{font-family:var(--fd);font-weight:700;font-size:.88rem;letter-spacing:-.02em}
+.logo small{font-size:0.55rem;color:var(--mut);display:block;text-transform:uppercase;letter-spacing:.1em}
+.hdr-r{display:flex;align-items:center;gap:6px}
+.ts-badge{font-size:0.6rem;color:var(--mut);background:var(--surf);border:1px solid var(--brd);border-radius:4px;padding:2px 8px;white-space:nowrap}
+.data-badge{font-size:0.6rem;color:var(--am);background:var(--am-d);border:1px solid var(--am-b);border-radius:4px;padding:2px 8px;white-space:nowrap}
+.btn-xs{background:var(--surf);border:1px solid var(--brd2);color:var(--tx2);font-family:var(--fm);font-size:0.68rem;padding:4px 9px;border-radius:5px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-xs:hover{color:var(--tx);background:var(--surf2)}
+
+main{max-width:700px;margin:0 auto;padding:16px 14px calc(24px + var(--safe-bottom))}
+
+.sect{font-size:0.6rem;letter-spacing:.13em;text-transform:uppercase;color:var(--mut);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sect::after{content:'';flex:1;height:1px;background:var(--brd)}
+.tag{display:inline-block;font-size:0.56rem;background:var(--am-d);color:var(--am);border:1px solid var(--am-b);padding:1px 6px;border-radius:3px;letter-spacing:.05em;text-transform:uppercase;margin-left:4px;vertical-align:middle}
+.tag-src{background:var(--gn-d);color:var(--gn);border-color:rgba(76,175,125,.3)}
+
+/* CARDS */
+.cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:22px}
+@media(min-width:480px){.cards-grid{grid-template-columns:repeat(4,1fr)}}
+.card{background:var(--surf);border:1px solid var(--brd);border-radius:9px;padding:12px 14px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:9px 9px 0 0}
+.c-bz::before{background:var(--am)}
+.c-go::before{background:var(--bl)}
+.c-gpl::before{background:var(--gn)}
+.c-met::before{background:var(--pu)}
+.clabel{font-size:0.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.cprice{font-family:var(--fd);font-size:1.55rem;font-weight:700;line-height:1;color:var(--tx);letter-spacing:-.02em}
+.cunit{font-size:0.62rem;color:var(--mut);margin-top:4px}
+.cmode{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap}
+.mb{font-size:0.58rem;padding:1px 5px;border-radius:3px}
+.mb-s{background:var(--am-d);color:var(--am)}
+.mb-v{background:var(--surf2);color:var(--tx2)}
+@keyframes flash{0%,100%{opacity:1}40%{opacity:.25}}
+.flash{animation:flash .5s ease}
+
+/* SEARCH */
+.search-box{display:flex;gap:7px;margin-bottom:8px}
+.search-wrap{flex:1;position:relative}
+.search-wrap input{
+  width:100%;background:var(--surf);border:1px solid var(--brd2);color:var(--tx);
+  font-family:var(--fm);font-size:0.82rem;padding:10px 14px;border-radius:7px;
+  outline:none;transition:border-color .2s;
+  -webkit-appearance:none;
+}
+.search-wrap input::placeholder{color:var(--mut)}
+.search-wrap input:focus{border-color:var(--am)}
+.btn-go{background:var(--am);color:#0d0e0f;border:none;font-family:var(--fm);font-size:0.8rem;font-weight:500;padding:10px 16px;border-radius:7px;cursor:pointer;transition:opacity .15s;white-space:nowrap}
+.btn-go:hover{opacity:.87}
+.btn-go:disabled{opacity:.4;cursor:not-allowed}
+
+/* SUGGESTIONS */
+.sug{background:var(--surf2);border:1px solid var(--brd2);border-radius:7px;overflow:hidden;display:none;margin-bottom:10px}
+.sug-row{padding:9px 14px;font-size:0.8rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px;transition:background .1s}
+.sug-row:hover{background:var(--surf3)}
+.sug-row:not(:last-child){border-bottom:1px solid var(--brd)}
+.sug-prov{font-size:0.62rem;color:var(--mut);white-space:nowrap}
+
+/* FILTERS */
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;display:none}
+.fb{background:var(--surf);border:1px solid var(--brd2);color:var(--tx2);font-family:var(--fm);font-size:0.68rem;padding:5px 10px;border-radius:5px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.fb:hover,.fb.on{color:var(--am);border-color:var(--am);background:var(--am-d)}
+
+/* STATUS */
+.status{display:flex;align-items:center;gap:7px;font-size:0.68rem;color:var(--mut);margin-bottom:14px;min-height:20px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--mut);flex-shrink:0;transition:background .3s}
+.dot.ld{background:var(--am);animation:pulse 1.2s ease-in-out infinite}
+.dot.ok{background:var(--gn)}
+.dot.err{background:var(--rd)}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.6)}}
+
+/* RESULTS */
+.res-hdr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+.res-title{font-family:var(--fd);font-weight:700;font-size:.95rem;color:var(--tx)}
+.res-sub{font-size:0.68rem;color:var(--mut)}
+
+.slist{display:flex;flex-direction:column;gap:7px;margin-bottom:20px}
+.station{
+  background:var(--surf);border:1px solid var(--brd);border-radius:8px;
+  padding:11px 14px;display:grid;grid-template-columns:28px 1fr auto;
+  gap:6px 12px;align-items:start;transition:border-color .15s;
+}
+.station:hover{border-color:var(--brd2)}
+.st-rank{font-family:var(--fd);font-size:1.15rem;font-weight:700;color:var(--mut);text-align:center;line-height:1}
+.r1{color:var(--am)}
+.r2,.r3{color:var(--tx2)}
+.st-info{min-width:0}
+.st-name{font-size:0.8rem;font-weight:500;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-addr{font-size:0.68rem;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-tags{display:flex;gap:5px;margin-top:3px;flex-wrap:wrap}
+.st-tag{font-size:0.58rem;background:var(--surf2);color:var(--tx2);padding:1px 5px;border-radius:3px}
+.st-p{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.st-price{font-family:var(--fd);font-size:1.3rem;font-weight:700;color:var(--tx);white-space:nowrap}
+.cheap{color:var(--gn)}
+.dear{color:var(--rd)}
+.st-unit{font-size:0.6rem;color:var(--mut);text-align:right}
+.st-dt{font-size:0.58rem;color:var(--mut);text-align:right;opacity:.65}
+
+.no-res{background:var(--surf);border:1px solid var(--brd);border-radius:8px;padding:20px;text-align:center;color:var(--mut);font-size:0.8rem}
+
+footer{border-top:1px solid var(--brd);padding:10px 16px calc(10px + var(--safe-bottom));font-size:0.62rem;color:var(--mut);text-align:center;line-height:1.7}
+footer a{color:var(--mut);text-decoration:underline}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.fi{animation:fadeIn .25s ease both}
+.hidden{display:none!important}
+
+/* ── MODAL ────────────────────────────────────────────────── */
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:50;
+  display:flex;align-items:flex-end;justify-content:center;
+  animation:fadeIn .2s ease;
+  backdrop-filter:blur(2px);
+}
+@media(min-width:600px){.overlay{align-items:center}}
+.modal{
+  background:var(--surf);border:1px solid var(--brd2);
+  border-radius:14px 14px 0 0;width:100%;max-width:560px;
+  padding:20px 20px calc(20px + var(--safe-bottom));
+  animation:slideUp .25s ease;
+}
+@media(min-width:600px){.modal{border-radius:14px;margin:16px}}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
+.modal-handle{width:36px;height:3px;background:var(--brd2);border-radius:2px;margin:0 auto 16px}
+.modal-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+.modal-title{font-family:var(--fd);font-weight:700;font-size:1.05rem;color:var(--tx);line-height:1.3}
+.modal-close{background:var(--surf2);border:1px solid var(--brd2);color:var(--tx2);font-size:1rem;width:30px;height:30px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1}
+.modal-close:hover{color:var(--tx)}
+.modal-price-row{display:flex;align-items:baseline;gap:8px;margin-bottom:16px;padding:12px 14px;background:var(--surf2);border-radius:8px}
+.modal-price{font-family:var(--fd);font-size:2rem;font-weight:700;color:var(--am);letter-spacing:-.02em}
+.modal-price-meta{font-size:0.72rem;color:var(--mut)}
+.modal-rows{display:flex;flex-direction:column;gap:0;margin-bottom:18px;border:1px solid var(--brd);border-radius:8px;overflow:hidden}
+.modal-row{display:flex;gap:12px;padding:10px 14px;border-bottom:1px solid var(--brd)}
+.modal-row:last-child{border-bottom:none}
+.modal-row-icon{font-size:14px;flex-shrink:0;margin-top:1px;opacity:.7}
+.modal-row-content{}
+.modal-row-label{font-size:0.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-bottom:2px}
+.modal-row-val{font-size:0.82rem;color:var(--tx);line-height:1.4}
+.modal-btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn-maps{
+  flex:1;background:var(--am);color:#0d0e0f;border:none;
+  font-family:var(--fm);font-size:0.82rem;font-weight:500;
+  padding:11px 16px;border-radius:8px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:opacity .15s;text-decoration:none;
+}
+.btn-maps:hover{opacity:.88}
+.btn-maps-apple{background:var(--surf2);color:var(--tx);border:1px solid var(--brd2)}
+.btn-maps-apple:hover{background:var(--surf3);opacity:1}
+
+/* ── GPS btn ── */
+.btn-gps{background:var(--surf);border:1px solid var(--brd2);color:var(--tx2);font-family:var(--fm);font-size:0.8rem;padding:10px 14px;border-radius:7px;cursor:pointer;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.btn-gps:hover{color:var(--tx);border-color:var(--am);background:var(--am-d)}
+.btn-gps.active{color:var(--am);border-color:var(--am);background:var(--am-d)}
+.btn-gps svg{flex-shrink:0}
+
+/* ── Bandiera filter ── */
+.bandiera-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;display:none}
+.bfb{background:var(--surf);border:1px solid var(--brd2);color:var(--tx2);font-family:var(--fm);font-size:0.65rem;padding:4px 9px;border-radius:5px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.bfb:hover,.bfb.on{color:var(--am);border-color:var(--am);background:var(--am-d)}
+
+/* ── Preferiti ── */
+.fav-btn{background:var(--surf2);border:1px solid var(--brd2);border-radius:5px;cursor:pointer;font-size:0.62rem;padding:3px 7px;line-height:1.4;color:var(--mut);transition:all .15s;white-space:nowrap;flex-shrink:0;margin-top:4px}
+.fav-btn:hover{color:var(--am);border-color:var(--am);background:var(--am-d)}
+.fav-btn.on{color:var(--am);border-color:var(--am);background:var(--am-d)}
+
+/* ── Preferiti section ── */
+.fav-section{margin-bottom:20px}
+.fav-list{display:flex;flex-direction:column;gap:7px}
+.fav-empty{font-size:0.75rem;color:var(--mut);padding:4px 0}
+#fav-filter-btn.on{color:var(--am);border-color:var(--am);background:var(--am-d)}
+
+/* ── Distanza badge ── */
+.dist-badge{font-size:0.58rem;color:var(--bl);text-align:right;opacity:.85;margin-top:1px}
+
+/* ── Update bar ── */
+.update-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--surf);border:1px solid var(--brd);border-radius:8px;
+  padding:9px 14px;margin-bottom:18px;gap:10px;flex-wrap:wrap;
+}
+.update-col{display:flex;flex-direction:column;gap:2px}
+.update-label{font-size:0.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+.update-val{font-size:0.78rem;color:var(--tx);font-family:var(--fm)}
+.update-val.fresh{color:var(--gn)}
+.update-val.stale{color:var(--am)}
+.update-divider{width:1px;height:32px;background:var(--brd);flex-shrink:0}
+
+/* ── New data banner ── */
+.new-data-banner{
+  background:var(--am-d);border:1px solid var(--am-b);border-radius:8px;
+  padding:10px 14px;margin-bottom:14px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  animation:fadeIn .3s ease;
+}
+.banner-text{font-size:0.78rem;color:var(--am);display:flex;align-items:center;gap:7px}
+.btn-refresh{background:var(--am);color:#0d0e0f;border:none;font-family:var(--fm);font-size:0.72rem;font-weight:500;padding:6px 13px;border-radius:5px;cursor:pointer;white-space:nowrap}
+.btn-refresh:hover{opacity:.88}
+
+/* ── Fav modal ── */
+.fav-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:60;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(2px);animation:fadeIn .2s ease}
+@media(min-width:600px){.fav-modal-overlay{align-items:center}}
+.fav-modal{background:var(--surf);border:1px solid var(--brd2);border-radius:14px 14px 0 0;width:100%;max-width:480px;padding:20px 20px calc(20px + var(--safe-bottom));animation:slideUp .25s ease}
+@media(min-width:600px){.fav-modal{border-radius:14px;margin:16px}}
+.fav-modal h3{font-family:var(--fd);font-size:1rem;font-weight:700;margin-bottom:16px;color:var(--tx)}
+.fav-modal label{display:block;font-size:0.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin-bottom:5px;margin-top:12px}
+.fav-modal input,.fav-modal textarea{width:100%;background:var(--surf2);border:1px solid var(--brd2);color:var(--tx);font-family:var(--fm);font-size:0.82rem;padding:9px 12px;border-radius:7px;outline:none;transition:border-color .2s;resize:none}
+.fav-modal input:focus,.fav-modal textarea:focus{border-color:var(--am)}
+.fav-modal-btns{display:flex;gap:8px;margin-top:18px}
+.btn-fav-save{flex:1;background:var(--am);color:#0d0e0f;border:none;font-family:var(--fm);font-size:0.82rem;font-weight:500;padding:11px;border-radius:7px;cursor:pointer}
+.btn-fav-cancel{background:var(--surf2);color:var(--tx2);border:1px solid var(--brd2);font-family:var(--fm);font-size:0.82rem;padding:11px 16px;border-radius:7px;cursor:pointer}
+.btn-fav-delete{background:var(--rd-d);color:var(--rd);border:1px solid rgba(224,90,74,.25);font-family:var(--fm);font-size:0.82rem;padding:11px 16px;border-radius:7px;cursor:pointer}
+
+/* ── Fav sort row ── */
+.fav-sort-row{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.fav-sort-label{font-size:0.62rem;color:var(--mut);letter-spacing:.06em}
+.sort-btn{background:var(--surf);border:1px solid var(--brd2);color:var(--tx2);font-family:var(--fm);font-size:0.65rem;padding:3px 9px;border-radius:4px;cursor:pointer;transition:all .15s}
+.sort-btn:hover,.sort-btn.on{color:var(--am);border-color:var(--am);background:var(--am-d)}
+
+/* ── Fav card extras ── */
+.fav-note{font-size:0.68rem;color:var(--mut);margin-top:3px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fav-edit-btn{background:none;border:none;cursor:pointer;font-size:12px;opacity:.4;padding:2px 4px;transition:opacity .15s;margin-left:4px;color:var(--tx)}
+.fav-edit-btn:hover{opacity:1}
+
+/* ── Preferiti button ── */
+#fav-filter-btn{
+  display:flex;align-items:center;gap:8px;
+  background:var(--surf);border:1px solid var(--brd2);color:var(--tx2);
+  font-family:var(--fm);font-size:0.82rem;padding:10px 16px;
+  border-radius:7px;cursor:pointer;transition:all .2s;width:100%;
+  justify-content:center;
+}
+#fav-filter-btn:hover{color:var(--am);border-color:var(--am);background:var(--am-d)}
+#fav-filter-btn.on{color:var(--am);border-color:var(--am);background:var(--am-d);font-weight:500}
+#fav-btn-count{
+  background:var(--am);color:#0d0e0f;font-size:0.65rem;font-weight:500;
+  padding:1px 7px;border-radius:10px;
+}
+
+/* ── Card hide toggle ── */
+.card-toggle-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;margin-top:-4px}
+.card-toggle{background:var(--surf);border:1px solid var(--brd2);color:var(--tx2);font-family:var(--fm);font-size:0.65rem;padding:3px 9px;border-radius:4px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:4px}
+.card-toggle:hover{border-color:var(--brd2);background:var(--surf2);color:var(--tx)}
+.card-toggle.hidden-fuel{opacity:.45;text-decoration:line-through}
+.card-toggle-label{font-size:0.6rem;color:var(--mut);align-self:center;letter-spacing:.06em}
+.price-card.card-hidden{display:none}
+
+/* ── GPS location badge ── */
+.gps-location{
+  display:none;align-items:center;gap:8px;
+  background:var(--surf);border:1px solid var(--brd);border-radius:7px;
+  padding:8px 13px;margin-bottom:10px;font-size:0.78rem;color:var(--tx2);
+}
+.gps-location.visible{display:flex}
+.gps-pin{color:var(--am);flex-shrink:0;font-size:14px}
+.gps-loc-text{flex:1}
+.gps-loc-name{color:var(--tx);font-weight:500}
+.gps-loc-coords{font-size:0.65rem;color:var(--mut);margin-top:1px}
+.gps-loc-close{background:none;border:none;color:var(--mut);cursor:pointer;font-size:14px;padding:2px;line-height:1}
+.gps-loc-close:hover{color:var(--tx)}
+
+/* ── Map view ── */
+#map-view{
+  display:none;position:fixed;inset:0;background:var(--bg);z-index:50;
+  flex-direction:column;
+}
+#map-view.visible{display:flex}
+.map-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;border-bottom:1px solid var(--brd);
+  background:var(--bg);flex-shrink:0;gap:10px;flex-wrap:wrap;
+}
+.map-header-left{display:flex;align-items:center;gap:10px}
+.map-title{font-family:var(--fd);font-weight:700;font-size:.95rem;letter-spacing:-.02em}
+.map-title small{font-size:0.55rem;color:var(--mut);display:block;text-transform:uppercase;letter-spacing:.1em}
+.btn-close-map{background:var(--surf);border:1px solid var(--brd2);color:var(--tx2);font-family:var(--fm);font-size:0.72rem;padding:5px 11px;border-radius:5px;cursor:pointer;white-space:nowrap}
+.btn-close-map:hover{color:var(--tx);background:var(--surf2)}
+#map-container{flex:1;position:relative;min-height:0;overflow:hidden}
+#leaflet-map{width:100%;height:100%;min-height:200px}
+.map-controls{
+  position:absolute;bottom:20px;left:50%;transform:translateX(-50%);
+  display:flex;gap:8px;z-index:1000;flex-wrap:wrap;justify-content:center;
+}
+.map-ctrl-btn{
+  background:var(--bg);border:1px solid var(--brd2);color:var(--tx);
+  font-family:var(--fm);font-size:0.75rem;font-weight:500;
+  padding:9px 16px;border-radius:7px;cursor:pointer;
+  box-shadow:0 2px 12px rgba(0,0,0,.5);transition:all .15s;white-space:nowrap;
+}
+.map-ctrl-btn:hover{border-color:var(--am);color:var(--am)}
+.map-ctrl-btn.active{background:var(--am);color:#0d0e0f;border-color:var(--am)}
+.map-ctrl-btn:disabled{opacity:.4;cursor:not-allowed}
+.map-status{
+  position:absolute;top:12px;left:50%;transform:translateX(-50%);
+  background:var(--bg);border:1px solid var(--brd);border-radius:6px;
+  padding:6px 14px;font-size:0.72rem;color:var(--mut);z-index:1000;
+  white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.4);
+  pointer-events:none;transition:opacity .3s;
+}
+.map-status.hidden{opacity:0}
+.map-fuel-row{
+  display:flex;gap:6px;padding:10px 14px;border-bottom:1px solid var(--brd);
+  background:var(--bg);flex-shrink:0;overflow-x:auto;
+  scrollbar-width:none;
+}
+.map-fuel-row::-webkit-scrollbar{display:none}
+/* Leaflet popup custom style */
+.leaflet-popup-content-wrapper{
+  background:var(--surf)!important;border:1px solid var(--brd2)!important;
+  border-radius:10px!important;box-shadow:0 4px 20px rgba(0,0,0,.5)!important;
+  padding:0!important;overflow:hidden;
+}
+.leaflet-popup-content{margin:0!important;width:220px!important}
+.leaflet-popup-tip{background:var(--surf)!important}
+.leaflet-popup-close-button{color:var(--tx2)!important;font-size:16px!important;padding:6px 8px!important}
+.map-popup{padding:12px 14px}
+.map-popup-price{font-family:var(--fd);font-size:1.4rem;font-weight:700;color:var(--am);line-height:1}
+.map-popup-unit{font-size:0.65rem;color:var(--mut);margin-bottom:6px}
+.map-popup-name{font-size:0.8rem;font-weight:500;color:var(--tx);margin-bottom:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.map-popup-addr{font-size:0.7rem;color:var(--mut);margin-bottom:8px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.map-popup-tags{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap}
+.map-popup-tag{font-size:0.6rem;background:var(--surf2);color:var(--tx2);padding:1px 6px;border-radius:3px}
+.map-popup-dist{font-size:0.65rem;color:var(--bl);margin-bottom:8px}
+.map-popup-btn{
+  display:block;width:100%;background:var(--am);color:#0d0e0f;border:none;
+  font-family:var(--fm);font-size:0.75rem;font-weight:500;
+  padding:8px;border-radius:6px;cursor:pointer;text-align:center;
+  text-decoration:none;
+}
+
+
+
+/* ── Map place search ── */
+.map-search-bar{
+  display:flex;gap:7px;padding:10px 14px;border-bottom:1px solid var(--brd);
+  background:var(--bg);flex-shrink:0;position:relative;
+}
+.map-search-bar input{
+  flex:1;background:var(--surf);border:1px solid var(--brd2);color:var(--tx);
+  font-family:var(--fm);font-size:0.8rem;padding:8px 12px;border-radius:6px;
+  outline:none;transition:border-color .2s;
+}
+.map-search-bar input:focus{border-color:var(--am)}
+.map-search-bar input::placeholder{color:var(--mut)}
+.btn-route{background:var(--am);color:#0d0e0f;border:none;font-family:var(--fm);font-size:0.78rem;font-weight:500;padding:8px 14px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:opacity .15s}
+.btn-route:hover{opacity:.88}
+.btn-route:disabled{opacity:.4;cursor:not-allowed}
+.map-search-bar .btn-route{padding:8px 13px}
+.map-place-sug{
+  position:absolute;top:100%;left:14px;right:14px;z-index:2000;
+  background:var(--surf2);border:1px solid var(--brd2);border-radius:7px;
+  overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.5);
+}
+
+/* ── Fav compare ── */
+.compare-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:70;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px);animation:fadeIn .2s ease}
+@media(min-width:600px){.compare-modal-overlay{align-items:center}}
+.compare-modal{background:var(--surf);border:1px solid var(--brd2);border-radius:14px 14px 0 0;width:100%;max-width:520px;padding:20px 20px calc(20px + var(--safe-bottom));animation:slideUp .25s ease;max-height:85vh;overflow-y:auto}
+@media(min-width:600px){.compare-modal{border-radius:14px;margin:16px}}
+.compare-modal h3{font-family:var(--fd);font-weight:700;font-size:1rem;margin-bottom:4px;color:var(--tx)}
+.compare-modal p{font-size:0.75rem;color:var(--mut);margin-bottom:16px}
+.radius-row{display:flex;align-items:center;gap:12px;margin-bottom:20px;background:var(--surf2);border-radius:8px;padding:12px 14px}
+.radius-row label{font-size:0.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);white-space:nowrap}
+.radius-row input[type=range]{flex:1}
+.radius-val{font-family:var(--fd);font-size:1.1rem;font-weight:700;color:var(--am);min-width:40px;text-align:right}
+.btn-compare-go{width:100%;background:var(--am);color:#0d0e0f;border:none;font-family:var(--fm);font-size:0.85rem;font-weight:500;padding:12px;border-radius:7px;cursor:pointer;margin-bottom:16px;transition:opacity .15s}
+.btn-compare-go:hover{opacity:.88}
+.btn-compare-go:disabled{opacity:.4;cursor:not-allowed}
+.compare-results{display:flex;flex-direction:column;gap:8px}
+.compare-card{background:var(--surf2);border:1px solid var(--brd);border-radius:8px;padding:11px 14px;display:grid;grid-template-columns:28px 1fr auto;gap:6px 10px;align-items:center}
+.compare-card.best{border-color:var(--gn);background:var(--gn-d)}
+.compare-card.fav-ref{border-color:var(--am);background:var(--am-d)}
+.compare-rank{font-family:var(--fd);font-size:1.1rem;font-weight:700;color:var(--mut);text-align:center}
+.compare-rank.r1{color:var(--gn)}
+.compare-info .compare-name{font-size:0.8rem;font-weight:500;color:var(--tx)}
+.compare-info .compare-addr{font-size:0.68rem;color:var(--mut)}
+.compare-info .compare-dist{font-size:0.65rem;color:var(--bl);margin-top:2px}
+.compare-price-col{text-align:right}
+.compare-price{font-family:var(--fd);font-size:1.25rem;font-weight:700;color:var(--tx)}
+.compare-price.best-p{color:var(--gn)}
+.compare-saving{font-size:0.65rem;color:var(--gn);margin-top:2px;text-align:right}
+.compare-label{font-size:0.6rem;background:var(--am-d);color:var(--am);border:1px solid var(--am-b);padding:1px 6px;border-radius:3px;display:inline-block;margin-top:3px}
+.compare-close{background:var(--surf2);border:1px solid var(--brd2);color:var(--tx2);font-family:var(--fm);font-size:0.8rem;padding:10px;border-radius:7px;cursor:pointer;width:100%;margin-top:8px}
+
+/* ── Fav view ── */
+#fav-view{
+  display:none;position:fixed;inset:0;background:var(--bg);z-index:50;
+  flex-direction:column;
+}
+#fav-view.visible{display:flex}
+.fav-view-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;border-bottom:1px solid var(--brd);
+  background:var(--bg);flex-shrink:0;gap:10px;
+}
+.fav-view-body{flex:1;overflow-y:auto;padding:16px;max-width:700px;width:100%;margin:0 auto}
+
+/* ── EV / Colonnine ── */
+.ev-section{margin-top:20px;margin-bottom:20px}
+.ev-card{background:var(--surf);border:1px solid var(--brd);border-radius:9px;padding:12px 14px;display:grid;grid-template-columns:28px 1fr auto;gap:6px 12px;align-items:start;transition:border-color .15s;cursor:pointer}
+.ev-card:hover{border-color:var(--brd2)}
+.ev-card::before{content:'⚡';font-size:1rem;line-height:1;padding-top:2px;color:#7dd4fc}
+.ev-name{font-size:0.82rem;font-weight:500;color:var(--tx)}
+.ev-addr{font-size:0.7rem;color:var(--mut);margin-top:2px}
+.ev-tags{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+.ev-tag{font-size:0.6rem;padding:1px 6px;border-radius:3px;background:var(--surf2);color:var(--tx2)}
+.ev-tag.fast{background:rgba(125,212,252,.12);color:#7dd4fc}
+.ev-tag.slow{background:var(--surf2);color:var(--mut)}
+.ev-tag.avail{background:var(--gn-d);color:var(--gn)}
+.ev-tag.busy{background:var(--rd-d);color:var(--rd)}
+.ev-tag.unknown{background:var(--surf2);color:var(--mut)}
+.ev-power{text-align:right}
+.ev-kw{font-family:var(--fd);font-size:1.2rem;font-weight:700;color:#7dd4fc;line-height:1}
+.ev-kw-label{font-size:0.6rem;color:var(--mut)}
+.ev-dist{font-size:0.62rem;color:var(--bl);margin-top:4px;text-align:right}
+.ev-toggle-btn{background:var(--surf);border:1px solid var(--brd2);color:var(--tx2);font-family:var(--fm);font-size:0.69rem;padding:5px 11px;border-radius:5px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.ev-toggle-btn:hover,.ev-toggle-btn.on{color:#7dd4fc;border-color:#7dd4fc;background:rgba(125,212,252,.1)}
+.ev-loading{font-size:.78rem;color:var(--mut);padding:12px 0;text-align:center}
+/* Map EV marker */
+.ev-map-marker{background:#7dd4fc;width:12px;height:12px;border-radius:50%;border:2px solid rgba(255,255,255,.4);box-shadow:0 2px 6px rgba(0,0,0,.5)}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="ld-logo">
+    <div class="ld-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0d0e0f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 22V4a2 2 0 012-2h6a2 2 0 012 2v18"/><path d="M5 12h10"/>
+        <path d="M15 7l4 4-4 4"/><path d="M19 7v8"/>
+      </svg>
+    </div>
+    <h2>OsservaPrezzi</h2>
+  </div>
+  <div class="ld-bar-w"><div class="ld-bar" id="lbar"></div></div>
+  <div class="ld-msg" id="lmsg">Carico dati…</div>
+  <div class="ld-err" id="lerr"></div>
+  <button class="btn-retry" id="lretry" onclick="loadMedie()">↻ Riprova</button>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header>
+    <div class="logo">
+      <div class="h-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0d0e0f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 22V4a2 2 0 012-2h6a2 2 0 012 2v18"/><path d="M5 12h10"/>
+          <path d="M15 7l4 4-4 4"/><path d="M19 7v8"/>
+        </svg>
+      </div>
+      <div><h1>OsservaPrezzi <small>Carburanti</small></h1></div>
+    </div>
+    <div class="hdr-r">
+      <span class="data-badge" id="data-badge">—</span>
+      <span class="ts-badge" id="ts-badge">—</span>
+      <button class="btn-xs" id="btn-open-favs" onclick="openFavView()" title="Preferiti">★<span id="fav-hdr-count" style="font-size:0.6rem;vertical-align:super;line-height:0"></span></button>
+      <button class="btn-xs" onclick="openMapView()">🗺 Mappa</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="sect">Medie nazionali <span class="tag tag-src">MIMIT live</span></div>
+    <div class="cards-grid">
+      <div class="card c-bz">
+        <div class="clabel">Benzina</div>
+        <div class="cprice" id="avg-bz">—</div>
+        <div class="cunit">€/litro</div>
+        <div class="cmode">
+          <span class="mb mb-s" id="s-bz">self —</span>
+          <span class="mb mb-v" id="v-bz">serv. —</span>
+        </div>
+      </div>
+      <div class="card c-go">
+        <div class="clabel">Diesel</div>
+        <div class="cprice" id="avg-go">—</div>
+        <div class="cunit">€/litro</div>
+        <div class="cmode">
+          <span class="mb mb-s" id="s-go">self —</span>
+          <span class="mb mb-v" id="v-go">serv. —</span>
+        </div>
+      </div>
+      <div class="card c-gpl">
+        <div class="clabel">GPL</div>
+        <div class="cprice" id="avg-gpl">—</div>
+        <div class="cunit">€/litro</div>
+        <div class="cmode">
+          <span class="mb mb-s" id="s-gpl">self —</span>
+          <span class="mb mb-v" id="v-gpl">serv. —</span>
+        </div>
+      </div>
+      <div class="card c-met">
+        <div class="clabel">Metano</div>
+        <div class="cprice" id="avg-met">—</div>
+        <div class="cunit">€/kg</div>
+        <div class="cmode">
+          <span class="mb mb-s" id="s-met">self —</span>
+          <span class="mb mb-v" id="v-met">serv. —</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPDATE BAR -->
+    <div class="update-bar" id="update-bar">
+      <div class="update-col">
+        <div class="update-label">Ultimo aggiornamento dati</div>
+        <div class="update-val" id="last-update">—</div>
+      </div>
+      <div class="update-divider"></div>
+      <div class="update-col">
+        <div class="update-label">Prossimo aggiornamento</div>
+        <div class="update-val" id="next-update">—</div>
+      </div>
+      <div class="update-divider"></div>
+      <div class="update-col">
+        <div class="update-label">Fonte</div>
+        <div class="update-val" style="color:var(--mut)">MIMIT · ogni 4 ore</div>
+      </div>
+    </div>
+
+    <!-- NEW DATA BANNER -->
+    <div class="new-data-banner hidden" id="new-data-banner">
+      <div class="banner-text">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        Nuovi dati disponibili
+      </div>
+      <button class="btn-refresh" onclick="doRefresh()">↻ Aggiorna ora</button>
+    </div>
+
+    <div class="sect">Cerca impianti</div>
+    <div class="search-box">
+      <div class="search-wrap">
+        <input type="text" id="qinput" placeholder="Comune o CAP — es. Abbiategrasso, 20081…" autocomplete="off" autocorrect="off" autocapitalize="words" inputmode="text" />
+      </div>
+      <button class="btn-go" id="sbtn" onclick="doSearch()">Cerca</button>
+      <button class="btn-gps" id="gps-btn" onclick="doGPS()" title="Usa la mia posizione">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7" stroke-dasharray="2 2" opacity=".4"/></svg>
+        Vicino a me
+      </button>
+    </div>
+    <div class="gps-location" id="gps-location">
+      <span class="gps-pin">📍</span>
+      <div class="gps-loc-text">
+        <div class="gps-loc-name" id="gps-loc-name">—</div>
+        <div class="gps-loc-coords" id="gps-loc-coords"></div>
+      </div>
+      <button class="gps-loc-close" onclick="clearGPSLocation()" title="Chiudi">✕</button>
+    </div>
+    <div class="sug" id="sug"></div>
+
+    <div class="filter-row" id="frow">
+      <button class="fb on" data-f="Benzina" onclick="setFuel(this)">Benzina</button>
+      <button class="fb" data-f="Diesel" onclick="setFuel(this)">Diesel</button>
+      <button class="fb" data-f="Benzina Premium" onclick="setFuel(this)">Benzina Prem.</button>
+      <button class="fb" data-f="Diesel Premium" onclick="setFuel(this)">Diesel Prem.</button>
+      <button class="fb" data-f="HVO" onclick="setFuel(this)">HVO</button>
+      <button class="fb" data-f="GPL" onclick="setFuel(this)">GPL</button>
+      <button class="fb" data-f="Metano" onclick="setFuel(this)">Metano</button>
+      <button class="fb" id="self-btn" onclick="toggleSelf()">Solo self</button>
+      <button class="fb" id="sort-dist-btn" onclick="toggleSortDist()" style="display:none">↕ Distanza</button>
+      <button class="ev-toggle-btn" id="ev-toggle-btn" onclick="toggleEV()" style="display:none">⚡ Colonnine</button>
+    </div>
+    <div class="bandiera-row" id="brow"></div>
+
+    <div class="status">
+      <div class="dot" id="sdot"></div>
+      <span id="stxt">Pronto</span>
+    </div>
+
+    <div id="results"></div>
+    <div class="ev-section hidden" id="ev-section">
+      <div class="sect">⚡ Colonnine elettriche <span class="tag" style="background:rgba(125,212,252,.12);color:#7dd4fc;border-color:rgba(125,212,252,.3)">OpenChargeMap</span></div>
+      <div id="ev-list"></div>
+    </div>
+  </main>
+
+  <footer>
+    Dati: <a href="https://www.mimit.gov.it/it/open-data/elenco-dataset/carburanti-prezzi-praticati-e-anagrafica-degli-impianti" target="_blank">Open data MIMIT</a>
+    · aggiornamento giornaliero ore 08:00 · Licenza IODL 2.0
+  </footer>
+
+    <button class="btn-install" id="btn-install">Installa</button>
+    <button class="btn-install-close" onclick="dismissInstall()">✕</button>
+  </div>
+
+
+
+</div>
+
+  <!-- FAV VIEW -->
+  <div id="fav-view">
+    <div class="fav-view-header">
+      <div class="logo">
+        <div class="h-icon" style="width:30px;height:30px;background:var(--am)">
+          <span style="font-size:15px;line-height:30px;display:block;text-align:center">★</span>
+        </div>
+        <div><h1 style="font-family:var(--fd);font-weight:700;font-size:.95rem;letter-spacing:-.02em">Preferiti <small style="font-size:.55rem;color:var(--mut);display:block;text-transform:uppercase;letter-spacing:.1em">Distributori salvati</small></h1></div>
+      </div>
+      <button class="btn-close-map" onclick="closeFavView()">✕ Chiudi</button>
+    </div>
+    <div class="fav-view-body" id="fav-view-body"></div>
+  </div>
+
+
+  <!-- MAP VIEW -->
+  <div id="map-view">
+    <div class="map-header">
+      <div class="map-header-left">
+        <div class="h-icon" style="width:30px;height:30px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0d0e0f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 22V4a2 2 0 012-2h6a2 2 0 012 2v18"/><path d="M5 12h10"/>
+            <path d="M15 7l4 4-4 4"/><path d="M19 7v8"/>
+          </svg>
+        </div>
+        <div class="map-title">Mappa distributori <small>Carburanti Italia</small></div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn-close-map" onclick="closeMapView()">✕ Chiudi</button>
+      </div>
+    </div>
+    <!-- MAP PLACE SEARCH -->
+    <div class="map-search-bar">
+      <input type="text" id="map-place-input" placeholder="🔍  Cerca un posto…" autocomplete="off" autocorrect="off" />
+      <button class="btn-route" id="btn-map-place" onclick="mapSearchPlace()">Vai</button>
+      <div class="map-place-sug" id="map-place-sug" style="display:none"></div>
+    </div>
+
+    <div class="map-fuel-row" id="map-fuel-row">
+      <button class="fb on" data-mf="Benzina" onclick="setMapFuel(this)">Benzina</button>
+      <button class="fb" data-mf="Diesel" onclick="setMapFuel(this)">Diesel</button>
+      <button class="fb" data-mf="GPL" onclick="setMapFuel(this)">GPL</button>
+      <button class="fb" data-mf="Metano" onclick="setMapFuel(this)">Metano</button>
+      <button class="fb" data-mf="HVO" onclick="setMapFuel(this)">HVO</button>
+      <button class="fb" data-mf="Diesel Premium" onclick="setMapFuel(this)">Diesel Prem.</button>
+    </div>
+    <div id="map-container">
+      <div id="leaflet-map"></div>
+      <div class="map-status hidden" id="map-status">—</div>
+      <div class="map-controls">
+        <button class="map-ctrl-btn active" id="map-gps-btn" onclick="mapLocateMe()">📍 Localizzami</button>
+        <button class="map-ctrl-btn" id="map-self-btn" onclick="toggleMapSelf()">Self service</button>
+        <button class="map-ctrl-btn" id="map-ev-btn" onclick="toggleMapEV()">⚡ Colonnine</button>
+        <button class="map-ctrl-btn" id="map-reload-btn" onclick="loadMapStations()" disabled>↻ Aggiorna area</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- COMPARE MODAL -->
+  <div class="compare-modal-overlay hidden" id="compare-overlay">
+    <div class="compare-modal">
+      <h3>Confronta con i distributori vicini</h3>
+      <p id="compare-subtitle">Confronta il tuo preferito con quelli nell'area</p>
+      <div class="radius-row">
+        <label>Raggio</label>
+        <input type="range" id="compare-radius" min="5" max="20" step="1" value="10"
+          oninput="document.getElementById('compare-radius-val').textContent=this.value+' km'" />
+        <span class="radius-val" id="compare-radius-val">10 km</span>
+      </div>
+      <button class="btn-compare-go" id="btn-compare-go" onclick="runComparison()">Confronta</button>
+      <div class="compare-results" id="compare-results"></div>
+      <button class="compare-close" onclick="closeCompare()">Chiudi</button>
+    </div>
+  </div>
+
+
+  <!-- EV DETAIL MODAL -->
+  <div class="overlay hidden" id="ev-modal-overlay" onclick="closeEVModal(event)">
+    <div class="modal" id="ev-modal">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <div class="modal-title" id="ev-modal-nome">—</div>
+        <button class="modal-close" onclick="closeEVModal()">✕</button>
+      </div>
+      <div class="modal-rows" id="ev-modal-rows"></div>
+      <div class="modal-btns" id="ev-modal-btns"></div>
+    </div>
+  </div>
+
+
+  <!-- FAV EDIT MODAL -->
+  <div class="fav-modal-overlay hidden" id="fav-edit-overlay">
+    <div class="fav-modal">
+      <h3>Modifica preferito</h3>
+      <label>Nome personalizzato</label>
+      <input type="text" id="fav-edit-name" placeholder="Es. Distributore vicino casa" maxlength="60" />
+      <label>Nota</label>
+      <textarea id="fav-edit-note" rows="2" placeholder="Es. Aperto 24h, accetta carta…" maxlength="120"></textarea>
+      <div class="fav-modal-btns">
+        <button class="btn-fav-cancel" onclick="closeFavModal()">Annulla</button>
+        <button class="btn-fav-delete" onclick="deleteFavFromModal()">Elimina</button>
+        <button class="btn-fav-save" onclick="saveFavModal()">Salva</button>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <!-- MODAL DETTAGLIO -->
+  <div class="overlay hidden" id="modal-overlay" onclick="closeModal(event)">
+    <div class="modal" id="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <div class="modal-title" id="modal-nome">—</div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-price-row">
+        <div class="modal-price" id="modal-prezzo">—</div>
+        <div class="modal-price-meta" id="modal-price-meta">€/litro · —</div>
+      </div>
+      <div class="modal-rows">
+        <div class="modal-row">
+          <div class="modal-row-icon">📍</div>
+          <div class="modal-row-content">
+            <div class="modal-row-label">Indirizzo</div>
+            <div class="modal-row-val" id="modal-addr">—</div>
+          </div>
+        </div>
+        <div class="modal-row">
+          <div class="modal-row-icon">⛽</div>
+          <div class="modal-row-content">
+            <div class="modal-row-label">Gestore · Bandiera</div>
+            <div class="modal-row-val" id="modal-gestore">—</div>
+          </div>
+        </div>
+        <div class="modal-row">
+          <div class="modal-row-icon">🔧</div>
+          <div class="modal-row-content">
+            <div class="modal-row-label">Modalità</div>
+            <div class="modal-row-val" id="modal-mode">—</div>
+          </div>
+        </div>
+        <div class="modal-row" id="modal-dist-row" style="display:none">
+          <div class="modal-row-icon">📍</div>
+          <div class="modal-row-content">
+            <div class="modal-row-label">Distanza</div>
+            <div class="modal-row-val" id="modal-dist-val">—</div>
+          </div>
+        </div>
+        <div class="modal-row">
+          <div class="modal-row-icon">📅</div>
+          <div class="modal-row-content">
+            <div class="modal-row-label">Ultimo aggiornamento prezzo</div>
+            <div class="modal-row-val" id="modal-dt">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-btns">
+        <a class="btn-maps" id="btn-gmaps" href="#" target="_blank">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Apri in Google Maps
+        </a>
+        <a class="btn-maps btn-maps-apple" id="btn-apple" href="#" target="_blank">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Apple Maps
+        </a>
+      </div>
+    </div>
+  </div>
+
+
+<script>
+let WORKER = 'https://osservaprezzi.gabrycois.workers.dev';
+let activeComune = null;
+let activeFuel = 'Benzina';
+let activeSelf = false;
+let suggestTimer = null;
+let _stationData = [];
+
+// ── Init ──────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  startApp();
+  document.getElementById('frow').style.display = 'flex';
+  updateFavBtn();
+  applyCardVisibility();
+  updateTs();
+  setInterval(updateTs, 30000);
+  document.getElementById('qinput').addEventListener('input', onInput);
+  document.getElementById('qinput').addEventListener('keydown', e => { if(e.key==='Enter'){ document.getElementById('sug').style.display='none'; doSearch(); } });
+  document.addEventListener('click', e => { if(!e.target.closest('#sug') && !e.target.closest('#qinput')) document.getElementById('sug').style.display='none'; });
 });
 
-// Activate: remove old caches
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    )
-  );
-  self.clients.claim();
-});
 
-// Fetch: cache-first per static, network-first per API Worker
-self.addEventListener('fetch', e => {
-  const url = new URL(e.request.url);
+// ── App start ─────────────────────────────────────────────────
+function startApp() {
+  showLoader(true);
+  document.getElementById('app').style.display = 'none';
+  loadMedie();
+}
 
-  // API Worker → sempre network, mai cache
-  if (url.hostname.includes('workers.dev') ||
-      url.hostname.includes('nominatim') ||
-      url.hostname.includes('osrm') ||
-      url.hostname.includes('openstreetmap')) {
-    e.respondWith(fetch(e.request).catch(() => new Response('{"error":"offline"}', { headers: { 'Content-Type': 'application/json' } })));
+function showLoader(show) {
+  document.getElementById('loader').style.display = show ? 'flex' : 'none';
+}
+
+async function loadMedie() {
+  document.getElementById('lerr').style.display = 'none';
+  document.getElementById('lretry').style.display = 'none';
+  setLd(10, 'Connessione al Worker…');
+  try {
+    setLd(40, 'Carico medie nazionali…');
+    const data = await api('/api/medie');
+    setLd(100, 'Pronto!');
+    renderMedie(data);
+    await sleep(250);
+    showLoader(false);
+    document.getElementById('app').style.display = 'block';
+  } catch(e) {
+    document.getElementById('lmsg').textContent = '';
+    document.getElementById('lerr').textContent = 'Errore: ' + e.message;
+    document.getElementById('lerr').style.display = 'block';
+    document.getElementById('lretry').style.display = 'block';
+  }
+}
+
+function setLd(pct, msg) {
+  document.getElementById('lbar').style.width = pct + '%';
+  document.getElementById('lmsg').textContent = msg;
+}
+
+// ── API ───────────────────────────────────────────────────────
+async function api(path) {
+  const res = await fetch(WORKER + path);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+// ── Medie nazionali ───────────────────────────────────────────
+function renderMedie(data) {
+  if (data._cachedAt && data._nextUpdate) renderUpdateBar(data._cachedAt, data._nextUpdate, data._extractionDate);
+  const map = { bz:'Benzina', go:'Diesel', gpl:'GPL', met:'Metano' };
+  for (const [k, fuel] of Object.entries(map)) {
+    const d = data[fuel] || {};
+    const avg = document.getElementById('avg-' + k);
+    avg.textContent = d.self ? d.self.toFixed(3) : 'n.d.';
+    avg.classList.remove('flash'); void avg.offsetWidth; avg.classList.add('flash');
+    document.getElementById('s-' + k).textContent = d.self  ? 'self '  + d.self.toFixed(3)  : 'self n.d.';
+    document.getElementById('v-' + k).textContent = d.serv  ? 'serv. ' + d.serv.toFixed(3)  : 'serv. n.d.';
+  }
+}
+
+// ── Autocomplete ──────────────────────────────────────────────
+function onInput() {
+  clearTimeout(suggestTimer);
+  const q = document.getElementById('qinput').value.trim();
+  if (q.length < 2) { document.getElementById('sug').style.display = 'none'; return; }
+  // CAP: no autocomplete, just wait for search
+  if (/^\d+$/.test(q)) {
+    document.getElementById('sug').style.display = 'none';
+    return;
+  }
+  suggestTimer = setTimeout(() => fetchSuggest(q), 280);
+}
+
+async function fetchSuggest(q) {
+  try {
+    const results = await api('/api/comuni?q=' + encodeURIComponent(q));
+    const sug = document.getElementById('sug');
+    if (!results.length) { sug.style.display = 'none'; return; }
+    sug.innerHTML = '';
+    results.forEach(r => {
+      const div = document.createElement('div');
+      div.className = 'sug-row';
+      div.innerHTML = `<span>${capFn(r.nome)}</span><span class="sug-prov">${r.provincia} · ${r.count} imp.</span>`;
+      div.onclick = () => {
+        document.getElementById('qinput').value = capFn(r.nome);
+        sug.style.display = 'none';
+        activeComune = r.nome;
+        activeFuel = 'Benzina'; activeSelf = false;
+        resetFilters();
+        fetchStations();
+      };
+      sug.appendChild(div);
+    });
+    sug.style.display = 'block';
+  } catch(e) {}
+}
+
+// ── Cerca ─────────────────────────────────────────────────────
+async function doSearch() {
+  clearGPSLocation();
+  _gpsActive = false;
+  _sortByDist = false;
+  _evActive = false;
+  document.getElementById('sort-dist-btn').style.display = 'none';
+  document.getElementById('ev-toggle-btn').style.display = 'none';
+  document.getElementById('ev-section').classList.add('hidden');
+  const evBtn = document.getElementById('ev-toggle-btn');
+  if (evBtn) { evBtn.classList.remove('on'); evBtn.textContent = '⚡ Colonnine'; }
+  const q = document.getElementById('qinput').value.trim();
+  if (!q) { document.getElementById('qinput').focus(); return; }
+
+  // Detect CAP (5 digits)
+  if (/^\d{5}$/.test(q)) {
+    await searchByCAP(q);
     return;
   }
 
-  // Tile maps → network con fallback cache
-  if (url.hostname.includes('carto') || url.hostname.includes('tile')) {
-    e.respondWith(
-      fetch(e.request).then(r => {
-        const clone = r.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
-        return r;
-      }).catch(() => caches.match(e.request))
-    );
+  const qu = q.toUpperCase();
+  try {
+    const res = await api('/api/comuni?q=' + encodeURIComponent(qu));
+    if (res.length > 0) {
+      const exact = res.find(r => r.nome === qu) || res[0];
+      activeComune = exact.nome;
+      document.getElementById('qinput').value = capFn(exact.nome);
+      activeFuel = 'Benzina'; activeSelf = false;
+      resetFilters();
+      fetchStations();
+    } else {
+      setStatus('err', 'Comune non trovato');
+      document.getElementById('results').innerHTML = `<div class="no-res">Nessun comune trovato per "${cap(qu)}"</div>`;
+    }
+  } catch(e) {
+    setStatus('err', e.message);
+  }
+}
+
+async function searchByCAP(cap_code) {
+  setStatus('ld', 'Risolvo il CAP ' + cap_code + '…');
+  document.getElementById('sbtn').disabled = true;
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?postalcode=${cap_code}&country=Italy&format=json&limit=5&addressdetails=1`;
+    const res = await fetch(url, { headers: { 'Accept-Language': 'it' } });
+    if (!res.ok) throw new Error('Nominatim HTTP ' + res.status);
+    const data = await res.json();
+    if (!data.length) {
+      setStatus('err', 'CAP non trovato');
+      document.getElementById('results').innerHTML = `<div class="no-res">CAP ${cap_code} non trovato. Prova a inserire il nome del comune.</div>`;
+      return;
+    }
+    // Extract comune from result
+    const addr = data[0].address || {};
+    const comuneName = (addr.village || addr.town || addr.city || addr.municipality || '').toUpperCase();
+    if (!comuneName) throw new Error('Impossibile determinare il comune dal CAP');
+
+    // Try to find in MIMIT index
+    const res2 = await api('/api/comuni?q=' + encodeURIComponent(comuneName.slice(0, 6)));
+    const match = res2.find(r => r.nome === comuneName) || res2[0];
+    if (!match) {
+      setStatus('err', 'Comune non trovato nel database MIMIT');
+      document.getElementById('results').innerHTML = `<div class="no-res">CAP ${cap_code} corrisponde a <strong>${cap(comuneName)}</strong>, ma non è presente nel database MIMIT.</div>`;
+      return;
+    }
+    activeComune = match.nome;
+    document.getElementById('qinput').value = capFn(match.nome) + ' (' + cap_code + ')';
+    activeFuel = 'Benzina'; activeSelf = false;
+    resetFilters();
+    fetchStations();
+  } catch(e) {
+    setStatus('err', 'Errore CAP: ' + e.message);
+  } finally {
+    document.getElementById('sbtn').disabled = false;
+  }
+}
+
+async function fetchStations() {
+  if (!activeComune) return;
+  document.getElementById('frow').style.display = 'flex';
+  setStatus('ld', 'Cerco impianti a ' + capFn(activeComune) + '…');
+  document.getElementById('sbtn').disabled = true;
+  try {
+    const url = `/api/cerca?comune=${encodeURIComponent(activeComune)}&carburante=${encodeURIComponent(activeFuel)}&self=${activeSelf?1:0}`;
+    const data = await api(url);
+    renderStations(data);
+    setStatus('ok', `${data.length} impianti trovati · ${capFn(activeComune)}`);
+    // Show EV toggle and store search coords for EV lookup
+    if (data.length > 0 && data[0].lat) {
+      _lastSearchLat = data[0].lat;
+      _lastSearchLng = data[0].lng;
+      _lastSearchRadius = 5;
+    } else if (activeComune) {
+      // Fallback: use centroid of results if available
+    }
+    document.getElementById('ev-toggle-btn').style.display = '';
+    if (_evActive) { document.getElementById('ev-section').classList.remove('hidden'); loadEVStations(); }
+  } catch(e) {
+    setStatus('err', 'Errore: ' + e.message);
+  } finally {
+    document.getElementById('sbtn').disabled = false;
+  }
+}
+
+function renderStations(data) {
+  const area = document.getElementById('results');
+  if (!data.length) {
+    area.innerHTML = `<div class="no-res">Nessun impianto trovato a ${capFn(activeComune)} per ${activeFuel}${activeSelf?' self service':''}.</div>`;
     return;
   }
+  _stationData = data;
+  const minP = data[0].prezzo, maxP = data[data.length-1].prezzo;
+  const unit = activeFuel === 'Metano' ? 'kg' : 'lt';
+  let html = `<div class="res-hdr fi">
+    <div class="res-title">${activeFuel} · ${activeComune ? capFn(activeComune) : "Vicino a te"}</div>
+    <div class="res-sub">min <span style="color:var(--gn)">${minP.toFixed(3)}</span> — max <span style="color:var(--rd)">${maxP.toFixed(3)}</span></div>
+  </div><div class="slist fi">`;
+  data.forEach((s, i) => {
+    const r = i+1, rc = r===1?'r1':r===2?'r2':r===3?'r3':'';
+    const pc = s.prezzo <= minP*1.005 ? 'cheap' : s.prezzo >= maxP*0.995 ? 'dear' : '';
+    html += `<div class="station" onclick="openModalIdx(${i})" style="cursor:pointer">
+      <div class="st-rank ${rc}">${r}</div>
+      <div class="st-info">
+        <div class="st-name">${esc(s.nome)}</div>
+        <div class="st-addr">${esc(s.indirizzo)}</div>
+        <div class="st-tags">
+          ${s.bandiera ? `<span class="st-tag">${esc(s.bandiera)}</span>` : ''}
+          <span class="st-tag">${s.isSelf?'self':'servito'}</span>
+        </div>
+      </div>
+      <div class="st-p">
+        <div class="st-price ${pc}">${s.prezzo.toFixed(3)}</div>
+        <div class="st-unit">€/${unit}</div>
+        <div class="st-dt">${s.dtComu||''}</div>
+        ${s.distanza!=null?`<div class="dist-badge">📍 ${s.distanza} km</div>`:''}
+        <button class="fav-btn ${isFav(s.id)?'on':''}" onclick="event.stopPropagation();toggleFav(${i})" title="${isFav(s.id)?'Rimuovi':'Salva'}">${isFav(s.id)?'★ Salvato':'☆ Salva'}</button>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+  if (data.length === 60) html += `<div style="font-size:.68rem;color:var(--mut);text-align:center;margin-top:-10px;margin-bottom:16px">Mostrati i 60 più economici</div>`;
+  area.innerHTML = html;
+  buildBandieraFilter(data);
+  renderFavSection();
+}
 
-  // Static assets → cache-first
-  e.respondWith(
-    caches.match(e.request).then(cached => {
-      if (cached) return cached;
-      return fetch(e.request).then(r => {
-        if (r.ok) {
-          const clone = r.clone();
-          caches.open(CACHE).then(c => c.put(e.request, clone));
-        }
-        return r;
+// ── Filters ───────────────────────────────────────────────────
+function setFuel(btn) {
+  activeFuel = btn.dataset.f;
+  document.querySelectorAll('.fb[data-f]').forEach(b => b.classList.toggle('on', b===btn));
+  if (activeComune) fetchStations();
+}
+
+function toggleSelf() {
+  activeSelf = !activeSelf;
+  const btn = document.getElementById('self-btn');
+  btn.classList.toggle('on', activeSelf);
+  btn.textContent = activeSelf ? '✓ Solo self' : 'Solo self';
+  if (activeComune) fetchStations();
+}
+
+function resetFilters() {
+  document.querySelectorAll('.fb[data-f]').forEach(b => b.classList.toggle('on', b.dataset.f==='Benzina'));
+  document.getElementById('self-btn').classList.remove('on');
+  document.getElementById('self-btn').textContent = 'Solo self';
+  activeBandiera = null;
+  document.getElementById('brow').style.display = 'none';
+  _sortByDist = false;
+  const sdb = document.getElementById('sort-dist-btn');
+  if (sdb) { sdb.classList.remove('on'); sdb.textContent = '↕ Distanza'; }
+}
+
+// ── Utils ─────────────────────────────────────────────────────
+function setStatus(s, msg) {
+  const d = document.getElementById('sdot');
+  d.className = 'dot' + (s==='ld'?' ld':s==='ok'?' ok':s==='err'?' err':'');
+  document.getElementById('stxt').textContent = msg;
+}
+
+function updateTs() {
+  const n = new Date();
+  document.getElementById('ts-badge').textContent =
+    n.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+}
+
+function capFn(s) { return s ? s.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()) : ''; }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+
+
+
+
+// ── ROUTE ────────────────────────────────────────────────────
+let _routeLayer = null;
+let _routeMarkers = [];
+let _routeActive = false;
+let _suggestTimer2 = null;
+
+
+
+
+
+function openMapView() {
+  const view = document.getElementById('map-view');
+  view.classList.add('visible');
+  document.body.style.overflow = 'hidden';
+
+  // Wait for layout to settle, then measure and init
+  setTimeout(() => {
+    const mc = document.getElementById('map-container');
+    const mapEl = document.getElementById('leaflet-map');
+    // Explicitly set pixel dimensions - the only reliable cross-browser approach
+    const h = mc.clientHeight || (window.innerHeight - 155);
+    const w = mc.clientWidth  || window.innerWidth;
+    mapEl.style.width  = w + 'px';
+    mapEl.style.height = h + 'px';
+
+    if (!_mapInitialized) {
+      initMap();
+      _mapInitialized = true;
+    } else if (_map) {
+      _map.invalidateSize(true);
+    }
+  }, 200);
+}
+
+function closeMapView() {
+  document.getElementById('map-view').classList.remove('visible');
+  document.body.style.overflow = '';
+}
+
+window.addEventListener('resize', () => {
+  if (_map && document.getElementById('map-view').classList.contains('visible')) {
+    const mc = document.getElementById('map-container');
+    const mapEl = document.getElementById('leaflet-map');
+    mapEl.style.width  = mc.clientWidth + 'px';
+    mapEl.style.height = mc.clientHeight + 'px';
+    _map.invalidateSize(true);
+  }
+});
+
+
+// ── Map place search ─────────────────────────────────────────
+let _mapPlaceSugTimer = null;
+
+function initMapPlaceSearch() {
+  const inp = document.getElementById('map-place-input');
+  if (!inp || inp._inited) return;
+  inp._inited = true;
+  inp.addEventListener('input', () => {
+    clearTimeout(_mapPlaceSugTimer);
+    const q = inp.value.trim();
+    const sug = document.getElementById('map-place-sug');
+    if (q.length < 2) { sug.style.display = 'none'; return; }
+    _mapPlaceSugTimer = setTimeout(async () => {
+      const res = await geocode(q);
+      if (!res.length) { sug.style.display = 'none'; return; }
+      sug.innerHTML = '';
+      res.slice(0, 5).forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'route-sug-item';
+        div.innerHTML = `<div>${esc(r.display_name.split(',')[0])}</div><div class="route-sug-sub">${esc(r.display_name.split(',').slice(1,3).join(','))}</div>`;
+        div.onclick = () => {
+          inp.value = r.display_name.split(',')[0];
+          sug.style.display = 'none';
+          const lat = parseFloat(r.lat), lng = parseFloat(r.lon);
+          _map.setView([lat, lng], 14);
+          loadMapStations();
+        };
+        sug.appendChild(div);
       });
-    })
+      sug.style.display = 'block';
+    }, 320);
+  });
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') mapSearchPlace(); });
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.map-search-bar')) document.getElementById('map-place-sug').style.display = 'none';
+  });
+}
+
+async function mapSearchPlace() {
+  const q = document.getElementById('map-place-input').value.trim();
+  if (!q) return;
+  const res = await geocode(q);
+  if (!res.length) { setMapStatus('Posto non trovato'); return; }
+  const lat = parseFloat(res[0].lat), lng = parseFloat(res[0].lon);
+  _map.setView([lat, lng], 14);
+  document.getElementById('map-place-sug').style.display = 'none';
+  loadMapStations();
+}
+
+// Geocode via Nominatim (OpenStreetMap)
+async function geocode(q) {
+  const res = await fetch(
+    `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=5&accept-language=it`,
+    { headers: { 'User-Agent': 'OsservaPrezziCarburanti/1.0' } }
   );
+  return res.json();
+}
+
+function initMap() {
+  _map = L.map('leaflet-map', {
+    center: [41.9, 12.5], // Centro Italia
+    zoom: 6,
+    zoomControl: true,
+  });
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
+    maxZoom: 19,
+    subdomains: ['a','b','c'],
+  }).addTo(_map);
+
+  _map.on('moveend', () => {
+    if (_map.getZoom() >= 13) {
+      document.getElementById('map-reload-btn').disabled = false;
+    } else {
+      document.getElementById('map-reload-btn').disabled = true;
+    }
+  });
+
+  // Auto-locate on open
+  initMapPlaceSearch();
+  mapLocateMe();
+}
+
+function setMapStatus(msg, hide = false) {
+  const el = document.getElementById('map-status');
+  el.textContent = msg;
+  el.classList.toggle('hidden', hide);
+}
+
+function mapLocateMe() {
+  const btn = document.getElementById('map-gps-btn');
+  btn.textContent = '⏳ Localizzando…';
+  btn.disabled = true;
+  setMapStatus('Rilevo la tua posizione…');
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const { latitude: lat, longitude: lng } = pos.coords;
+      _mapCenter = { lat, lng };
+      _map.setView([lat, lng], 15);
+
+      // User marker
+      if (_userMarker) _userMarker.remove();
+      _userMarker = L.circleMarker([lat, lng], {
+        radius: 10,
+        fillColor: '#e8a030',
+        color: '#0d0e0f',
+        weight: 2,
+        fillOpacity: 1,
+      }).addTo(_map).bindPopup('<div class="map-popup"><div class="map-popup-name">📍 Sei qui</div></div>');
+
+      btn.textContent = '📍 Localizzami';
+      btn.disabled = false;
+      loadMapStations();
+    },
+    err => {
+      setMapStatus('Posizione non disponibile', false);
+      btn.textContent = '📍 Localizzami';
+      btn.disabled = false;
+    },
+    { timeout: 10000 }
+  );
+}
+
+function setMapFuel(btn) {
+  _mapFuel = btn.dataset.mf;
+  document.querySelectorAll('[data-mf]').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  if (_mapCenter) loadMapStations();
+}
+
+function toggleMapSelf() {
+  _mapSelf = !_mapSelf;
+  const btn = document.getElementById('map-self-btn');
+  btn.classList.toggle('active', _mapSelf);
+  btn.textContent = _mapSelf ? '✓ Self service' : 'Self service';
+  if (_mapCenter) loadMapStations();
+}
+
+async function loadMapStations() {
+  if (!_mapCenter) { setMapStatus('Premi "Localizzami" per trovare la tua posizione'); return; }
+  const center = _map.getCenter();
+  const zoom = _map.getZoom();
+  // Calculate radius from zoom level
+  const radius = zoom >= 15 ? 3 : zoom >= 13 ? 8 : 15;
+
+  setMapStatus(`Cerco ${_mapFuel} entro ${radius} km…`);
+  try {
+    const url = `/api/vicini?lat=${center.lat}&lng=${center.lng}&carburante=${encodeURIComponent(_mapFuel)}&self=${_mapSelf?1:0}&raggio=${radius}`;
+    const data = await api(url);
+    renderMapMarkers(data, center.lat, center.lng);
+    setMapStatus(`${data.length} impianti trovati`, data.length > 0);
+    if (data.length === 0) setTimeout(() => setMapStatus('Nessun impianto trovato in questa area — prova ad allargare la mappa', false), 100);
+  } catch(e) {
+    setMapStatus('Errore: ' + e.message);
+  }
+}
+
+function renderMapMarkers(stations, userLat, userLng) {
+  // Remove old markers
+  _mapMarkers.forEach(m => m.remove());
+  _mapMarkers = [];
+
+  if (!stations.length) return;
+
+  const prices = stations.map(s => s.prezzo);
+  const minP = Math.min(...prices);
+  const maxP = Math.max(...prices);
+
+  stations.forEach(s => {
+    if (!s.lat || !s.lng || isNaN(s.lat) || isNaN(s.lng)) return;
+
+    // Color: green=cheap, amber=mid, red=dear
+    const ratio = maxP === minP ? 0.5 : (s.prezzo - minP) / (maxP - minP);
+    const color = ratio < 0.33 ? '#4caf7d' : ratio < 0.66 ? '#e8a030' : '#e05a4a';
+    const unit = _mapFuel === 'Metano' ? 'kg' : 'lt';
+
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="
+        width:14px;height:14px;
+        background:${color};
+        border-radius:50%;
+        box-shadow:0 2px 6px rgba(0,0,0,.6);
+        border:2px solid rgba(255,255,255,.35);
+      "></div>`,
+      iconAnchor: [7, 7],
+    });
+
+    const marker = L.marker([s.lat, s.lng], { icon })
+      .addTo(_map)
+      .bindPopup(`
+        <div class="map-popup">
+          <div class="map-popup-price">${s.prezzo.toFixed(3)}</div>
+          <div class="map-popup-unit">€/${unit} · ${s.isSelf ? 'self service' : 'servito'}</div>
+          <div class="map-popup-name">${esc(s.nome)}</div>
+          <div class="map-popup-addr">${esc(s.indirizzo)}</div>
+          ${s.distanza != null ? `<div class="map-popup-dist">📍 ${s.distanza} km da te</div>` : ''}
+          <div class="map-popup-tags">
+            ${s.bandiera ? `<span class="map-popup-tag">${esc(s.bandiera)}</span>` : ''}
+            <span class="map-popup-tag">${esc(s.carburante||'')}</span>
+          </div>
+          <a class="map-popup-btn" href="${s.lat && s.lng ? `https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.nome+' '+s.indirizzo)}`}" target="_blank">Apri in Maps →</a>
+        </div>
+      `, { maxWidth: 240 });
+
+    _mapMarkers.push(marker);
+  });
+}
+
+// ── Update bar & polling ───────────────────────────────────────
+let _lastCachedAt = null;
+
+function renderUpdateBar(cachedAt, nextUpdate, extractionDate) {
+  _lastCachedAt = cachedAt;
+
+  const next   = new Date(nextUpdate);
+  const now    = new Date();
+  const lastEl = document.getElementById('last-update');
+  const nextEl = document.getElementById('next-update');
+
+  // Show MIMIT extraction date (real data date), not worker cache time
+  if (extractionDate) {
+    const [y, m, d] = extractionDate.split('-');
+    lastEl.textContent = `${d}/${m}/${y} · estrazione MIMIT`;
+    // Check if extraction date is today
+    const todayStr = now.toISOString().slice(0, 10);
+    lastEl.className = 'update-val ' + (extractionDate === todayStr ? 'fresh' : 'stale');
+  } else {
+    const cached = new Date(cachedAt);
+    const ageMin = Math.round((now - cached) / 60000);
+    const dateStr = cached.toLocaleDateString('it-IT', { day:'2-digit', month:'2-digit', year:'numeric' });
+    const timeStr = cached.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
+    lastEl.textContent = `${dateStr} ${timeStr}`;
+    lastEl.className   = 'update-val ' + (ageMin < 240 ? 'fresh' : 'stale');
+  }
+
+  // Format next update
+  const minsToNext = Math.round((next - now) / 60000);
+  if (minsToNext <= 0) {
+    nextEl.textContent = 'Disponibile ora';
+    nextEl.className   = 'update-val fresh';
+  } else {
+    const h = Math.floor(minsToNext / 60), m = minsToNext % 60;
+    nextEl.textContent = h > 0 ? `tra ${h}h ${m}min` : `tra ${m} min`;
+    nextEl.className   = 'update-val';
+  }
+
+  // Update countdown every minute
+  setTimeout(() => { if (_lastCachedAt === cachedAt) renderUpdateBar(cachedAt, nextUpdate); }, 60000);
+}
+
+async function checkForNewData() {
+  if (!_lastCachedAt) return;
+  try {
+    const data = await api('/');
+    if (data.cachedAt && data.cachedAt !== _lastCachedAt) {
+      document.getElementById('new-data-banner').classList.remove('hidden');
+    }
+  } catch(e) {}
+}
+
+async function doRefresh() {
+  document.getElementById('new-data-banner').classList.add('hidden');
+  await loadMedie();
+}
+
+// Poll for new data every 15 minutes
+setInterval(checkForNewData, 15 * 60 * 1000);
+
+
+// ── Card visibility ────────────────────────────────────────────
+const CARD_PREF_KEY = 'opf_hidden_cards';
+
+function loadHiddenCards() {
+  try { return JSON.parse(localStorage.getItem(CARD_PREF_KEY) || '[]'); } catch(e) { return []; }
+}
+
+function applyCardVisibility() {
+  const hidden = loadHiddenCards();
+  document.querySelectorAll('.card-toggle').forEach(btn => {
+    const id = btn.dataset.card;
+    const isHidden = hidden.includes(id);
+    btn.classList.toggle('hidden-fuel', isHidden);
+    const card = document.querySelector('.c-' + id);
+    if (card) card.classList.toggle('card-hidden', isHidden);
+  });
+  // Collapse cards-grid if all hidden
+  const grid = document.querySelector('.cards-grid');
+  const allHidden = ['bz','go','gpl','met'].every(id => hidden.includes(id));
+  if (grid) grid.style.marginBottom = allHidden ? '0' : '';
+}
+
+function toggleCard(btn) {
+  const id = btn.dataset.card;
+  let hidden = loadHiddenCards();
+  if (hidden.includes(id)) hidden = hidden.filter(h => h !== id);
+  else hidden.push(id);
+  localStorage.setItem(CARD_PREF_KEY, JSON.stringify(hidden));
+  applyCardVisibility();
+}
+
+
+// ── GPS Location badge ────────────────────────────────────────
+async function showGPSLocation(lat, lng) {
+  const badge  = document.getElementById('gps-location');
+  const name   = document.getElementById('gps-loc-name');
+  const coords = document.getElementById('gps-loc-coords');
+
+  // Show coords immediately
+  coords.textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  name.textContent = 'Localizzazione in corso…';
+  badge.classList.add('visible');
+
+  // Reverse geocode via Nominatim (OpenStreetMap, gratuito)
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=it`,
+      { headers: { 'User-Agent': 'OsservaPrezziCarburanti/1.0' } }
+    );
+    const data = await res.json();
+    const addr = data.address || {};
+    const parts = [
+      addr.village || addr.town || addr.city || addr.municipality || addr.county,
+      addr.state_district || addr.province,
+      addr.postcode,
+    ].filter(Boolean);
+    name.textContent = parts.length ? parts.join(' · ') : 'Posizione rilevata';
+  } catch(e) {
+    name.textContent = 'Posizione rilevata';
+  }
+}
+
+function clearGPSLocation() {
+  document.getElementById('gps-location').classList.remove('visible');
+}
+
+// ── GPS ────────────────────────────────────────────────────────
+async function doGPS() {
+  if (!navigator.geolocation) { setStatus('err', 'Geolocalizzazione non supportata'); return; }
+  const btn = document.getElementById('gps-btn');
+  btn.classList.add('active');
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg> Localizzazione…`;
+  navigator.geolocation.getCurrentPosition(
+    async pos => {
+      const { latitude: lat, longitude: lng } = pos.coords;
+      document.getElementById('qinput').value = '';
+      activeComune = null;
+      _gpsActive = true;
+      _sortByDist = false;
+      document.getElementById('frow').style.display = 'flex';
+      document.getElementById('sort-dist-btn').style.display = '';
+      document.getElementById('sort-dist-btn').classList.remove('on');
+      document.getElementById('sort-dist-btn').textContent = '↕ Distanza';
+      resetFilters();
+      setStatus('ld', 'Cerco distributori vicino a te…');
+      showGPSLocation(lat, lng);
+      try {
+        const url = `/api/vicini?lat=${lat}&lng=${lng}&carburante=${encodeURIComponent(activeFuel)}&self=${activeSelf?1:0}&raggio=10`;
+        const data = await api(url);
+        renderStations(data, { gps: true, lat, lng });
+        setStatus('ok', `${data.length} impianti entro 10 km`);
+        _lastSearchLat = pos.coords.latitude;
+        _lastSearchLng = pos.coords.longitude;
+        _lastSearchRadius = 10;
+        document.getElementById('ev-toggle-btn').style.display = '';
+        if (_evActive) { document.getElementById('ev-section').classList.remove('hidden'); loadEVStations(); }
+      } catch(e) { setStatus('err', 'Errore: ' + e.message); }
+      btn.classList.remove('active');
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7" stroke-dasharray="2 2" opacity=".4"/></svg> Vicino a me`;
+    },
+    err => {
+      btn.classList.remove('active');
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7" stroke-dasharray="2 2" opacity=".4"/></svg> Vicino a me`;
+      setStatus('err', 'Posizione non disponibile — controlla i permessi');
+    },
+    { timeout: 10000 }
+  );
+}
+
+// ── Bandiera filter ────────────────────────────────────────────
+let activeBandiera = null;
+
+function buildBandieraFilter(data) {
+  const brands = [...new Set(data.map(s => s.bandiera).filter(Boolean))].sort();
+  const brow = document.getElementById('brow');
+  if (brands.length < 2) { brow.style.display = 'none'; return; }
+  brow.innerHTML = `<span style="font-size:.65rem;color:var(--mut);align-self:center;margin-right:2px">Marca:</span>`;
+  brands.forEach(b => {
+    const btn = document.createElement('button');
+    btn.className = 'bfb' + (activeBandiera === b ? ' on' : '');
+    btn.textContent = b;
+    btn.onclick = () => {
+      activeBandiera = activeBandiera === b ? null : b;
+      document.querySelectorAll('.bfb').forEach(x => x.classList.remove('on'));
+      if (activeBandiera) btn.classList.add('on');
+      applyBandieraFilter();
+    };
+    brow.appendChild(btn);
+  });
+  brow.style.display = 'flex';
+}
+
+function applyBandieraFilter() {
+  const stations = document.querySelectorAll('.station');
+  stations.forEach((el, i) => {
+    const s = _stationData[i];
+    const show = !activeBandiera || s.bandiera === activeBandiera;
+    el.style.display = show ? '' : 'none';
+  });
+}
+
+// ── Preferiti ──────────────────────────────────────────────────
+function loadFavs() { try { return JSON.parse(localStorage.getItem('opf_favs') || '[]'); } catch(e) { return []; } }
+function saveFavs(favs) { localStorage.setItem('opf_favs', JSON.stringify(favs)); }
+function isFav(id) { return loadFavs().some(f => f.id === id); }
+let _favSort = 'saved';
+let _editingFavId = null;
+
+function toggleFav(idx) {
+  const s = _stationData[idx];
+  let favs = loadFavs();
+  const existing = favs.findIndex(f => f.id === s.id);
+  if (existing >= 0) {
+    favs.splice(existing, 1);
+    saveFavs(favs);
+  } else {
+    favs.unshift({ ...s, savedAt: new Date().toISOString(), customName: '', note: '' });
+    saveFavs(favs);
+  }
+  refreshFavStars();
+  renderFavSection();
+}
+
+function refreshFavStars() {
+  document.querySelectorAll('.fav-btn').forEach((btn, i) => {
+    const s = _stationData[i];
+    if (!s) return;
+    const on = isFav(s.id);
+    btn.textContent = on ? '★ Salvato' : '☆ Salva';
+    btn.title = on ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti';
+    btn.classList.toggle('on', on);
+  });
+}
+
+function setSortFav(btn) {
+  _favSort = btn.dataset.sort;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderFavSection();
+}
+
+function getSortedFavs() {
+  let favs = loadFavs();
+  if (_favSort === 'price') favs.sort((a,b) => a.prezzo - b.prezzo);
+  else if (_favSort === 'name') favs.sort((a,b) => (a.customName||a.nome).localeCompare(b.customName||b.nome));
+  return favs;
+}
+
+let _favFilterActive = false;
+let _gpsActive = false;
+let _sortByDist = false;
+
+function toggleSortDist() {
+  _sortByDist = !_sortByDist;
+  const btn = document.getElementById('sort-dist-btn');
+  btn.classList.toggle('on', _sortByDist);
+  btn.textContent = _sortByDist ? '↕ Prezzo' : '↕ Distanza';
+  if (_gpsActive && _stationData.length) {
+    const sorted = _sortByDist
+      ? [..._stationData].sort((a,b) => (a.distanza||999) - (b.distanza||999))
+      : [..._stationData].sort((a,b) => a.prezzo - b.prezzo);
+    _stationData = sorted;
+    renderStations(sorted);
+  }
+}
+
+
+// ── Fav view ─────────────────────────────────────────────────
+function openFavView() {
+  document.getElementById('fav-view').classList.add('visible');
+  document.body.style.overflow = 'hidden';
+  renderFavView();
+}
+
+function closeFavView() {
+  document.getElementById('fav-view').classList.remove('visible');
+  document.body.style.overflow = '';
+}
+
+function openCompareById(id) {
+  const fav = loadFavs().find(f => f.id === id);
+  if (fav) openCompare(fav);
+}
+
+
+
+function updateFavBtn() {
+  const countEl = document.getElementById('fav-hdr-count');
+  const n = loadFavs().length;
+  if (countEl) countEl.textContent = n > 0 ? ' (' + n + ')' : '';
+}
+
+function showFavResults() {
+  renderFavView();
+}
+
+function renderFavView() {
+  const favs = getSortedFavs();
+  const area = document.getElementById('fav-view-body');
+  if (!area) return;
+
+  if (!favs.length) {
+    area.innerHTML = `<div class="no-res" style="margin-top:24px">Nessun preferito salvato.<br><span style="font-size:.78rem;color:var(--mut)">Cerca un distributore e tocca ☆ Salva.</span></div>`;
+    return;
+  }
+
+  let html = `
+    <div class="fav-sort-row" style="margin-bottom:14px">
+      <span class="fav-sort-label">Ordina:</span>
+      <button class="sort-btn ${_favSort==='saved'?'on':''}" data-sort="saved" onclick="setSortFav(this)">Aggiunti</button>
+      <button class="sort-btn ${_favSort==='price'?'on':''}" data-sort="price" onclick="setSortFav(this)">Prezzo</button>
+      <button class="sort-btn ${_favSort==='name'?'on':''}" data-sort="name" onclick="setSortFav(this)">Nome</button>
+    </div>
+    <div class="slist">
+  `;
+
+  favs.forEach(s => {
+    const displayName = s.customName || s.nome;
+    const unit = (s.carburante||'').toLowerCase().includes('metano') ? 'kg' : 'lt';
+    const sid = s.id;
+    html += `<div class="station" style="cursor:pointer" id="fav-card-${sid}">
+      <div class="st-rank" style="color:var(--am)">★</div>
+      <div class="st-info">
+        <div class="st-name">${esc(displayName)}
+          <button class="fav-edit-btn" onclick="openFavModal('${sid}')" title="Modifica">✏</button>
+        </div>
+        ${s.note ? `<div class="fav-note">${esc(s.note)}</div>` : `<div class="st-addr">${esc(s.indirizzo)} · ${esc(s.comune)}</div>`}
+        <div class="st-tags">
+          ${s.bandiera?`<span class="st-tag">${esc(s.bandiera)}</span>`:''}
+          <span class="st-tag">${s.isSelf?'self':'servito'}</span>
+          <span class="st-tag">${esc(s.carburante||'')}</span>
+        </div>
+      </div>
+      <div class="st-p">
+        <div class="st-price">${s.prezzo.toFixed(3)}</div>
+        <div class="st-unit">€/${unit}</div>
+        <div class="st-dt">${s.dtComu||''}</div>
+        <button class="fav-btn" style="background:rgba(91,155,213,.15);color:var(--bl);border-color:rgba(91,155,213,.3);margin-top:3px" onclick="openCompareById('${sid}')" title="Confronta">⚖ Confronta</button>
+        <button class="fav-btn on" style="margin-top:3px" onclick="removeFavAndRefresh('${sid}')">✕ Rimuovi</button>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+  area.innerHTML = html;
+
+  // Attach click handlers after rendering (avoids JSON.stringify issues)
+  favs.forEach(s => {
+    const card = document.getElementById('fav-card-' + s.id);
+    if (card) {
+      card.addEventListener('click', function(e) {
+        if (e.target.closest('button')) return;
+        openModal(s);
+      });
+    }
+  });
+}
+
+function removeFavAndRefresh(id) {
+  saveFavs(loadFavs().filter(f => f.id !== id));
+  refreshFavStars();
+  renderFavSection();
+}
+
+function renderFavSection() {
+  updateFavBtn();
+  refreshFavStars();
+  // Refresh fav view if it's open
+  const favView = document.getElementById('fav-view');
+  if (favView && favView.classList.contains('visible')) renderFavView();
+  return;
+  const favs = getSortedFavs();
+  const sec  = document.getElementById('fav-section');
+  const list = document.getElementById('fav-list');
+  if (!favs.length) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  list.innerHTML = '';
+  favs.forEach(s => {
+    const displayName = s.customName || s.nome;
+    const div = document.createElement('div');
+    div.className = 'station';
+    div.style.cursor = 'pointer';
+    div.onclick = () => openModal(s);
+    div.innerHTML = `
+      <div class="st-rank" style="color:var(--am)">★</div>
+      <div class="st-info">
+        <div class="st-name">
+          ${esc(displayName)}
+          <button class="fav-edit-btn" onclick="event.stopPropagation();openFavModal('${s.id}')" title="Modifica">✏</button>
+        </div>
+        ${s.note ? `<div class="fav-note">${esc(s.note)}</div>` : `<div class="st-addr">${esc(s.indirizzo)} · ${esc(s.comune)}</div>`}
+        <div class="st-tags">
+          ${s.bandiera ? `<span class="st-tag">${esc(s.bandiera)}</span>` : ''}
+          <span class="st-tag">${s.isSelf?'self':'servito'}</span>
+          <span class="st-tag">${esc(s.carburante||'')}</span>
+        </div>
+      </div>
+      <div class="st-p">
+        <div class="st-price">${s.prezzo.toFixed(3)}</div>
+        <div class="st-unit">€/${(s.carburante||'').toLowerCase().includes('metano')?'kg':'lt'}</div>
+        <div class="st-dt">${s.dtComu||''}</div>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+// ── Fav edit modal ─────────────────────────────────────────────
+function openFavModal(id) {
+  const fav = loadFavs().find(f => f.id === id);
+  if (!fav) return;
+  _editingFavId = id;
+  document.getElementById('fav-edit-name').value = fav.customName || '';
+  document.getElementById('fav-edit-note').value = fav.note || '';
+  document.getElementById('fav-edit-overlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('fav-edit-name').focus(), 100);
+}
+
+function closeFavModal() {
+  document.getElementById('fav-edit-overlay').classList.add('hidden');
+  document.body.style.overflow = '';
+  _editingFavId = null;
+}
+
+function saveFavModal() {
+  let favs = loadFavs();
+  const i = favs.findIndex(f => f.id === _editingFavId);
+  if (i >= 0) {
+    favs[i].customName = document.getElementById('fav-edit-name').value.trim();
+    favs[i].note       = document.getElementById('fav-edit-note').value.trim();
+    saveFavs(favs);
+  }
+  closeFavModal();
+  renderFavSection();
+}
+
+function deleteFavFromModal() {
+  let favs = loadFavs();
+  saveFavs(favs.filter(f => f.id !== _editingFavId));
+  closeFavModal();
+  refreshFavStars();
+  renderFavSection();
+}
+
+// ── Modal ─────────────────────────────────────────────────────
+function openModalIdx(i) {
+  openModal(_stationData[i]);
+}
+
+function openModal(s) {
+  document.getElementById('modal-nome').textContent = s.nome || 'Impianto ' + s.id;
+  document.getElementById('modal-prezzo').textContent = s.prezzo.toFixed(3);
+  const unit = s.carburante && s.carburante.toLowerCase().includes('metano') ? 'kg' : 'litro';
+  document.getElementById('modal-price-meta').textContent = '€/' + unit + ' · ' + (s.isSelf ? 'self service' : 'servito');
+  document.getElementById('modal-addr').textContent = [s.indirizzo, s.comune, s.provincia].filter(Boolean).join(', ');
+  document.getElementById('modal-gestore').textContent = [s.gestore, s.bandiera].filter(Boolean).join(' · ') || 'Non disponibile';
+  document.getElementById('modal-mode').textContent = s.isSelf ? 'Self service' : 'Servito';
+  const distRow = document.getElementById('modal-dist-row');
+  if (s.distanza != null && distRow) {
+    distRow.style.display = '';
+    document.getElementById('modal-dist-val').textContent = s.distanza + ' km da te';
+  } else if (distRow) { distRow.style.display = 'none'; }
+  document.getElementById('modal-dt').textContent = s.dtComu || 'Non disponibile';
+
+  // Maps URLs
+  const addr = encodeURIComponent([s.nome, s.indirizzo, s.comune].filter(Boolean).join(', '));
+  const coord = (s.lat && s.lng && !isNaN(s.lat) && !isNaN(s.lng))
+    ? s.lat + ',' + s.lng : null;
+
+  const gmaps = coord
+    ? `https://www.google.com/maps/search/?api=1&query=${coord}`
+    : `https://www.google.com/maps/search/?api=1&query=${addr}`;
+  const apple = coord
+    ? `https://maps.apple.com/?ll=${coord}&q=${addr}`
+    : `https://maps.apple.com/?q=${addr}`;
+
+  document.getElementById('btn-gmaps').href = gmaps;
+  document.getElementById('btn-apple').href = apple;
+
+  document.getElementById('modal-overlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modal-overlay')) return;
+  document.getElementById('modal-overlay').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+// Close on ESC
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') { closeModal(); closeFavModal(); closeCompare(); closeFavView(); closeEVModal(); }
 });
+
+// ── Fav comparison ─────────────────────────────────────────────
+let _compareFav = null;
+
+function openCompare(fav) {
+  if (!fav) return;
+  _compareFav = fav;
+  const name = fav.customName || fav.nome;
+  document.getElementById('compare-subtitle').textContent =
+    `Confronta "${name}" con i distributori per ${fav.carburante || 'Benzina'} nell'area`;
+  document.getElementById('compare-results').innerHTML = '';
+  document.getElementById('btn-compare-go').disabled = false;
+  document.getElementById('compare-overlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCompare() {
+  document.getElementById('compare-overlay').classList.add('hidden');
+  document.body.style.overflow = '';
+  _compareFav = null;
+}
+
+async function runComparison() {
+  if (!_compareFav) return;
+  const fav = _compareFav;
+  const radius = parseInt(document.getElementById('compare-radius').value);
+  const btn = document.getElementById('btn-compare-go');
+  btn.disabled = true;
+  btn.textContent = '⏳ Cerco…';
+  const resultsEl = document.getElementById('compare-results');
+  resultsEl.innerHTML = '<div style="color:var(--mut);font-size:.78rem;padding:8px 0">Cerco distributori nelle vicinanze…</div>';
+
+  try {
+    if (!fav.lat || !fav.lng || isNaN(fav.lat) || isNaN(fav.lng)) {
+      throw new Error('Coordinate non disponibili per questo preferito — riprova aggiungendolo di nuovo dai risultati GPS');
+    }
+    const carb = fav.carburante || 'Benzina';
+    const url = `/api/vicini?lat=${fav.lat}&lng=${fav.lng}&carburante=${encodeURIComponent(carb)}&self=0&raggio=${radius}`;
+    const stations = await api(url);
+
+    if (!stations.length) {
+      resultsEl.innerHTML = `<div style="color:var(--mut);font-size:.78rem;padding:8px 0">Nessun distributore trovato entro ${radius} km.</div>`;
+      return;
+    }
+
+    // Sort by price
+    stations.sort((a, b) => a.prezzo - b.prezzo);
+    const minPrice = stations[0].prezzo;
+    const favPrice = fav.prezzo;
+    const unit = carb.toLowerCase().includes('metano') ? 'kg' : 'litro';
+
+    // Find fav in list (by id or nearest price)
+    const favInList = stations.find(s => s.id === fav.id);
+
+    let html = '';
+
+    // Reference fav card (always shown first)
+    const favSaving = favPrice > minPrice ? ((favPrice - minPrice) * 50).toFixed(2) : null;
+    html += `<div class="compare-card fav-ref">
+      <div class="compare-rank" style="color:var(--am)">★</div>
+      <div class="compare-info">
+        <div class="compare-name">${esc(fav.customName || fav.nome)}</div>
+        <div class="compare-addr">${esc(fav.indirizzo || '')}</div>
+        <div class="compare-label">Il tuo preferito</div>
+      </div>
+      <div class="compare-price-col">
+        <div class="compare-price ${favPrice === minPrice ? 'best-p' : ''}">${favPrice.toFixed(3)}</div>
+        <div style="font-size:.6rem;color:var(--mut)">€/${unit}</div>
+        ${favSaving ? `<div class="compare-saving" style="color:var(--rd)">+${favSaving}€/50L</div>` : '<div style="font-size:.65rem;color:var(--gn)">Il più economico!</div>'}
+      </div>
+    </div>`;
+
+    // Top competitors (show up to 5, skip fav itself)
+    const others = stations.filter(s => s.id !== fav.id).slice(0, 5);
+    others.forEach((s, i) => {
+      const rank = i + 1;
+      const isBest = rank === 1;
+      const saving = favPrice > s.prezzo ? ((favPrice - s.prezzo) * 50).toFixed(2) : null;
+      const extra = s.prezzo > favPrice ? ((s.prezzo - favPrice) * 50).toFixed(2) : null;
+      html += `<div class="compare-card ${isBest ? 'best' : ''}">
+        <div class="compare-rank ${isBest ? 'r1' : ''}">${rank}</div>
+        <div class="compare-info">
+          <div class="compare-name">${esc(s.nome)}</div>
+          <div class="compare-addr">${esc(s.indirizzo)}</div>
+          ${s.distanza != null ? `<div class="compare-dist">📍 ${s.distanza} km</div>` : ''}
+          ${s.bandiera ? `<div style="font-size:.6rem;color:var(--mut)">${esc(s.bandiera)} · ${s.isSelf?'self':'servito'}</div>` : ''}
+        </div>
+        <div class="compare-price-col">
+          <div class="compare-price ${isBest ? 'best-p' : ''}">${s.prezzo.toFixed(3)}</div>
+          <div style="font-size:.6rem;color:var(--mut)">€/${unit}</div>
+          ${saving ? `<div class="compare-saving">risparmi ${saving}€/50L</div>` : ''}
+          ${extra ? `<div style="font-size:.65rem;color:var(--rd);text-align:right">+${extra}€/50L</div>` : ''}
+        </div>
+      </div>`;
+    });
+
+    // Summary
+    if (favPrice > minPrice) {
+      const totalSaving = ((favPrice - minPrice) * 50).toFixed(2);
+      html += `<div style="background:var(--gn-d);border:1px solid rgba(76,175,125,.3);border-radius:8px;padding:10px 14px;font-size:.78rem;color:var(--gn);margin-top:4px">
+        💡 Andando al distributore più economico risparmi <strong>${totalSaving}€</strong> ogni pieno da 50 litri
+      </div>`;
+    } else {
+      html += `<div style="background:var(--gn-d);border:1px solid rgba(76,175,125,.3);border-radius:8px;padding:10px 14px;font-size:.78rem;color:var(--gn);margin-top:4px">
+        ✅ Il tuo preferito è già il più economico nell'area!
+      </div>`;
+    }
+
+    resultsEl.innerHTML = html;
+  } catch(e) {
+    resultsEl.innerHTML = `<div style="color:var(--rd);font-size:.78rem;padding:8px 0">${e.message}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Confronta';
+  }
+}
+
+// Close compare on overlay click / ESC
+document.getElementById('compare-overlay')?.addEventListener('click', e => {
+  if (e.target === document.getElementById('compare-overlay')) closeCompare();
+});
+
+document.getElementById('fav-edit-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('fav-edit-overlay')) closeFavModal();
+});
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+</body>
+</html>
