@@ -1170,29 +1170,15 @@ function openMapView() {
   document.body.style.overflow = 'hidden';
 
   // Wait for layout to settle, then measure and init
-  function _doInitMap() {
-    const mc = document.getElementById('map-container');
-    const mapEl = document.getElementById('leaflet-map');
-    const h = mc.clientHeight || (window.innerHeight - 155);
-    const w = mc.clientWidth  || window.innerWidth;
-    if (h > 0) {
-      mapEl.style.width  = w + 'px';
-      mapEl.style.height = h + 'px';
-    } else {
-      // Fallback: use viewport minus fixed elements
-      mapEl.style.width  = window.innerWidth + 'px';
-      mapEl.style.height = (window.innerHeight - 155) + 'px';
-    }
-    if (!_mapInitialized) {
-      initMap();
-      _mapInitialized = true;
-    } else if (_map) {
-      _map.invalidateSize(true);
-    }
+  const mapEl = document.getElementById('leaflet-map');
+  mapEl.style.width  = window.innerWidth + 'px';
+  mapEl.style.height = window.innerHeight + 'px';
+  if (!_mapInitialized) {
+    initMap();
+    _mapInitialized = true;
+  } else if (_map) {
+    _map.invalidateSize(true);
   }
-  // Try immediately, then again after layout settles
-  setTimeout(_doInitMap, 100);
-  setTimeout(() => { if (_map) _map.invalidateSize(true); }, 500);
 }
 
 function closeMapView() {
@@ -1276,10 +1262,10 @@ function initMap() {
     zoomControl: true,
   });
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap contributors © CARTO',
+    subdomains: 'abcd',
     maxZoom: 19,
-    subdomains: ['a','b','c'],
   }).addTo(_map);
 
   _map.on('moveend', () => {
