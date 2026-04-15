@@ -479,6 +479,23 @@ footer a{color:var(--mut);text-decoration:underline}
 .cmp-save{font-size:0.65rem;color:var(--gn);text-align:right;margin-top:2px}
 .cmp-extra{font-size:0.65rem;color:var(--rd);text-align:right;margin-top:2px}
 .cmp-summary{background:var(--gn-d);border:1px solid rgba(76,175,125,.3);border-radius:8px;padding:10px 14px;font-size:.78rem;color:var(--gn);margin-top:6px}
+
+/* ── EV colonnine ── */
+.fb[data-f="EV"]{border-color:rgba(125,212,252,.4);color:#7dd4fc}
+.fb[data-f="EV"].on{background:rgba(125,212,252,.15);border-color:#7dd4fc;color:#7dd4fc}
+.ev-section{margin-top:4px}
+.ev-card{background:var(--surf);border:1px solid var(--brd);border-radius:9px;padding:12px 14px;margin-bottom:7px;display:grid;grid-template-columns:24px 1fr auto;gap:4px 10px;align-items:start;cursor:pointer;transition:border-color .15s}
+.ev-card:hover{border-color:rgba(125,212,252,.4)}
+.ev-icon{color:#7dd4fc;font-size:1rem;padding-top:1px}
+.ev-name{font-size:0.82rem;font-weight:500;color:var(--tx)}
+.ev-addr{font-size:0.7rem;color:var(--mut);margin-top:1px}
+.ev-tags{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+.ev-tag{font-size:0.6rem;padding:1px 6px;border-radius:3px;background:var(--surf2);color:var(--tx2)}
+.ev-tag.fast{background:rgba(125,212,252,.12);color:#7dd4fc}
+.ev-kw{font-family:var(--fd);font-size:1.2rem;font-weight:700;color:#7dd4fc;line-height:1;text-align:right}
+.ev-kw-lbl{font-size:0.6rem;color:var(--mut);text-align:right}
+.ev-dist{font-size:0.62rem;color:var(--bl);text-align:right;margin-top:4px}
+.ev-map-dot{width:11px;height:11px;border-radius:50%;background:#7dd4fc;border:2px solid rgba(255,255,255,.35);box-shadow:0 2px 6px rgba(0,0,0,.5)}
 </style>
 </head>
 <body>
@@ -652,6 +669,7 @@ footer a{color:var(--mut);text-decoration:underline}
     </div>
 
     <div id="results"></div>
+    <div class="ev-section hidden" id="ev-results"></div>
   </main>
 
   <footer>
@@ -679,6 +697,7 @@ footer a{color:var(--mut);text-decoration:underline}
       <button class="fb" data-mf="Metano" onclick="setMapFuel(this)">Metano</button>
       <button class="fb" data-mf="HVO" onclick="setMapFuel(this)">HVO</button>
       <button class="fb" data-mf="Diesel Premium" onclick="setMapFuel(this)">Diesel Prem.</button>
+      <button class="fb" data-mf="EV" onclick="setMapFuel(this)">⚡ EV</button>
     </div>
     <div id="map-container">
       <div id="leaflet-map"></div>
@@ -826,6 +845,8 @@ let activeFuel = 'Benzina';
 let activeSelf = false;
 let suggestTimer = null;
 let _stationData = [];
+let _mapStationById = {};
+let _gpsLat = null, _gpsLng = null;
 
 // ── Init ──────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
@@ -1100,7 +1121,24 @@ function renderStations(data) {
 function setFuel(btn) {
   activeFuel = btn.dataset.f;
   document.querySelectorAll('.fb[data-f]').forEach(b => b.classList.toggle('on', b===btn));
-  if (activeComune) fetchStations();
+  const evBox = document.getElementById('ev-results');
+  evBox.classList.add('hidden');
+  evBox.innerHTML = '';
+  if (activeFuel === 'EV') {
+    document.getElementById('results').innerHTML = '';
+    // Use GPS coords if available, else last search center
+    if (typeof _gpsLat !== 'undefined' && _gpsLat) {
+      loadEVHome(_gpsLat, _gpsLng, 10);
+    } else if (activeComune) {
+      // geocode the comune to get coords
+      fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(activeComune) + '+Italia&format=json&limit=1')
+        .then(r => r.json()).then(d => {
+          if (d.length) loadEVHome(parseFloat(d[0].lat), parseFloat(d[0].lon), 10);
+        });
+    }
+  } else {
+    if (activeComune) fetchStations();
+  }
 }
 
 function toggleSelf() {
@@ -1309,12 +1347,144 @@ width:14px;height:14px;
             ${s.bandiera ? `<span class="map-popup-tag">${esc(s.bandiera)}</span>` : ''}
             <span class="map-popup-tag">${esc(s.carburante||'')}</span>
           </div>
-          <a class="map-popup-btn" href="${s.lat && s.lng ? `https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.nome+' '+s.indirizzo)}`}" target="_blank">Apri in Maps →</a>
+          <div style="display:flex;gap:6px;margin-top:8px">
+            <a class="map-popup-btn" style="flex:1" href="${s.lat && s.lng ? `https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.nome+' '+s.indirizzo)}`}" target="_blank">📍 Maps</a>
+            <button class="map-popup-btn" style="flex:1;border:none;cursor:pointer" onclick="openMapStation('${s.id}')">📋 Scheda</button>
+          </div>
         </div>
       `, { maxWidth: 240 });
 
     _mapMarkers.push(marker);
   });
+}
+
+
+// ══════════════════════════════════════════════════════════════
+// EV — OpenChargeMap
+// ══════════════════════════════════════════════════════════════
+const OCM = 'https://api.openchargemap.io/v3/poi/';
+let _evMapMarkers = [];
+
+async function fetchEV(lat, lng, radius) {
+  const p = new URLSearchParams({
+    output:'json', latitude:lat, longitude:lng,
+    distance:radius, distanceunit:'km',
+    maxresults:50, countrycode:'IT',
+    compact:true, verbose:false
+  });
+  const r = await fetch(OCM + '?' + p);
+  if (!r.ok) throw new Error('OpenChargeMap ' + r.status);
+  return r.json();
+}
+
+function parseEV(s, userLat, userLng) {
+  const ai = s.AddressInfo || {};
+  const conns = s.Connections || [];
+  const maxKW = Math.max(0, ...conns.map(c => c.PowerKW || 0));
+  const types = [...new Set(conns.map(c => (c.ConnectionType||{}).Title||'').filter(Boolean))].slice(0,3);
+  const status = (conns[0]||{}).StatusType||{};
+  const isFast = maxKW >= 50;
+  const lat = ai.Latitude, lng = ai.Longitude;
+  let dist = null;
+  if (userLat && lat) {
+    const dLat=(lat-userLat)*Math.PI/180, dLng=(lng-userLng)*Math.PI/180;
+    const a=Math.sin(dLat/2)**2+Math.cos(userLat*Math.PI/180)*Math.cos(lat*Math.PI/180)*Math.sin(dLng/2)**2;
+    dist = Math.round(6371*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))*10)/10;
+  }
+  return { id:s.ID, nome:ai.Title||'Colonnina', indirizzo:ai.AddressLine1||'',
+    comune:ai.Town||'', lat, lng, maxKW, types, numPrese:conns.length,
+    isFast, statusTitle:(status.Title||''), operatore:(s.OperatorInfo||{}).Title||'', dist };
+}
+
+// ── HOME: show EV list when EV filter is active ────────────────
+async function loadEVHome(lat, lng, radius) {
+  const box = document.getElementById('ev-results');
+  box.classList.remove('hidden');
+  box.innerHTML = '<div style="color:var(--mut);font-size:.78rem;padding:12px 0;text-align:center">Carico colonnine…</div>';
+  try {
+    const data = await fetchEV(lat, lng, radius);
+    if (!data.length) { box.innerHTML = '<div style="color:var(--mut);font-size:.78rem;padding:12px 0;text-align:center">Nessuna colonnina trovata.</div>'; return; }
+    const stations = data.map(s => parseEV(s, lat, lng)).sort((a,b) => (a.dist||999)-(b.dist||999));
+    let html = '<div class="res-hdr fi"><div class="res-title">⚡ Colonnine elettriche</div><div class="res-sub">' + stations.length + ' trovate · OpenChargeMap</div></div>';
+    stations.forEach(s => {
+      html += '<div class="ev-card" id="evc-' + s.id + '">'
+        + '<div class="ev-icon">⚡</div>'
+        + '<div><div class="ev-name">' + esc(s.nome) + '</div>'
+        + '<div class="ev-addr">' + esc(s.indirizzo) + (s.comune ? ' · ' + esc(s.comune) : '') + '</div>'
+        + '<div class="ev-tags">'
+        + (s.isFast ? '<span class="ev-tag fast">⚡ Fast ' + s.maxKW + ' kW</span>' : (s.maxKW > 0 ? '<span class="ev-tag">' + s.maxKW + ' kW</span>' : ''))
+        + s.types.map(t => '<span class="ev-tag">' + esc(t) + '</span>').join('')
+        + '<span class="ev-tag">' + s.numPrese + ' prese</span>'
+        + (s.operatore ? '<span class="ev-tag">' + esc(s.operatore) + '</span>' : '')
+        + '</div></div>'
+        + (s.dist != null ? '<div><div class="ev-kw">' + s.dist + '</div><div class="ev-kw-lbl">km</div></div>' : '<div></div>')
+        + '</div>';
+    });
+    box.innerHTML = html;
+    stations.forEach(s => {
+      const el = document.getElementById('evc-' + s.id);
+      if (el) el.addEventListener('click', () => openEVModal(s));
+    });
+  } catch(e) {
+    box.innerHTML = '<div style="color:var(--rd);font-size:.78rem;padding:12px 0">' + esc(e.message) + '</div>';
+  }
+}
+
+// ── EV detail modal (reuses existing .overlay/.modal structure) ─
+function openEVModal(s) {
+  document.getElementById('modal-nome').textContent = s.nome;
+  document.getElementById('modal-prezzo').textContent = s.maxKW > 0 ? s.maxKW + ' kW' : '—';
+  document.getElementById('modal-price-meta').textContent = s.isFast ? 'Ricarica rapida' : 'Ricarica lenta';
+  document.getElementById('modal-addr').textContent = [s.indirizzo, s.comune].filter(Boolean).join(', ');
+  document.getElementById('modal-gestore').textContent = s.operatore || 'Non disponibile';
+  document.getElementById('modal-mode').textContent = s.types.join(' · ') || 'Non specificato';
+  const distRow = document.getElementById('modal-dist-row');
+  if (s.dist != null && distRow) { distRow.style.display=''; document.getElementById('modal-dist-val').textContent = s.dist + ' km da te'; }
+  else if (distRow) distRow.style.display = 'none';
+  document.getElementById('modal-dt').textContent = s.statusTitle || 'Non disponibile';
+  const coord = (s.lat && s.lng) ? s.lat + ',' + s.lng : null;
+  const addr = encodeURIComponent([s.nome, s.indirizzo, s.comune].filter(Boolean).join(', '));
+  document.getElementById('btn-gmaps').href = coord ? 'https://www.google.com/maps/search/?api=1&query=' + coord : 'https://www.google.com/maps/search/?api=1&query=' + addr;
+  document.getElementById('btn-apple').href = coord ? 'https://maps.apple.com/?ll=' + coord + '&q=' + addr : 'https://maps.apple.com/?q=' + addr;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+// ── MAP EV layer ────────────────────────────────────────────────
+async function loadEVMap() {
+  const center = _map.getCenter();
+  const zoom = _map.getZoom();
+  const radius = zoom >= 14 ? 3 : zoom >= 12 ? 8 : 15;
+  setMapStatus('Carico colonnine EV…');
+  try {
+    const data = await fetchEV(center.lat, center.lng, radius);
+    clearEVMapMarkers();
+    data.map(s => parseEV(s, center.lat, center.lng)).forEach(s => {
+      if (!s.lat || !s.lng || isNaN(s.lat) || isNaN(s.lng)) return;
+      const icon = L.divIcon({ className:'', html:'<div class="ev-map-dot"></div>', iconAnchor:[5,5] });
+      const unit = s.maxKW > 0 ? s.maxKW + ' kW' : '—';
+      const m = L.marker([s.lat, s.lng], {icon}).addTo(_map).bindPopup(
+        '<div class="map-popup">'
+        + '<div class="map-popup-price" style="color:#7dd4fc">' + unit + '</div>'
+        + '<div class="map-popup-unit">' + (s.isFast ? 'Ricarica rapida' : 'Ricarica lenta') + ' · ' + s.numPrese + ' prese</div>'
+        + '<div class="map-popup-name">' + esc(s.nome) + '</div>'
+        + '<div class="map-popup-addr">' + esc(s.indirizzo) + '</div>'
+        + '<a class="map-popup-btn" style="background:rgba(125,212,252,.2);color:#7dd4fc;border:1px solid rgba(125,212,252,.3)" href="https://www.google.com/maps/search/?api=1&query=' + s.lat + ',' + s.lng + '" target="_blank">Apri in Maps →</a>'
+        + '</div>', {maxWidth:240});
+      _evMapMarkers.push(m);
+    });
+    setMapStatus(_evMapMarkers.length + ' colonnine EV · ' + radius + ' km', true);
+  } catch(e) { setMapStatus('Errore EV: ' + e.message); }
+}
+
+function openMapStation(id) {
+  const s = _mapStationById[id];
+  if (s) { if (_map) _map.closePopup(); openModal(s); }
+}
+
+function clearEVMapMarkers() {
+  _evMapMarkers.forEach(m => m.remove());
+  _evMapMarkers = [];
 }
 
 // ── Update bar & polling ───────────────────────────────────────
@@ -1468,6 +1638,8 @@ async function doGPS() {
         const url = `/api/vicini?lat=${lat}&lng=${lng}&carburante=${encodeURIComponent(activeFuel)}&self=${activeSelf?1:0}&raggio=10`;
         const data = await api(url);
         renderStations(data, { gps: true, lat, lng });
+        _gpsLat = pos.coords.latitude;
+        _gpsLng = pos.coords.longitude;
         setStatus('ok', `${data.length} impianti entro 10 km`);
       } catch(e) { setStatus('err', 'Errore: ' + e.message); }
       btn.classList.remove('active');
