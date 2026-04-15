@@ -1833,23 +1833,28 @@ function renderFavView() {
   if (!area) return;
   const favs = getViewFavs();
   if (!favs.length) {
-    area.innerHTML = '<div class="no-res" style="margin-top:24px">Nessun preferito.<br><small style="color:var(--mut)">Cerca un distributore e tocca ☆ Salva.</small></div>';
+    area.innerHTML = '<div class="no-res" style="margin-top:24px">Nessun preferito.<br><small style="color:var(--mut)">Cerca un distributore e tocca \u2606 Salva.</small></div>';
     return;
   }
-  let html = '<div class="fav-sort-row"><span class="fav-sort-label">Ordina:</span>'
-    + '<button class="sort-btn ' + (_favViewSort==='saved'?'on':'') + '" data-sort="saved" onclick="setFavSort(this)">Aggiunti</button>'
-    + '<button class="sort-btn ' + (_favViewSort==='price'?'on':'') + '" data-sort="price" onclick="setFavSort(this)">Prezzo</button>'
-    + '<button class="sort-btn ' + (_favViewSort==='name'?'on':'') + '" data-sort="name" onclick="setFavSort(this)">Nome</button>'
-    + '</div><div class="slist">';
-
-  favs.forEach(s => {
+  const sortRow = document.createElement('div');
+  sortRow.className = 'fav-sort-row';
+  sortRow.innerHTML = '<span class="fav-sort-label">Ordina:</span>'
+    + [['saved','Aggiunti'],['price','Prezzo'],['name','Nome']].map(function(x) {
+        return '<button class="sort-btn ' + (_favViewSort===x[0]?'on':'') + '" data-sort="' + x[0] + '" onclick="setFavSort(this)">' + x[1] + '</button>';
+      }).join('');
+  const list = document.createElement('div');
+  list.className = 'slist';
+  favs.forEach(function(s) {
     const name = s.customName || s.nome;
-    const unit = (s.carburante || '').toLowerCase().includes('metano') ? 'kg' : 'lt';
-    html += '<div class="station" style="cursor:pointer" id="fvc-' + s.id + '">'
-      + '<div class="st-rank" style="color:var(--am)">★</div>'
-      + '<div class="st-info">'
-      + '<div class="st-name">' + esc(name) + '<button class="fav-edit-btn" onclick="event.stopPropagation();openFavEdit('' + s.id + '')" title="Modifica">✏</button></div>'
-      + (s.note ? '<div class="fav-note">' + esc(s.note) + '</div>' : '<div class="st-addr">' + esc(s.indirizzo) + (s.comune ? ' · ' + esc(s.comune) : '') + '</div>')
+    const unit = (s.carburante || '').toLowerCase().indexOf('metano') >= 0 ? 'kg' : 'lt';
+    const card = document.createElement('div');
+    card.className = 'station';
+    card.style.cursor = 'pointer';
+    card.innerHTML = '<div class="st-rank" style="color:var(--am)">\u2605</div>'
+      + '<div class="st-info"><div class="st-name">' + esc(name)
+      + ' <button class="fav-edit-btn" data-eid="' + esc(s.id) + '" title="Modifica">\u270F</button></div>'
+      + (s.note ? '<div class="fav-note">' + esc(s.note) + '</div>'
+               : '<div class="st-addr">' + esc(s.indirizzo||'') + (s.comune ? ' \u00B7 ' + esc(s.comune) : '') + '</div>')
       + '<div class="st-tags">'
       + (s.bandiera ? '<span class="st-tag">' + esc(s.bandiera) + '</span>' : '')
       + '<span class="st-tag">' + (s.isSelf ? 'self' : 'servito') + '</span>'
@@ -1857,23 +1862,27 @@ function renderFavView() {
       + '</div></div>'
       + '<div class="st-p">'
       + '<div class="st-price">' + s.prezzo.toFixed(3) + '</div>'
-      + '<div class="st-unit">€/' + unit + '</div>'
-      + '<div class="st-dt">' + (s.dtComu || '') + '</div>'
-      + '<button class="fav-btn" style="background:rgba(91,155,213,.15);color:var(--bl);border-color:rgba(91,155,213,.3);margin-top:3px;font-size:0.6rem;padding:2px 7px" onclick="event.stopPropagation();openCmp('' + s.id + '')" title="Confronta">⚖ Confronta</button>'
-      + '<button class="fav-btn on" style="margin-top:3px" onclick="event.stopPropagation();removeFavView('' + s.id + '')">✕</button>'
-      + '</div></div>';
+      + '<div class="st-unit">\u20AC/' + unit + '</div>'
+      + '<div class="st-dt">' + (s.dtComu||'') + '</div>'
+      + '<button class="fav-btn" data-cmp="' + esc(s.id) + '" style="background:rgba(91,155,213,.15);color:var(--bl);border-color:rgba(91,155,213,.3);margin-top:3px;font-size:0.6rem;padding:2px 7px">\u2696 Confronta</button>'
+      + '<button class="fav-btn on" data-rm="' + esc(s.id) + '" style="margin-top:3px">\u2715</button>'
+      + '</div>';
+    card.addEventListener('click', (function(fav) {
+      return function(e) {
+        var eid = e.target.closest('[data-eid]');
+        var cmp = e.target.closest('[data-cmp]');
+        var rm  = e.target.closest('[data-rm]');
+        if (eid) { e.stopPropagation(); openFavEdit(eid.dataset.eid); return; }
+        if (cmp) { e.stopPropagation(); openCmp(cmp.dataset.cmp); return; }
+        if (rm)  { e.stopPropagation(); removeFavView(rm.dataset.rm); return; }
+        openModal(fav);
+      };
+    })(s));
+    list.appendChild(card);
   });
-  html += '</div>';
-  area.innerHTML = html;
-
-  // Attach click to open modal
-  favs.forEach(s => {
-    const el = document.getElementById('fvc-' + s.id);
-    if (el) el.addEventListener('click', function(e) {
-      if (e.target.closest('button')) return;
-      openModal(s);
-    });
-  });
+  area.innerHTML = '';
+  area.appendChild(sortRow);
+  area.appendChild(list);
 }
 
 function removeFavView(id) {
