@@ -1304,56 +1304,46 @@ async function loadMapStations() {
 }
 
 function renderMapMarkers(stations, userLat, userLng) {
-  // Remove old markers
   _mapMarkers.forEach(m => m.remove());
   _mapMarkers = [];
-
+  _mapStationById = {};
   if (!stations.length) return;
-
   const prices = stations.map(s => s.prezzo);
   const minP = Math.min(...prices);
   const maxP = Math.max(...prices);
-
   stations.forEach(s => {
     if (!s.lat || !s.lng || isNaN(s.lat) || isNaN(s.lng)) return;
-
-    // Color: green=cheap, amber=mid, red=dear
+    _mapStationById[s.id] = s;
     const ratio = maxP === minP ? 0.5 : (s.prezzo - minP) / (maxP - minP);
     const color = ratio < 0.33 ? '#4caf7d' : ratio < 0.66 ? '#e8a030' : '#e05a4a';
     const unit = _mapFuel === 'Metano' ? 'kg' : 'lt';
-
+    const mapsUrl = s.lat && s.lng
+      ? 'https://www.google.com/maps/search/?api=1&query=' + s.lat + ',' + s.lng
+      : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(s.nome + ' ' + s.indirizzo);
     const icon = L.divIcon({
       className: '',
-      html: `<div style="
-width:14px;height:14px;
-        background:${color};
-        border-radius:50%;
-        box-shadow:0 2px 6px rgba(0,0,0,.6);
-        border:2px solid rgba(255,255,255,.35);
-      "></div>`,
+      html: '<div style="width:14px;height:14px;background:' + color + ';border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.6);border:2px solid rgba(255,255,255,.35)"></div>',
       iconAnchor: [7, 7],
     });
-
+    const el = document.createElement('div');
+    el.className = 'map-popup';
+    el.innerHTML = '<div class="map-popup-price">' + s.prezzo.toFixed(3) + '</div>'
+      + '<div class="map-popup-unit">&#8364;/' + unit + ' &middot; ' + (s.isSelf ? 'self service' : 'servito') + '</div>'
+      + '<div class="map-popup-name">' + esc(s.nome) + '</div>'
+      + '<div class="map-popup-addr">' + esc(s.indirizzo) + '</div>'
+      + (s.distanza != null ? '<div class="map-popup-dist">&#128205; ' + s.distanza + ' km da te</div>' : '')
+      + '<div class="map-popup-tags">'
+      + (s.bandiera ? '<span class="map-popup-tag">' + esc(s.bandiera) + '</span>' : '')
+      + '<span class="map-popup-tag">' + esc(s.carburante||'') + '</span></div>'
+      + '<div style="display:flex;gap:6px;margin-top:8px">'
+      + '<a class="map-popup-btn" style="flex:1;text-align:center" href="' + mapsUrl + '" target="_blank">&#128205; Maps</a>'
+      + '<button class="map-popup-btn" style="flex:1;background:var(--surf2);color:var(--tx);border:1px solid var(--brd2);cursor:pointer">&#128203; Scheda</button>'
+      + '</div>';
+    el.querySelector('button').addEventListener('click', (function(st) {
+      return function() { _map.closePopup(); openModal(st); };
+    })(s));
     const marker = L.marker([s.lat, s.lng], { icon })
-      .addTo(_map)
-      .bindPopup(`
-        <div class="map-popup">
-          <div class="map-popup-price">${s.prezzo.toFixed(3)}</div>
-          <div class="map-popup-unit">€/${unit} · ${s.isSelf ? 'self service' : 'servito'}</div>
-          <div class="map-popup-name">${esc(s.nome)}</div>
-          <div class="map-popup-addr">${esc(s.indirizzo)}</div>
-          ${s.distanza != null ? `<div class="map-popup-dist">📍 ${s.distanza} km da te</div>` : ''}
-          <div class="map-popup-tags">
-            ${s.bandiera ? `<span class="map-popup-tag">${esc(s.bandiera)}</span>` : ''}
-            <span class="map-popup-tag">${esc(s.carburante||'')}</span>
-          </div>
-          <div style="display:flex;gap:6px;margin-top:8px">
-            <a class="map-popup-btn" style="flex:1" href="${s.lat && s.lng ? `https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.nome+' '+s.indirizzo)}`}" target="_blank">📍 Maps</a>
-            <button class="map-popup-btn" style="flex:1;border:none;cursor:pointer" onclick="openMapStation('${s.id}')">📋 Scheda</button>
-          </div>
-        </div>
-      `, { maxWidth: 240 });
-
+      .addTo(_map).bindPopup(el, { maxWidth: 240 });
     _mapMarkers.push(marker);
   });
 }
