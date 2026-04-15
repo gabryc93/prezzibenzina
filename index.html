@@ -1375,29 +1375,20 @@ function renderMapMarkers(stations, userLat, userLng) {
 let _evMapMarkers = [];
 
 async function fetchEV(lat, lng, radiusKm) {
-  const r = radiusKm * 1000;
-  const query = '[out:json][timeout:30];nwr[amenity=charging_station](around:' + r + ',' + lat + ',' + lng + ');out center 60;';
-  console.log('[EV] query:', query);
-  const res = await fetch('https://overpass-api.de/api/interpreter', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: 'data=' + encodeURIComponent(query)
-  });
-  console.log('[EV] response status:', res.status, res.ok);
-  if (!res.ok) {
-    const txt = await res.text();
-    console.log('[EV] error body:', txt.slice(0, 200));
-    throw new Error('Overpass ' + res.status);
-  }
-  const json = await res.json();
-  console.log('[EV] json elements:', (json.elements||[]).length);
-  return (json.elements || []).filter(e => e.lat || (e.center && e.center.lat));
+  // Calls our Worker which handles Overpass server-side — no CORS/timeout issues
+  const res = await fetch(WORKER + '/api/ev?lat=' + lat + '&lng=' + lng + '&raggio=' + Math.min(radiusKm, 8));
+  if (!res.ok) throw new Error('Worker EV ' + res.status);
+  return res.json(); // returns already-parsed station array
 }
+
+// parseEV is now done server-side; client just receives clean objects
+function parseEV(s) { return s; }
+
 
 function parseEV(node, userLat, userLng) {
   const t = node.tags || {};
-  const lat = node.lat ?? (node.center && node.center.lat);
-  const lng = node.lon ?? (node.center && node.center.lon);
+  const lat = (node.lat != null ? node.lat : (node.center ? node.center.lat : null));
+  const lng = (node.lon != null ? node.lon : (node.center ? node.center.lon : null));
   const name = t.name || t.operator || t.brand || 'Colonnina EV';
   const addr = [t['addr:street'], t['addr:housenumber']].filter(Boolean).join(' ');
   const city = t['addr:city'] || t['addr:municipality'] || '';
@@ -1448,7 +1439,7 @@ async function loadEVHome(lat, lng, radius) {
       box.innerHTML = '<div style="color:var(--mut);font-size:.78rem;padding:12px 0;text-align:center">Nessuna colonnina trovata nell\'area.</div>';
       return;
     }
-    const stations = nodes.map(n => parseEV(n, lat, lng)).sort((a,b) => (a.dist||999)-(b.dist||999));
+    const stations = nodes.sort((a,b) => (a.distanza||999)-(b.distanza||999));
     let html = '<div class="res-hdr fi"><div class="res-title">&#9889; Colonnine elettriche</div>'
       + '<div class="res-sub">' + stations.length + ' trovate &middot; OpenStreetMap</div></div>';
     stations.forEach(s => {
@@ -1462,7 +1453,7 @@ async function loadEVHome(lat, lng, radius) {
         + '<span class="ev-tag">' + s.numPrese + ' prese</span>'
         + (s.operatore ? '<span class="ev-tag">' + esc(s.operatore) + '</span>' : '')
         + '</div></div>'
-        + (s.dist != null ? '<div><div class="ev-kw">' + s.dist + '</div><div class="ev-kw-lbl">km</div></div>' : '<div></div>')
+        + (s.distanza != null ? '<div><div class="ev-kw">' + s.distanza + '</div><div class="ev-kw-lbl">km</div></div>' : '<div></div>')
         + '</div>';
     });
     box.innerHTML = html;
@@ -1500,13 +1491,16 @@ function openEVModal(s) {
 async function loadEVMap() {
   const center = _map.getCenter();
   const zoom = _map.getZoom();
-  // Keep radius small to avoid Overpass timeouts
-  const radius = zoom >= 14 ? 2 : zoom >= 12 ? 5 : 8;
+  if (zoom < 11) {
+    setMapStatus('Avvicinati sulla mappa per vedere le colonnine EV');
+    return;
+  }
+  const radius = zoom >= 14 ? 5 : zoom >= 12 ? 6 : 6;
   setMapStatus('Carico colonnine EV...');
   try {
     const nodes = await fetchEV(center.lat, center.lng, radius);
     clearEVMapMarkers();
-    nodes.map(n => parseEV(n, center.lat, center.lng)).forEach(s => {
+    nodes.forEach(s => {
       if (!s.lat || !s.lng || isNaN(s.lat) || isNaN(s.lng)) return;
       const icon = L.divIcon({ className: '', html: '<div class="ev-map-dot"></div>', iconAnchor: [5,5] });
       const el = document.createElement('div');
