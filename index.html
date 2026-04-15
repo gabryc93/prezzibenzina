@@ -830,6 +830,12 @@ footer a{color:var(--mut);text-decoration:underline}
           oninput="document.getElementById('cmp-radius-val').textContent=this.value+' km'"/>
         <span class="radius-val" id="cmp-radius-val">10 km</span>
       </div>
+      <div class="radius-row" style="margin-top:8px">
+        <label>Litri pieno</label>
+        <input type="range" id="cmp-liters" min="20" max="100" step="5" value="50"
+          oninput="document.getElementById('cmp-liters-val').textContent=this.value+' L';saveCmpLiters(this.value)"/>
+        <span class="radius-val" id="cmp-liters-val">50 L</span>
+      </div>
       <button class="btn-cmp-go" id="btn-cmp-go" onclick="runCmp()">Confronta</button>
       <div class="cmp-list" id="cmp-list"></div>
       <button class="btn-cmp-close" onclick="closeCmp()">Chiudi</button>
@@ -2115,6 +2121,10 @@ function deleteFavEdit() {
 }
 
 // ── Confronto preferiti ────────────────────────────────────────
+function saveCmpLiters(val) {
+  try { localStorage.setItem('opf_cmp_liters', val); } catch(e) {}
+}
+
 function openCmp(id) {
   const fav = loadFavs().find(f => f.id === id);
   if (!fav) return;
@@ -2124,6 +2134,15 @@ function openCmp(id) {
   document.getElementById('cmp-list').innerHTML = '';
   document.getElementById('btn-cmp-go').disabled = false;
   document.getElementById('btn-cmp-go').textContent = 'Confronta';
+  // Restore saved liters
+  try {
+    const saved = localStorage.getItem('opf_cmp_liters');
+    if (saved) {
+      const sl = document.getElementById('cmp-liters');
+      sl.value = saved;
+      document.getElementById('cmp-liters-val').textContent = saved + ' L';
+    }
+  } catch(e) {}
   document.getElementById('cmp-overlay').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
 }
@@ -2147,7 +2166,8 @@ async function runCmp() {
       throw new Error('Coordinate non disponibili — aggiungi di nuovo questo preferito dai risultati GPS o per comune');
 
     const carb = s.carburante || 'Benzina';
-    const data = await api('/api/vicini?lat=' + s.lat + '&lng=' + s.lng
+    const liters = parseInt(document.getElementById('cmp-liters').value) || 50;
+  const data = await api('/api/vicini?lat=' + s.lat + '&lng=' + s.lng
       + '&carburante=' + encodeURIComponent(carb)
       + '&self=0&raggio=' + radius);
 
@@ -2162,6 +2182,7 @@ async function runCmp() {
 
     // Fav reference card
     const favAboveMin = s.prezzo > minP;
+    const litersLabel = liters + 'L';
     let html = '<div class="cmp-row cmp-fav">'
       + '<div class="cmp-rank" style="color:var(--am)">★</div>'
       + '<div><div class="cmp-name">' + esc(s.customName || s.nome) + '</div>'
@@ -2176,8 +2197,8 @@ async function runCmp() {
     const others = data.filter(o => o.id !== s.id).slice(0, 5);
     others.forEach((o, i) => {
       const isBest = i === 0;
-      const saves = s.prezzo > o.prezzo ? ((s.prezzo - o.prezzo) * 50).toFixed(2) : null;
-      const costs = o.prezzo > s.prezzo ? ((o.prezzo - s.prezzo) * 50).toFixed(2) : null;
+      const saves = s.prezzo > o.prezzo ? ((s.prezzo - o.prezzo) * liters).toFixed(2) : null;
+      const costs = o.prezzo > s.prezzo ? ((o.prezzo - s.prezzo) * liters).toFixed(2) : null;
       html += '<div class="cmp-row' + (isBest ? ' cmp-best' : '') + '">'
         + '<div class="cmp-rank ' + (isBest ? 'r1' : '') + '">' + (i + 1) + '</div>'
         + '<div><div class="cmp-name">' + esc(o.nome) + '</div>'
