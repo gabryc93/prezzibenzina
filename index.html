@@ -424,6 +424,61 @@ footer a{color:var(--mut);text-decoration:underline}
   padding:8px;border-radius:6px;cursor:pointer;text-align:center;
   text-decoration:none;
 }
+
+/* ── Fav full-screen view ── */
+#fav-view{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:50;flex-direction:column}
+#fav-view.visible{display:flex}
+.fav-view-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--brd);background:var(--bg);flex-shrink:0;gap:10px}
+.fav-view-body{flex:1;overflow-y:auto;padding:16px;max-width:700px;width:100%;margin:0 auto}
+.fav-sort-row{display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.fav-sort-label{font-size:0.62rem;color:var(--mut)}
+.sort-btn{background:var(--surf);border:1px solid var(--brd2);color:var(--mut);font-family:var(--fm);font-size:0.65rem;padding:3px 9px;border-radius:4px;cursor:pointer;transition:all .15s}
+.sort-btn.on,.sort-btn:hover{color:var(--am);border-color:var(--am);background:var(--am-d)}
+.fav-note{font-size:0.68rem;color:var(--mut);margin-top:2px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fav-edit-btn{background:none;border:none;cursor:pointer;font-size:12px;opacity:.4;padding:2px 4px;color:var(--tx)}
+.fav-edit-btn:hover{opacity:1}
+
+/* ── Fav edit modal ── */
+.fov{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:70;display:flex;align-items:flex-end;justify-content:center}
+.fov-card{background:var(--surf);border:1px solid var(--brd2);border-radius:14px 14px 0 0;width:100%;max-width:480px;padding:20px 20px calc(20px + var(--safe-bottom))}
+@media(min-width:600px){.fov-card{border-radius:14px;margin:16px}}
+.fov-card h3{font-family:var(--fd);font-size:1rem;font-weight:700;margin-bottom:16px;color:var(--tx)}
+.fov-card label{display:block;font-size:0.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin-bottom:5px;margin-top:12px}
+.fov-card input,.fov-card textarea{width:100%;background:var(--surf2);border:1px solid var(--brd2);color:var(--tx);font-family:var(--fm);font-size:0.82rem;padding:9px 12px;border-radius:7px;outline:none;resize:none;transition:border-color .2s}
+.fov-card input:focus,.fov-card textarea:focus{border-color:var(--am)}
+.fov-btns{display:flex;gap:8px;margin-top:18px}
+.fov-save{flex:1;background:var(--am);color:#0d0e0f;border:none;font-family:var(--fm);font-size:0.82rem;font-weight:500;padding:11px;border-radius:7px;cursor:pointer}
+.fov-cancel{background:var(--surf2);color:var(--tx2);border:1px solid var(--brd2);font-family:var(--fm);font-size:0.82rem;padding:11px 16px;border-radius:7px;cursor:pointer}
+.fov-del{background:var(--rd-d);color:var(--rd);border:1px solid rgba(224,90,74,.25);font-family:var(--fm);font-size:0.82rem;padding:11px 16px;border-radius:7px;cursor:pointer}
+
+/* ── Compare modal ── */
+.cmp-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.65);z-index:80;display:flex;align-items:flex-end;justify-content:center}
+.cmp-card{background:var(--surf);border:1px solid var(--brd2);border-radius:14px 14px 0 0;width:100%;max-width:520px;padding:20px 20px calc(20px + var(--safe-bottom));max-height:85vh;overflow-y:auto}
+@media(min-width:600px){.cmp-card{border-radius:14px;margin:16px}}
+.cmp-card h3{font-family:var(--fd);font-size:1rem;font-weight:700;color:var(--tx);margin-bottom:4px}
+.cmp-card p{font-size:0.72rem;color:var(--mut);margin-bottom:16px}
+.radius-row{display:flex;align-items:center;gap:12px;background:var(--surf2);border-radius:8px;padding:12px 14px;margin-bottom:18px}
+.radius-row label{font-size:0.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);white-space:nowrap}
+.radius-row input[type=range]{flex:1}
+.radius-val{font-family:var(--fd);font-size:1.1rem;font-weight:700;color:var(--am);min-width:44px;text-align:right}
+.btn-cmp-go{width:100%;background:var(--am);color:#0d0e0f;border:none;font-family:var(--fm);font-size:0.85rem;font-weight:500;padding:12px;border-radius:7px;cursor:pointer;margin-bottom:16px}
+.btn-cmp-go:disabled{opacity:.4;cursor:not-allowed}
+.btn-cmp-close{width:100%;background:var(--surf2);color:var(--tx2);border:1px solid var(--brd2);font-family:var(--fm);font-size:0.82rem;padding:10px;border-radius:7px;cursor:pointer;margin-top:8px}
+.cmp-list{display:flex;flex-direction:column;gap:8px}
+.cmp-row{background:var(--surf2);border:1px solid var(--brd);border-radius:8px;padding:11px 14px;display:grid;grid-template-columns:28px 1fr auto;gap:6px 10px;align-items:center}
+.cmp-row.cmp-fav{border-color:var(--am);background:var(--am-d)}
+.cmp-row.cmp-best{border-color:var(--gn);background:var(--gn-d)}
+.cmp-rank{font-family:var(--fd);font-size:1.1rem;font-weight:700;color:var(--mut);text-align:center}
+.cmp-rank.r1{color:var(--gn)}
+.cmp-name{font-size:0.8rem;font-weight:500;color:var(--tx)}
+.cmp-addr{font-size:0.68rem;color:var(--mut);margin-top:1px}
+.cmp-dist{font-size:0.62rem;color:var(--bl);margin-top:2px}
+.cmp-tag{font-size:0.6rem;background:var(--am-d);color:var(--am);border:1px solid var(--am-b);padding:1px 6px;border-radius:3px;display:inline-block;margin-top:2px}
+.cmp-price{font-family:var(--fd);font-size:1.25rem;font-weight:700;color:var(--tx);text-align:right}
+.cmp-price.best{color:var(--gn)}
+.cmp-save{font-size:0.65rem;color:var(--gn);text-align:right;margin-top:2px}
+.cmp-extra{font-size:0.65rem;color:var(--rd);text-align:right;margin-top:2px}
+.cmp-summary{background:var(--gn-d);border:1px solid rgba(76,175,125,.3);border-radius:8px;padding:10px 14px;font-size:.78rem;color:var(--gn);margin-top:6px}
 </style>
 </head>
 <body>
@@ -484,8 +539,8 @@ footer a{color:var(--mut);text-decoration:underline}
     <div class="hdr-r">
       <span class="data-badge" id="data-badge">—</span>
       <span class="ts-badge" id="ts-badge">—</span>
+      <button class="btn-xs" id="btn-open-favs" onclick="openFavView()" title="Preferiti">★<span id="fav-hdr-count" style="font-size:0.6rem;vertical-align:super;line-height:0"></span></button>
       <button class="btn-xs" onclick="openMapView()">🗺 Mappa</button>
-      <button class="btn-xs" onclick="resetWorker()">⚙</button>
     </div>
   </header>
 
@@ -596,12 +651,6 @@ footer a{color:var(--mut);text-decoration:underline}
       <span id="stxt">Pronto</span>
     </div>
 
-    <div style="margin-bottom:14px">
-      <button id="fav-filter-btn" onclick="toggleFavFilter()">
-        <span id="fav-btn-icon">☆</span> Preferiti
-        <span id="fav-btn-count" style="display:none"></span>
-      </button>
-    </div>
     <div id="results"></div>
   </main>
 
@@ -720,6 +769,54 @@ footer a{color:var(--mut);text-decoration:underline}
     </div>
   </div>
 
+
+  <!-- FAV VIEW -->
+  <div id="fav-view">
+    <div class="fav-view-hdr">
+      <div class="logo">
+        <div class="h-icon" style="background:var(--am);width:30px;height:30px">
+          <span style="font-size:14px;line-height:30px;display:block;text-align:center">★</span>
+        </div>
+        <div><h1 style="font-family:var(--fd);font-weight:700;font-size:.95rem;letter-spacing:-.02em">Preferiti <small style="font-size:.55rem;color:var(--mut);display:block;text-transform:uppercase;letter-spacing:.1em">Distributori salvati</small></h1></div>
+      </div>
+      <button class="btn-close-map" onclick="closeFavView()">✕ Chiudi</button>
+    </div>
+    <div class="fav-view-body" id="fav-view-body"></div>
+  </div>
+
+  <!-- FAV EDIT MODAL -->
+  <div class="fov hidden" id="fov-overlay" onclick="if(event.target===this)closeFavEdit()">
+    <div class="fov-card">
+      <h3>Modifica preferito</h3>
+      <label>Nome personalizzato</label>
+      <input type="text" id="fov-name" placeholder="Es. Stazione vicino casa" maxlength="60"/>
+      <label>Nota</label>
+      <textarea id="fov-note" rows="2" placeholder="Es. Aperto 24h, accetta carta…" maxlength="120"></textarea>
+      <div class="fov-btns">
+        <button class="fov-cancel" onclick="closeFavEdit()">Annulla</button>
+        <button class="fov-del" onclick="deleteFavEdit()">Elimina</button>
+        <button class="fov-save" onclick="saveFavEdit()">Salva</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPARE MODAL -->
+  <div class="cmp-overlay hidden" id="cmp-overlay" onclick="if(event.target===this)closeCmp()">
+    <div class="cmp-card">
+      <h3>Confronta con i distributori vicini</h3>
+      <p id="cmp-subtitle">—</p>
+      <div class="radius-row">
+        <label>Raggio</label>
+        <input type="range" id="cmp-radius" min="5" max="20" step="1" value="10"
+          oninput="document.getElementById('cmp-radius-val').textContent=this.value+' km'"/>
+        <span class="radius-val" id="cmp-radius-val">10 km</span>
+      </div>
+      <button class="btn-cmp-go" id="btn-cmp-go" onclick="runCmp()">Confronta</button>
+      <div class="cmp-list" id="cmp-list"></div>
+      <button class="btn-cmp-close" onclick="closeCmp()">Chiudi</button>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -733,6 +830,7 @@ let _stationData = [];
 // ── Init ──────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   startApp();
+  updateFavBtn();
   document.getElementById('frow').style.display = 'flex';
   updateFavBtn();
   applyCardVisibility();
@@ -1696,6 +1794,226 @@ document.addEventListener('keydown', e => {
 document.getElementById('fav-edit-overlay').addEventListener('click', e => {
   if (e.target === document.getElementById('fav-edit-overlay')) closeFavModal();
 });
+// ── Fav view ──────────────────────────────────────────────────
+let _favViewSort = 'saved';
+let _cmpFav = null;
+
+function updateFavBtn() {
+  const el = document.getElementById('fav-hdr-count');
+  const n = loadFavs().length;
+  if (el) el.textContent = n > 0 ? ' (' + n + ')' : '';
+}
+
+function openFavView() {
+  document.getElementById('fav-view').classList.add('visible');
+  document.body.style.overflow = 'hidden';
+  renderFavView();
+}
+
+function closeFavView() {
+  document.getElementById('fav-view').classList.remove('visible');
+  document.body.style.overflow = '';
+}
+
+function setFavSort(btn) {
+  _favViewSort = btn.dataset.sort;
+  document.querySelectorAll('#fav-view .sort-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderFavView();
+}
+
+function getViewFavs() {
+  let favs = loadFavs();
+  if (_favViewSort === 'price') favs.sort((a, b) => a.prezzo - b.prezzo);
+  else if (_favViewSort === 'name') favs.sort((a, b) => (a.customName || a.nome).localeCompare(b.customName || b.nome));
+  return favs;
+}
+
+function renderFavView() {
+  updateFavBtn();
+  const area = document.getElementById('fav-view-body');
+  if (!area) return;
+  const favs = getViewFavs();
+  if (!favs.length) {
+    area.innerHTML = '<div class="no-res" style="margin-top:24px">Nessun preferito.<br><small style="color:var(--mut)">Cerca un distributore e tocca ☆ Salva.</small></div>';
+    return;
+  }
+  let html = '<div class="fav-sort-row"><span class="fav-sort-label">Ordina:</span>'
+    + '<button class="sort-btn ' + (_favViewSort==='saved'?'on':'') + '" data-sort="saved" onclick="setFavSort(this)">Aggiunti</button>'
+    + '<button class="sort-btn ' + (_favViewSort==='price'?'on':'') + '" data-sort="price" onclick="setFavSort(this)">Prezzo</button>'
+    + '<button class="sort-btn ' + (_favViewSort==='name'?'on':'') + '" data-sort="name" onclick="setFavSort(this)">Nome</button>'
+    + '</div><div class="slist">';
+
+  favs.forEach(s => {
+    const name = s.customName || s.nome;
+    const unit = (s.carburante || '').toLowerCase().includes('metano') ? 'kg' : 'lt';
+    html += '<div class="station" style="cursor:pointer" id="fvc-' + s.id + '">'
+      + '<div class="st-rank" style="color:var(--am)">★</div>'
+      + '<div class="st-info">'
+      + '<div class="st-name">' + esc(name) + '<button class="fav-edit-btn" onclick="event.stopPropagation();openFavEdit('' + s.id + '')" title="Modifica">✏</button></div>'
+      + (s.note ? '<div class="fav-note">' + esc(s.note) + '</div>' : '<div class="st-addr">' + esc(s.indirizzo) + (s.comune ? ' · ' + esc(s.comune) : '') + '</div>')
+      + '<div class="st-tags">'
+      + (s.bandiera ? '<span class="st-tag">' + esc(s.bandiera) + '</span>' : '')
+      + '<span class="st-tag">' + (s.isSelf ? 'self' : 'servito') + '</span>'
+      + (s.carburante ? '<span class="st-tag">' + esc(s.carburante) + '</span>' : '')
+      + '</div></div>'
+      + '<div class="st-p">'
+      + '<div class="st-price">' + s.prezzo.toFixed(3) + '</div>'
+      + '<div class="st-unit">€/' + unit + '</div>'
+      + '<div class="st-dt">' + (s.dtComu || '') + '</div>'
+      + '<button class="fav-btn" style="background:rgba(91,155,213,.15);color:var(--bl);border-color:rgba(91,155,213,.3);margin-top:3px;font-size:0.6rem;padding:2px 7px" onclick="event.stopPropagation();openCmp('' + s.id + '')" title="Confronta">⚖ Confronta</button>'
+      + '<button class="fav-btn on" style="margin-top:3px" onclick="event.stopPropagation();removeFavView('' + s.id + '')">✕</button>'
+      + '</div></div>';
+  });
+  html += '</div>';
+  area.innerHTML = html;
+
+  // Attach click to open modal
+  favs.forEach(s => {
+    const el = document.getElementById('fvc-' + s.id);
+    if (el) el.addEventListener('click', function(e) {
+      if (e.target.closest('button')) return;
+      openModal(s);
+    });
+  });
+}
+
+function removeFavView(id) {
+  saveFavs(loadFavs().filter(f => f.id !== id));
+  renderFavSection();
+  renderFavView();
+}
+
+// ── Fav edit modal ─────────────────────────────────────────────
+function openFavEdit(id) {
+  const fav = loadFavs().find(f => f.id === id);
+  if (!fav) return;
+  _editingFavId = id;
+  document.getElementById('fov-name').value = fav.customName || '';
+  document.getElementById('fov-note').value = fav.note || '';
+  document.getElementById('fov-overlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeFavEdit() {
+  document.getElementById('fov-overlay').classList.add('hidden');
+  document.body.style.overflow = 'hidden'; // keep fav view scrollable
+}
+
+function saveFavEdit() {
+  let favs = loadFavs();
+  const i = favs.findIndex(f => f.id === _editingFavId);
+  if (i >= 0) {
+    favs[i].customName = document.getElementById('fov-name').value.trim();
+    favs[i].note = document.getElementById('fov-note').value.trim();
+    saveFavs(favs);
+  }
+  closeFavEdit();
+  renderFavView();
+}
+
+function deleteFavEdit() {
+  saveFavs(loadFavs().filter(f => f.id !== _editingFavId));
+  closeFavEdit();
+  renderFavSection();
+  renderFavView();
+}
+
+// ── Confronto preferiti ────────────────────────────────────────
+function openCmp(id) {
+  const fav = loadFavs().find(f => f.id === id);
+  if (!fav) return;
+  _cmpFav = fav;
+  document.getElementById('cmp-subtitle').textContent =
+    'Confronta "' + (fav.customName || fav.nome) + '" con i distributori nell'area';
+  document.getElementById('cmp-list').innerHTML = '';
+  document.getElementById('btn-cmp-go').disabled = false;
+  document.getElementById('btn-cmp-go').textContent = 'Confronta';
+  document.getElementById('cmp-overlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCmp() {
+  document.getElementById('cmp-overlay').classList.add('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+async function runCmp() {
+  if (!_cmpFav) return;
+  const s = _cmpFav;
+  const radius = parseInt(document.getElementById('cmp-radius').value);
+  const btn = document.getElementById('btn-cmp-go');
+  const list = document.getElementById('cmp-list');
+  btn.disabled = true;
+  btn.textContent = '⏳ Cerco…';
+  list.innerHTML = '<div style="color:var(--mut);font-size:.78rem;padding:8px 0">Carico distributori nelle vicinanze…</div>';
+
+  try {
+    if (!s.lat || !s.lng || isNaN(s.lat) || isNaN(s.lng))
+      throw new Error('Coordinate non disponibili — aggiungi di nuovo questo preferito dai risultati GPS o per comune');
+
+    const carb = s.carburante || 'Benzina';
+    const data = await api('/api/vicini?lat=' + s.lat + '&lng=' + s.lng
+      + '&carburante=' + encodeURIComponent(carb)
+      + '&self=0&raggio=' + radius);
+
+    if (!data.length) {
+      list.innerHTML = '<div style="color:var(--mut);font-size:.78rem;padding:8px 0">Nessun distributore trovato entro ' + radius + ' km.</div>';
+      return;
+    }
+
+    data.sort((a, b) => a.prezzo - b.prezzo);
+    const minP = data[0].prezzo;
+    const unit = carb.toLowerCase().includes('metano') ? 'kg' : 'litro';
+
+    // Fav reference card
+    const favAboveMin = s.prezzo > minP;
+    let html = '<div class="cmp-row cmp-fav">'
+      + '<div class="cmp-rank" style="color:var(--am)">★</div>'
+      + '<div><div class="cmp-name">' + esc(s.customName || s.nome) + '</div>'
+      + '<div class="cmp-addr">' + esc(s.indirizzo || '') + '</div>'
+      + '<span class="cmp-tag">Il tuo preferito</span></div>'
+      + '<div><div class="cmp-price' + (s.prezzo <= minP ? ' best' : '') + '">' + s.prezzo.toFixed(3) + '</div>'
+      + '<div style="font-size:.62rem;color:var(--mut)">€/' + unit + '</div>'
+      + (favAboveMin ? '<div class="cmp-extra">+' + ((s.prezzo - minP) * 50).toFixed(2) + '€/50L</div>' : '<div class="cmp-save">Il più economico!</div>')
+      + '</div></div>';
+
+    // Top competitors (exclude fav itself)
+    const others = data.filter(o => o.id !== s.id).slice(0, 5);
+    others.forEach((o, i) => {
+      const isBest = i === 0;
+      const saves = s.prezzo > o.prezzo ? ((s.prezzo - o.prezzo) * 50).toFixed(2) : null;
+      const costs = o.prezzo > s.prezzo ? ((o.prezzo - s.prezzo) * 50).toFixed(2) : null;
+      html += '<div class="cmp-row' + (isBest ? ' cmp-best' : '') + '">'
+        + '<div class="cmp-rank ' + (isBest ? 'r1' : '') + '">' + (i + 1) + '</div>'
+        + '<div><div class="cmp-name">' + esc(o.nome) + '</div>'
+        + '<div class="cmp-addr">' + esc(o.indirizzo) + '</div>'
+        + (o.distanza != null ? '<div class="cmp-dist">📍 ' + o.distanza + ' km</div>' : '')
+        + (o.bandiera ? '<div style="font-size:.6rem;color:var(--mut)">' + esc(o.bandiera) + ' · ' + (o.isSelf?'self':'servito') + '</div>' : '')
+        + '</div>'
+        + '<div><div class="cmp-price' + (isBest ? ' best' : '') + '">' + o.prezzo.toFixed(3) + '</div>'
+        + '<div style="font-size:.62rem;color:var(--mut)">€/' + unit + '</div>'
+        + (saves ? '<div class="cmp-save">risparmi ' + saves + '€/50L</div>' : '')
+        + (costs ? '<div class="cmp-extra">+' + costs + '€/50L</div>' : '')
+        + '</div></div>';
+    });
+
+    // Summary
+    if (favAboveMin) {
+      html += '<div class="cmp-summary">💡 Andando al distributore più economico risparmi <strong>' + ((s.prezzo - minP) * 50).toFixed(2) + '€</strong> ogni pieno da 50L</div>';
+    } else {
+      html += '<div class="cmp-summary">✅ Il tuo preferito è già il più economico nell'area!</div>';
+    }
+
+    list.innerHTML = html;
+  } catch(e) {
+    list.innerHTML = '<div style="color:var(--rd);font-size:.78rem;padding:8px 0">' + esc(e.message) + '</div>';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Confronta';
+  }
+}
+
 
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
