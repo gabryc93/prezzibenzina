@@ -1169,6 +1169,16 @@ let _suggestTimer2 = null;
 
 
 
+// ── Map state variables ──────────────────────────────────────
+let _map = null;
+let _mapInitialized = false;
+let _mapMarkers = [];
+let _mapFuel = 'Benzina';
+let _mapSelf = false;
+let _mapCenter = null;
+let _userMarker = null;
+let _mapPlaceSugTimer = null;
+
 function openMapView() {
   const v = document.getElementById('map-view');
   v.style.display = 'block';
