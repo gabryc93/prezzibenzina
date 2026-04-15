@@ -39,6 +39,39 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 
+/* ── SETUP ────────────────────────────────────────────────── */
+#setup{
+  position:fixed;inset:0;background:var(--bg);z-index:200;
+  display:flex;align-items:center;justify-content:center;padding:24px;
+}
+.setup-card{
+  background:var(--surf);border:1px solid var(--brd2);
+  border-radius:14px;padding:32px 28px;max-width:440px;width:100%;
+}
+.setup-logo{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.s-icon{width:42px;height:42px;background:var(--am);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.setup-logo h1{font-family:var(--fd);font-weight:700;font-size:1.15rem;letter-spacing:-.02em;line-height:1.2}
+.setup-logo small{font-size:0.6rem;color:var(--mut);display:block;text-transform:uppercase;letter-spacing:.1em}
+.setup-card p{font-size:0.8rem;color:var(--tx2);margin-bottom:18px;line-height:1.7}
+.setup-card label{display:block;font-size:0.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.setup-card input{
+  width:100%;background:var(--surf2);border:1px solid var(--brd2);color:var(--tx);
+  font-family:var(--fm);font-size:0.82rem;padding:11px 14px;border-radius:7px;
+  outline:none;transition:border-color .2s;margin-bottom:8px;
+}
+.setup-card input:focus{border-color:var(--am)}
+.setup-hint{font-size:0.7rem;color:var(--mut);margin-bottom:20px}
+.setup-hint a{color:var(--am);text-decoration:none}
+.btn-full{
+  width:100%;background:var(--am);color:#0d0e0f;border:none;
+  font-family:var(--fm);font-size:0.85rem;font-weight:500;
+  padding:12px;border-radius:7px;cursor:pointer;
+  transition:opacity .2s;
+}
+.btn-full:hover{opacity:.88}
+.btn-full:disabled{opacity:.4;cursor:not-allowed}
+.setup-err{font-size:0.72rem;color:var(--rd);margin-top:8px;text-align:center;min-height:16px}
+
 /* ── LOADER ───────────────────────────────────────────────── */
 #loader{
   position:fixed;inset:0;background:var(--bg);z-index:100;
@@ -391,41 +424,33 @@ footer a{color:var(--mut);text-decoration:underline}
   padding:8px;border-radius:6px;cursor:pointer;text-align:center;
   text-decoration:none;
 }
-
-/* ── Fav view ── */
-#fav-view{
-  display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:50;
-  flex-direction:column;
-}
-#fav-view.visible{display:flex}
-.fav-view-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 16px;border-bottom:1px solid var(--brd);
-  background:var(--bg);flex-shrink:0;gap:10px;
-}
-.fav-view-body{flex:1;overflow-y:auto;padding:16px;max-width:700px;width:100%;margin:0 auto}
-.fav-sort-row{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap}
-.fav-sort-label{font-size:0.62rem;color:var(--mut);letter-spacing:.06em}
-.sort-btn{background:var(--surf);border:1px solid var(--brd2);color:var(--mut);font-family:var(--fm);font-size:0.65rem;padding:3px 9px;border-radius:4px;cursor:pointer;transition:all .15s}
-.sort-btn:hover,.sort-btn.on{color:var(--am);border-color:var(--am);background:var(--am-d)}
-.fav-note{font-size:0.68rem;color:var(--mut);margin-top:3px;font-style:italic}
-.fav-edit-btn{background:none;border:none;cursor:pointer;font-size:12px;opacity:.4;padding:2px 4px;transition:opacity .15s;color:var(--tx)}
-.fav-edit-btn:hover{opacity:1}
-
-/* ── Fav modal ── */
-.fav-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:60;display:flex;align-items:flex-end;justify-content:center}
-.fav-modal{background:var(--surf);border:1px solid var(--brd2);border-radius:14px 14px 0 0;width:100%;max-width:480px;padding:20px 20px calc(20px + var(--safe-bottom))}
-.fav-modal h3{font-family:var(--fd);font-size:1rem;font-weight:700;margin-bottom:16px;color:var(--tx)}
-.fav-modal label{display:block;font-size:0.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin-bottom:5px;margin-top:12px}
-.fav-modal input,.fav-modal textarea{width:100%;background:var(--surf2);border:1px solid var(--brd2);color:var(--tx);font-family:var(--fm);font-size:0.82rem;padding:9px 12px;border-radius:7px;outline:none;resize:none}
-.fav-modal input:focus,.fav-modal textarea:focus{border-color:var(--am)}
-.fav-modal-btns{display:flex;gap:8px;margin-top:18px}
-.btn-fav-save{flex:1;background:var(--am);color:#0d0e0f;border:none;font-family:var(--fm);font-size:0.82rem;font-weight:500;padding:11px;border-radius:7px;cursor:pointer}
-.btn-fav-cancel{background:var(--surf2);color:var(--tx2);border:1px solid var(--brd2);font-family:var(--fm);font-size:0.82rem;padding:11px 16px;border-radius:7px;cursor:pointer}
-.btn-fav-delete{background:var(--rd-d);color:var(--rd);border:1px solid rgba(224,90,74,.25);font-family:var(--fm);font-size:0.82rem;padding:11px 16px;border-radius:7px;cursor:pointer}
 </style>
 </head>
 <body>
+
+<!-- SETUP: inserisci URL del Worker -->
+<div id="setup" style="display:none">
+  <div class="setup-card">
+    <div class="setup-logo">
+      <div class="s-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0d0e0f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 22V4a2 2 0 012-2h6a2 2 0 012 2v18"/><path d="M5 12h10"/>
+          <path d="M15 7l4 4-4 4"/><path d="M19 7v8"/>
+        </svg>
+      </div>
+      <div><h1>OsservaPrezzi</h1><small>Carburanti Italia</small></div>
+    </div>
+    <p>Inserisci l'URL del tuo Cloudflare Worker. Viene salvato solo su questo dispositivo.</p>
+    <label for="worker-url">URL Cloudflare Worker</label>
+    <input type="url" id="worker-url" placeholder="https://opf.TUO-NOME.workers.dev" autocomplete="off" />
+    <div class="setup-hint">
+      Segui le istruzioni nel file <strong>ISTRUZIONI.txt</strong> per creare il Worker gratis su
+      <a href="https://workers.cloudflare.com" target="_blank">workers.cloudflare.com</a>
+    </div>
+    <button class="btn-full" onclick="saveWorkerUrl()">Connetti →</button>
+    <div class="setup-err" id="setup-err"></div>
+  </div>
+</div>
 
 <!-- LOADER -->
 <div id="loader">
@@ -459,8 +484,8 @@ footer a{color:var(--mut);text-decoration:underline}
     <div class="hdr-r">
       <span class="data-badge" id="data-badge">—</span>
       <span class="ts-badge" id="ts-badge">—</span>
-      <button class="btn-xs" id="btn-open-favs" onclick="openFavView()" title="Preferiti">★<span id="fav-hdr-count" style="font-size:0.6rem;vertical-align:super;line-height:0"></span></button>
       <button class="btn-xs" onclick="openMapView()">🗺 Mappa</button>
+      <button class="btn-xs" onclick="resetWorker()">⚙</button>
     </div>
   </header>
 
@@ -695,22 +720,6 @@ footer a{color:var(--mut);text-decoration:underline}
     </div>
   </div>
 
-
-  <!-- FAV VIEW -->
-  <div id="fav-view">
-    <div class="fav-view-header">
-      <div class="logo">
-        <div class="h-icon" style="background:var(--am)">
-          <span style="font-size:14px;line-height:30px;display:block;text-align:center">★</span>
-        </div>
-        <div><h1 style="font-family:var(--fd);font-weight:700;font-size:.95rem;letter-spacing:-.02em">Preferiti <small style="font-size:.55rem;color:var(--mut);display:block;text-transform:uppercase;letter-spacing:.1em">Distributori salvati</small></h1></div>
-      </div>
-      <button class="btn-close-map" onclick="closeFavView()">✕ Chiudi</button>
-    </div>
-    <div class="fav-view-body" id="fav-view-body"></div>
-  </div>
-
-
 </div>
 
 <script>
@@ -726,7 +735,6 @@ window.addEventListener('DOMContentLoaded', () => {
   startApp();
   document.getElementById('frow').style.display = 'flex';
   updateFavBtn();
-  updateFavBtn();
   applyCardVisibility();
   updateTs();
   setInterval(updateTs, 30000);
@@ -737,7 +745,37 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // ── Setup ─────────────────────────────────────────────────────
+async function saveWorkerUrl() {
+  const url = document.getElementById('worker-url').value.trim().replace(/\/$/, '');
+  const err = document.getElementById('setup-err');
+  err.textContent = '';
+  if (!url.startsWith('https://')) { err.textContent = "L'URL deve iniziare con https://"; return; }
+  const btn = document.querySelector('#setup .btn-full');
+  btn.disabled = true; btn.textContent = 'Verifico…';
+  try {
+    const res = await fetch(url + '/');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    await res.json();
+    WORKER = url;
+    localStorage.setItem('opf_worker', url);
+    document.getElementById('setup').style.display = 'none';
+    startApp();
+  } catch(e) {
+    err.textContent = 'Worker non raggiungibile: ' + e.message;
+    btn.disabled = false; btn.textContent = 'Connetti →';
+  }
+}
 
+function resetWorker() {
+  if (!confirm('Cambiare Worker URL?')) return;
+  localStorage.removeItem('opf_worker');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('setup').style.display = 'flex';
+  document.getElementById('worker-url').value = WORKER;
+  WORKER = '';
+}
+
+// ── App start ─────────────────────────────────────────────────
 function startApp() {
   showLoader(true);
   document.getElementById('app').style.display = 'none';
@@ -1653,127 +1691,13 @@ function closeModal(e) {
 
 // Close on ESC
 document.addEventListener('keydown', e => {
-  if(e.key === 'Escape') { closeModal(); closeFavModal(); closeFavView(); }
+  if(e.key === 'Escape') { closeModal(); closeFavModal(); }
 });
 document.getElementById('fav-edit-overlay').addEventListener('click', e => {
   if (e.target === document.getElementById('fav-edit-overlay')) closeFavModal();
 });
-// ── Fav Header button count ───────────────────────────────────
-function updateFavBtn() {
-  const countEl = document.getElementById('fav-hdr-count');
-  const n = loadFavs().length;
-  if (countEl) countEl.textContent = n > 0 ? ' (' + n + ')' : '';
-}
-
-// ── Fav View ──────────────────────────────────────────────────
-function openFavView() {
-  document.getElementById('fav-view').classList.add('visible');
-  document.body.style.overflow = 'hidden';
-  renderFavView();
-}
-
-function closeFavView() {
-  document.getElementById('fav-view').classList.remove('visible');
-  document.body.style.overflow = '';
-}
-
-function setSortFav(btn) {
-  _favSort = btn.dataset.sort;
-  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on');
-  renderFavView();
-}
-
-function getSortedFavs() {
-  let favs = loadFavs();
-  if (_favSort === 'price') favs.sort((a,b) => a.prezzo - b.prezzo);
-  else if (_favSort === 'name') favs.sort((a,b) => (a.customName||a.nome).localeCompare(b.customName||b.nome));
-  return favs;
-}
-
-function renderFavView() {
-  updateFavBtn();
-  const favs = getSortedFavs();
-  const area = document.getElementById('fav-view-body');
-  if (!area) return;
-  if (!favs.length) {
-    area.innerHTML = '<div class="no-res" style="margin-top:24px">Nessun preferito salvato.<br><span style="font-size:.78rem;color:var(--mut)">Cerca un distributore e tocca ☆ Salva.</span></div>';
-    return;
-  }
-  let html = '<div class="fav-sort-row" style="margin-bottom:14px"><span class="fav-sort-label">Ordina:</span><button class="sort-btn ' + (_favSort==='saved'?'on':'') + '" data-sort="saved" onclick="setSortFav(this)">Aggiunti</button><button class="sort-btn ' + (_favSort==='price'?'on':'') + '" data-sort="price" onclick="setSortFav(this)">Prezzo</button><button class="sort-btn ' + (_favSort==='name'?'on':'') + '" data-sort="name" onclick="setSortFav(this)">Nome</button></div><div class="slist">';
-  favs.forEach(s => {
-    const displayName = s.customName || s.nome;
-    const unit = (s.carburante||'').toLowerCase().includes('metano') ? 'kg' : 'lt';
-    html += '<div class="station" style="cursor:pointer" id="fav-card-' + s.id + '"><div class="st-rank" style="color:var(--am)">★</div><div class="st-info"><div class="st-name">' + esc(displayName) + '<button class="fav-edit-btn" onclick="openFavModal('' + s.id + '')" title="Modifica">✏</button></div>' + (s.note ? '<div class="fav-note">' + esc(s.note) + '</div>' : '<div class="st-addr">' + esc(s.indirizzo) + ' · ' + esc(s.comune) + '</div>') + '<div class="st-tags">' + (s.bandiera?'<span class="st-tag">'+esc(s.bandiera)+'</span>':'') + '<span class="st-tag">' + (s.isSelf?'self':'servito') + '</span></div></div><div class="st-p"><div class="st-price">' + s.prezzo.toFixed(3) + '</div><div class="st-unit">€/' + unit + '</div><div class="st-dt">' + (s.dtComu||'') + '</div><button class="fav-btn on" style="margin-top:3px" onclick="removeFavById('' + s.id + '')">✕</button></div></div>';
-  });
-  html += '</div>';
-  area.innerHTML = html;
-  favs.forEach(s => {
-    const card = document.getElementById('fav-card-' + s.id);
-    if (card) card.addEventListener('click', function(e) { if (e.target.closest('button')) return; openModal(s); });
-  });
-}
-
-function removeFavById(id) {
-  saveFavs(loadFavs().filter(f => f.id !== id));
-  renderFavSection();
-  renderFavView();
-}
-
-// ── Fav Edit Modal ─────────────────────────────────────────────
-function openFavModal(id) {
-  const fav = loadFavs().find(f => f.id === id);
-  if (!fav) return;
-  _editingFavId = id;
-  document.getElementById('fav-edit-name').value = fav.customName || '';
-  document.getElementById('fav-edit-note').value = fav.note || '';
-  document.getElementById('fav-edit-overlay').classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-  setTimeout(() => document.getElementById('fav-edit-name').focus(), 100);
-}
-
-function closeFavModal() {
-  document.getElementById('fav-edit-overlay').classList.add('hidden');
-  document.body.style.overflow = '';
-  _editingFavId = null;
-}
-
-function saveFavModal() {
-  let favs = loadFavs();
-  const i = favs.findIndex(f => f.id === _editingFavId);
-  if (i >= 0) {
-    favs[i].customName = document.getElementById('fav-edit-name').value.trim();
-    favs[i].note = document.getElementById('fav-edit-note').value.trim();
-    saveFavs(favs);
-  }
-  closeFavModal();
-  renderFavView();
-}
-
-function deleteFavFromModal() {
-  saveFavs(loadFavs().filter(f => f.id !== _editingFavId));
-  closeFavModal();
-  renderFavView();
-}
-
 
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-
-  <!-- FAV EDIT MODAL -->
-  <div class="fav-modal-overlay hidden" id="fav-edit-overlay">
-    <div class="fav-modal">
-      <h3>Modifica preferito</h3>
-      <label>Nome personalizzato</label>
-      <input type="text" id="fav-edit-name" placeholder="Es. Distributore vicino casa" maxlength="60" />
-      <label>Nota</label>
-      <textarea id="fav-edit-note" rows="2" placeholder="Es. Aperto 24h, accetta carta…" maxlength="120"></textarea>
-      <div class="fav-modal-btns">
-        <button class="btn-fav-cancel" onclick="closeFavModal()">Annulla</button>
-        <button class="btn-fav-delete" onclick="deleteFavFromModal()">Elimina</button>
-        <button class="btn-fav-save" onclick="saveFavModal()">Salva</button>
-      </div>
-    </div>
-  </div>
 </body>
 </html>
