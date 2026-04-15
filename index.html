@@ -1168,17 +1168,21 @@ function openMapView() {
   const view = document.getElementById('map-view');
   view.classList.add('visible');
   document.body.style.overflow = 'hidden';
+  initMapPlaceSearch();
 
-  // Wait for layout to settle, then measure and init
-  const mapEl = document.getElementById('leaflet-map');
-  mapEl.style.width  = window.innerWidth + 'px';
-  mapEl.style.height = window.innerHeight + 'px';
-  if (!_mapInitialized) {
-    initMap();
-    _mapInitialized = true;
-  } else if (_map) {
-    _map.invalidateSize(true);
-  }
+  // requestAnimationFrame ensures display:flex is rendered
+  // before Leaflet tries to measure offsetWidth/offsetHeight
+  requestAnimationFrame(() => {
+    const mapEl = document.getElementById('leaflet-map');
+    mapEl.style.width  = window.innerWidth + 'px';
+    mapEl.style.height = window.innerHeight + 'px';
+    if (!_mapInitialized) {
+      initMap();
+      _mapInitialized = true;
+    } else if (_map) {
+      _map.invalidateSize(true);
+    }
+  });
 }
 
 function closeMapView() {
