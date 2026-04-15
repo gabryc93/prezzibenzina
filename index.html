@@ -1484,7 +1484,8 @@ function openEVModal(s) {
 async function loadEVMap() {
   const center = _map.getCenter();
   const zoom = _map.getZoom();
-  const radius = zoom >= 14 ? 3 : zoom >= 12 ? 8 : 15;
+  // Keep radius small to avoid Overpass timeouts
+  const radius = zoom >= 14 ? 2 : zoom >= 12 ? 5 : 8;
   setMapStatus('Carico colonnine EV...');
   try {
     const nodes = await fetchEV(center.lat, center.lng, radius);
