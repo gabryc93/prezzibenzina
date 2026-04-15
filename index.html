@@ -1286,7 +1286,14 @@ function setMapFuel(btn) {
   _mapFuel = btn.dataset.mf;
   document.querySelectorAll('[data-mf]').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
-  if (_mapCenter) loadMapStations();
+  if (_mapFuel === 'EV') {
+    _mapMarkers.forEach(m => m.remove());
+    _mapMarkers = [];
+    loadEVMap();
+  } else {
+    clearEVMapMarkers();
+    if (_mapCenter) loadMapStations();
+  }
 }
 
 function toggleMapSelf() {
