@@ -1375,11 +1375,14 @@ function renderMapMarkers(stations, userLat, userLng) {
 let _evMapMarkers = [];
 
 async function fetchEV(lat, lng, radiusKm) {
-  // Calls our Worker which handles Overpass server-side — no CORS/timeout issues
   const res = await fetch(WORKER + '/api/ev?lat=' + lat + '&lng=' + lng + '&raggio=' + Math.min(radiusKm, 8));
-  if (!res.ok) throw new Error('Worker EV ' + res.status);
-  return res.json(); // returns already-parsed station array
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Errore ' + res.status);
+  }
+  return res.json();
 }
+
 
 // parseEV is now done server-side; client just receives clean objects
 function parseEV(s) { return s; }
@@ -1478,7 +1481,7 @@ function openEVModal(s) {
   const distRow = document.getElementById('modal-dist-row');
   if (s.dist != null && distRow) { distRow.style.display = ''; document.getElementById('modal-dist-val').textContent = s.dist + ' km da te'; }
   else if (distRow) distRow.style.display = 'none';
-  document.getElementById('modal-dt').textContent = s.numPrese + ' prese';
+  document.getElementById('modal-dt').textContent = s.orario || (s.numPrese + ' prese');
   const coord = s.lat + ',' + s.lng;
   const addr = encodeURIComponent([s.nome, s.indirizzo, s.comune].filter(Boolean).join(', '));
   document.getElementById('btn-gmaps').href = 'https://www.google.com/maps/search/?api=1&query=' + coord;
