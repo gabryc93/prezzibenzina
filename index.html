@@ -1931,7 +1931,7 @@ function openCmp(id) {
   if (!fav) return;
   _cmpFav = fav;
   document.getElementById('cmp-subtitle').textContent =
-    'Confronta "' + (fav.customName || fav.nome) + '" con i distributori nell'area';
+    'Confronta "' + (fav.customName || fav.nome) + '" con i distributori nell\'area';
   document.getElementById('cmp-list').innerHTML = '';
   document.getElementById('btn-cmp-go').disabled = false;
   document.getElementById('btn-cmp-go').textContent = 'Confronta';
@@ -2007,7 +2007,7 @@ async function runCmp() {
     if (favAboveMin) {
       html += '<div class="cmp-summary">💡 Andando al distributore più economico risparmi <strong>' + ((s.prezzo - minP) * 50).toFixed(2) + '€</strong> ogni pieno da 50L</div>';
     } else {
-      html += '<div class="cmp-summary">✅ Il tuo preferito è già il più economico nell'area!</div>';
+      html += '<div class="cmp-summary">✅ Il tuo preferito è già il più economico nell\'area!</div>';
     }
 
     list.innerHTML = html;
