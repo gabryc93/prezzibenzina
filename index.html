@@ -1126,15 +1126,22 @@ function setFuel(btn) {
   evBox.innerHTML = '';
   if (activeFuel === 'EV') {
     document.getElementById('results').innerHTML = '';
-    // Use GPS coords if available, else last search center
-    if (typeof _gpsLat !== 'undefined' && _gpsLat) {
+    const evBox = document.getElementById('ev-results');
+    if (_gpsLat) {
       loadEVHome(_gpsLat, _gpsLng, 10);
     } else if (activeComune) {
-      // geocode the comune to get coords
+      evBox.classList.remove('hidden');
+      evBox.innerHTML = '<div style="color:var(--mut);font-size:.78rem;padding:12px 0;text-align:center">Carico colonnine...</div>';
       fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(activeComune) + '+Italia&format=json&limit=1')
-        .then(r => r.json()).then(d => {
+        .then(r => r.json())
+        .then(d => {
           if (d.length) loadEVHome(parseFloat(d[0].lat), parseFloat(d[0].lon), 10);
-        });
+          else evBox.innerHTML = '<div style="color:var(--mut);font-size:.78rem;padding:12px 0;text-align:center">Comune non trovato.</div>';
+        })
+        .catch(() => evBox.innerHTML = '<div style="color:var(--rd);font-size:.78rem;padding:12px 0">Errore di rete.</div>');
+    } else {
+      evBox.classList.remove('hidden');
+      evBox.innerHTML = '<div style="color:var(--mut);font-size:.78rem;padding:12px 0;text-align:center">Cerca prima un comune o usa il GPS, poi attiva &#9889; EV.</div>';
     }
   } else {
     if (activeComune) fetchStations();
@@ -1355,20 +1362,23 @@ function renderMapMarkers(stations, userLat, userLng) {
 let _evMapMarkers = [];
 
 async function fetchEV(lat, lng, radiusKm) {
-  const r = radiusKm * 1000; // convert to meters
-  const query = '[out:json][timeout:25];node[amenity=charging_station](around:' + r + ',' + lat + ',' + lng + ');out body 60;';
+  const r = radiusKm * 1000;
+  // nwr = nodes+ways+relations; out center gives coords for non-node types
+  const query = '[out:json][timeout:30];nwr[amenity=charging_station](around:' + r + ',' + lat + ',' + lng + ');out center 60;';
   const res = await fetch('https://overpass-api.de/api/interpreter', {
     method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: 'data=' + encodeURIComponent(query)
   });
-  if (!res.ok) throw new Error('Overpass API ' + res.status);
+  if (!res.ok) throw new Error('Overpass ' + res.status);
   const json = await res.json();
-  return json.elements || [];
+  return (json.elements || []).filter(e => e.lat || (e.center && e.center.lat));
 }
 
 function parseEV(node, userLat, userLng) {
   const t = node.tags || {};
-  const lat = node.lat, lng = node.lon;
+  const lat = node.lat || (node.center && node.center.lat);
+  const lng = node.lon || (node.center && node.center.lon);
   const name = t.name || t.operator || t.brand || 'Colonnina EV';
   const addr = [t['addr:street'], t['addr:housenumber']].filter(Boolean).join(' ');
   const city = t['addr:city'] || t['addr:municipality'] || '';
