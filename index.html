@@ -1169,6 +1169,14 @@ let _suggestTimer2 = null;
 
 
 
+// ── EV state variables ───────────────────────────────────────
+let _evActive = false;
+let _evMapActive = false;
+let _evMarkers = [];
+let _lastSearchLat = null;
+let _lastSearchLng = null;
+let _lastSearchRadius = 10;
+
 // ── Map state variables ──────────────────────────────────────
 let _map = null;
 let _mapInitialized = false;
@@ -1177,7 +1185,6 @@ let _mapFuel = 'Benzina';
 let _mapSelf = false;
 let _mapCenter = null;
 let _userMarker = null;
-let _mapPlaceSugTimer = null;
 
 function openMapView() {
   const v = document.getElementById('map-view');
