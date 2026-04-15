@@ -830,7 +830,6 @@ let _stationData = [];
 // ── Init ──────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   startApp();
-  updateFavBtn();
   document.getElementById('frow').style.display = 'flex';
   updateFavBtn();
   applyCardVisibility();
@@ -839,7 +838,6 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('qinput').addEventListener('input', onInput);
   document.getElementById('qinput').addEventListener('keydown', e => { if(e.key==='Enter'){ document.getElementById('sug').style.display='none'; doSearch(); } });
   document.addEventListener('click', e => { if(!e.target.closest('#sug') && !e.target.closest('#qinput')) document.getElementById('sug').style.display='none'; });
-  document.getElementById('worker-url').addEventListener('keydown', e => { if(e.key==='Enter') saveWorkerUrl(); });
 });
 
 // ── Setup ─────────────────────────────────────────────────────
@@ -1897,7 +1895,6 @@ function openFavEdit(id) {
 
 function closeFavEdit() {
   document.getElementById('fov-overlay').classList.add('hidden');
-  document.body.style.overflow = 'hidden'; // keep fav view scrollable
 }
 
 function saveFavEdit() {
@@ -1935,7 +1932,6 @@ function openCmp(id) {
 
 function closeCmp() {
   document.getElementById('cmp-overlay').classList.add('hidden');
-  document.body.style.overflow = 'hidden';
 }
 
 async function runCmp() {
