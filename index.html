@@ -1166,36 +1166,51 @@ let _suggestTimer2 = null;
 
 function openMapView() {
   const view = document.getElementById('map-view');
-  view.classList.add('visible');
+  // Set display directly — more reliable than class toggle on Safari
+  view.style.display = 'flex';
   document.body.style.overflow = 'hidden';
   initMapPlaceSearch();
 
-  // requestAnimationFrame ensures display:flex is rendered
-  // before Leaflet tries to measure offsetWidth/offsetHeight
-  requestAnimationFrame(() => {
+  // Double rAF: guarantees TWO paint cycles before we measure/init
+  // First rAF: browser applies display:flex
+  // Second rAF: browser finishes layout calculations
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const w = view.clientWidth  || window.innerWidth;
+    const h = view.clientHeight || window.innerHeight;
+    // Calculate actual map area (subtract header + search + fuel row)
+    const uiH = (view.querySelector('.map-header')?.clientHeight || 54)
+              + (view.querySelector('.map-search-bar')?.clientHeight || 50)
+              + (view.querySelector('.map-fuel-row')?.clientHeight || 44);
+    const mapH = Math.max(200, h - uiH);
     const mapEl = document.getElementById('leaflet-map');
-    mapEl.style.width  = window.innerWidth + 'px';
-    mapEl.style.height = window.innerHeight + 'px';
+    mapEl.style.width  = w + 'px';
+    mapEl.style.height = mapH + 'px';
+
     if (!_mapInitialized) {
       initMap();
       _mapInitialized = true;
     } else if (_map) {
       _map.invalidateSize(true);
     }
-  });
+    // Extra safety: invalidate again after 300ms for slow devices
+    setTimeout(() => { if (_map) _map.invalidateSize(true); }, 300);
+  }));
 }
 
 function closeMapView() {
-  document.getElementById('map-view').classList.remove('visible');
+  document.getElementById('map-view').style.display = 'none';
   document.body.style.overflow = '';
 }
 
 window.addEventListener('resize', () => {
-  if (_map && document.getElementById('map-view').classList.contains('visible')) {
-    const mc = document.getElementById('map-container');
+  const view = document.getElementById('map-view');
+  if (_map && view.style.display === 'flex') {
     const mapEl = document.getElementById('leaflet-map');
-    mapEl.style.width  = mc.clientWidth + 'px';
-    mapEl.style.height = mc.clientHeight + 'px';
+    mapEl.style.width  = view.clientWidth + 'px';
+    const uiH = (view.querySelector('.map-header')?.clientHeight || 54)
+              + (view.querySelector('.map-search-bar')?.clientHeight || 50)
+              + (view.querySelector('.map-fuel-row')?.clientHeight || 44);
+    mapEl.style.height = Math.max(200, view.clientHeight - uiH) + 'px';
     _map.invalidateSize(true);
   }
 });
@@ -1266,10 +1281,12 @@ function initMap() {
     zoomControl: true,
   });
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors © CARTO',
     subdomains: 'abcd',
     maxZoom: 19,
+    crossOrigin: true,
+    detectRetina: false,
   }).addTo(_map);
 
   _map.on('moveend', () => {
