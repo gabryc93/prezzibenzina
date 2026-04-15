@@ -3,12 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Carburanti">
 <meta name="theme-color" content="#0f1012">
-<link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEi0lEQVR4nMWXXYhVVRTHf2vvc7/GmTuj4zCZ0EMl+KQVlZGOPghFbyJoSNqH0FvRg4EUfqQFQfhQ+VSEYQSRTVA9aFGEWERYZEb14ps2fs3MnY/7MXfOPXuvHs6dcWa8595rDrRgcznn7rPXf6/9X/+9lgDoQYwcwl87vmZDJrAvRV4HnKdPFcMimAjeGoYDIz9MR+6d/mf++HHGp+iJbVa2f+auHFt7OJsxrwRWgmqoOK+L4XvWrBGyaSFyGlWn/Zsrdp8/oCe2WQEYOrb20J296QPXxmpeVRURIyCLCUBBUfUiIv1LU+byaHh45e7zB+Xqhw88EgT6k/fqnMeKJDvWhKAoYNqEq4pagzNGbBTJo4GK35tJGSlNeRGRxGW8QiYQGs0QoFpTaCNsIojzKrmMkZrzewOBjdXQIyI26SPnoTMrDBUiIgfG1Ldd916LlLuWp6g5RZWGIOeDEFsNPQIbA2CZ88mTnYfeLsOpcxV2Hb1CJfRYI7GjeEeEoeflLb28/mQvExWP0joSdZ/LgmaTvMY7//pcme1HLnP/PVl2rO+iHCpGYk5kU8Jfl0KOfD6CAK9uXUY11LYpnAhA62d+aTTiqXev8tCqLIN7VtLXbYmczguzFWF53vLW4AirV6bZsb6LsbLDSGPOzLVEoVEgMFCsespVz+7NPSzPG4YKNQolx0jRMVp0XJ9wlKqenRu7kLShWPWzTtMJpG0LwAwIIyAGqqESOUhZwRohMPVfGzspT8cE7MqZWSJeHotJ2wxEW1I7s2DThSQeZy9MkUsLo0XPwIGLfPVrka6cSVTWpiS8FXMO8h2G906O05cPeH5zN+Nlz0jRxYRN+K5tAKrzx03vgcjBg6tzvDE4ylAhIt9hMC1I0DaAlBUyqXjYObrrFTIpIZcWSlOeF5/o4eJIxP6PhyGoz21yr7UFQATGKo5/ChHjZYedsysP5FLC9ckIBCYqnn27+rhwJeSj78axLVjWEoBzkM8aXvt0hH2fxGIzd0MzzykLOKUrazj9S4mTv5XBCK1u9ZYAjIGpmrJ1XRcP35uhUlfBGVON8/36hOPoqTFO/13hy+Ml7ugJqISKc81VsSUAEQhryuP3LeHZx7qpFKObOJBLG/68OM0H309w/NtxNq3t5O3n+tiw/1Kz428PQIwCSlVPaSKKJXYBgI60Z3IqVsyBNUsY3LOC4UlHuRjRqrJpOwuMQFBXwYURCIwQ2DhST2/qpmeJpTKtvP/CCtatylGq6jzi/icAbZnAdE2pRUoqgJ0DeSqhEkaaqKKLC4Abkq0KY2UfH8HtkPB2rJUG3BIArxC5uFzXhe/9bIVzy9ZWGgJ0Zg2d3QHG0DANl066ljdmEoCCNY3rQgFqUZwB3/xeZqwUJQrRcNGhUVygtoPBGnCeQqBwJps2W0pTzs2tjIU4tPmc4e7+FF+cLTL4c7GpFHd2GLo7TMvjUFWXTVtbqvozTRuTmbKsUPJUQ8VaGt9scuNK7s/bpuq3sDFp2ZopkDIS9wItTImPIOG/xq1ZO81pUkvWyJJI2LQ5/T/b838BFFBhr8vWE6IAAAAASUVORK5CYII=">
 <link rel="icon" type="image/png" sizes="192x192" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAFBklEQVR4nO3dvXXbWBSF0SutKUKpg8ldkiqYYlyBS1LuYFJ3YQcUJf6KAAEQeO/sHc5aliHP+fBAUbKfaiN+//z+Z+1r4HFeXt+e1r6GqqrVLsLgObRWEA/9TY2eIR4Zw+K/kdEzxdIxLPbBDZ85LRXC7B/U8FnS3CE8z/nBjJ+lzb2xWWoyfNYwx2kw+QQwftYyx/YmBWD8rG3qBu86QgyfLbrnkWj0CWD8bNU92xwVgPGzdWM3OjgA46cVY7Y66/sA0JpBAbj705qhm70ZgPHTqiHb/TIA46d1tzbsNQDRrgbg7k8vvtryxQCMn95c27RHIKKdBeDuT68ubdsJQLSjANz96d3pxp0ARBMA0T4C8PhDisOtOwGIJgCiPVd5/CHPfvNOAKIJgGgCINqT53+SOQGI9s/aF7BF//73/9qXcNWvH9/WvoSueAQ6sOXhnxLCPDwCvWtp/FXtXe9WCaDaHVOr170l8QG0PqLWr39t0QH0Mp5ePo81xAbQ22h6+3weJTKAXsfS6+e1pLgAeh9J75/f3KLeB7hnHFv4enur192CmBOg5RHdcx1OgmEiAmh5/HsiWEb3AfQw/j0RzK/rAHoa/54I5tV1AGNtffx7rVxnC7oNYOxdr7VRjb1ep8Bl3QYwRmvj32v1urckPoDWR9T69a8tOoBextPL57GG6ABAAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDR/O3QjHb4rdWtfx+SABjs0s8U7P9bqyF4BCKaAIJM+amwW7+21Z84E0CYVoe6FAEEEsEnAYQSwY4AgolAAPHSIxAA0REIgKrKjUAAfEiMQAAcSYtAAJxJikAAXJQSgQC4KiECAQTxj2ucE0AYERwTQKBWf3hlCQIIJYIdAQQTgQDipUcgAKIjEABVlRuBAPiQGIEAOJIWgQA4kxSBALgoJQIBcFVCBALgqp6/B2gv+i/HTfgffK+UPxsnAGdSxl8lAE4kjb9KABxIG3+VAHiXOP4qAVC5468SQLzk8VcJIFr6+KsEEMv4d6LfCOvprf4xgzb+T06AMPeMv6cbxSkBBDH+cwLgqt7HXyUArkgYf5UAuCBl/FUC4ETS+KsEwIG08VcJgHeJ468SAJU7/ioBxEsef5UAoqWPv0oAsYx/RwCBjP+TAMIY/zEBBJky/lu/ttWwBEC06B+IYZz9Xf7w26pbvfPvCYDRWh/9IY9ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANGeX17fnta+CFjDy+vbkxOAaNH/SN7hv3ZIJicA0Z6rds9Ca18IPNJ+804AogmAaB8BeAwixeHWuz0Bfv34tvYlbIo/j8u6DQCGOHvs+f3z+581LmRJyV/vd+c/dvqoH/FGmBFwzdkjkBfD9OrStr0GINrFAJwC9Obapq+eACKgF19t2SMQ0b4MwClA625t+OYJIAJaNWS7gx6BREBrhm7WawCiDQ7AKUArxmx11AkgArZu7EZHPwKJgK26Z5uTxtzjd47Snik35Ukvgp0GrG3qBid/FUgErGWO7c06Xo9EPMKcN91Z3wdwGrC0uTe22GCdBsxpqZvr4ndsITDF0k8VD31kEQNDPPJRerVndjFwaK3Xj5t50SqILFv5gslfyy6BfAIvJcwAAAAASUVORK5CYII=">
 <link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAFBklEQVR4nO3dvXXbWBSF0SutKUKpg8ldkiqYYlyBS1LuYFJ3YQcUJf6KAAEQeO/sHc5aliHP+fBAUbKfaiN+//z+Z+1r4HFeXt+e1r6GqqrVLsLgObRWEA/9TY2eIR4Zw+K/kdEzxdIxLPbBDZ85LRXC7B/U8FnS3CE8z/nBjJ+lzb2xWWoyfNYwx2kw+QQwftYyx/YmBWD8rG3qBu86QgyfLbrnkWj0CWD8bNU92xwVgPGzdWM3OjgA46cVY7Y66/sA0JpBAbj705qhm70ZgPHTqiHb/TIA46d1tzbsNQDRrgbg7k8vvtryxQCMn95c27RHIKKdBeDuT68ubdsJQLSjANz96d3pxp0ARBMA0T4C8PhDisOtOwGIJgCiPVd5/CHPfvNOAKIJgGgCINqT53+SOQGI9s/aF7BF//73/9qXcNWvH9/WvoSueAQ6sOXhnxLCPDwCvWtp/FXtXe9WCaDaHVOr170l8QG0PqLWr39t0QH0Mp5ePo81xAbQ22h6+3weJTKAXsfS6+e1pLgAeh9J75/f3KLeB7hnHFv4enur192CmBOg5RHdcx1OgmEiAmh5/HsiWEb3AfQw/j0RzK/rAHoa/54I5tV1AGNtffx7rVxnC7oNYOxdr7VRjb1ep8Bl3QYwRmvj32v1urckPoDWR9T69a8tOoBextPL57GG6ABAAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDR/O3QjHb4rdWtfx+SABjs0s8U7P9bqyF4BCKaAIJM+amwW7+21Z84E0CYVoe6FAEEEsEnAYQSwY4AgolAAPHSIxAA0REIgKrKjUAAfEiMQAAcSYtAAJxJikAAXJQSgQC4KiECAQTxj2ucE0AYERwTQKBWf3hlCQIIJYIdAQQTgQDipUcgAKIjEABVlRuBAPiQGIEAOJIWgQA4kxSBALgoJQIBcFVCBALgqp6/B2gv+i/HTfgffK+UPxsnAGdSxl8lAE4kjb9KABxIG3+VAHiXOP4qAVC5468SQLzk8VcJIFr6+KsEEMv4d6LfCOvprf4xgzb+T06AMPeMv6cbxSkBBDH+cwLgqt7HXyUArkgYf5UAuCBl/FUC4ETS+KsEwIG08VcJgHeJ468SAJU7/ioBxEsef5UAoqWPv0oAsYx/RwCBjP+TAMIY/zEBBJky/lu/ttWwBEC06B+IYZz9Xf7w26pbvfPvCYDRWh/9IY9ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANGeX17fnta+CFjDy+vbkxOAaNH/SN7hv3ZIJicA0Z6rds9Ca18IPNJ+804AogmAaB8BeAwixeHWuz0Bfv34tvYlbIo/j8u6DQCGOHvs+f3z+581LmRJyV/vd+c/dvqoH/FGmBFwzdkjkBfD9OrStr0GINrFAJwC9Obapq+eACKgF19t2SMQ0b4MwClA625t+OYJIAJaNWS7gx6BREBrhm7WawCiDQ7AKUArxmx11AkgArZu7EZHPwKJgK26Z5uTxtzjd47Snik35Ukvgp0GrG3qBid/FUgErGWO7c06Xo9EPMKcN91Z3wdwGrC0uTe22GCdBsxpqZvr4ndsITDF0k8VD31kEQNDPPJRerVndjFwaK3Xj5t50SqILFv5gslfyy6BfAIvJcwAAAAASUVORK5CYII=">
@@ -359,8 +354,8 @@ footer a{color:var(--mut);text-decoration:underline}
 .map-title small{font-size:0.55rem;color:var(--mut);display:block;text-transform:uppercase;letter-spacing:.1em}
 .btn-close-map{background:var(--surf);border:1px solid var(--brd2);color:var(--tx2);font-family:var(--fm);font-size:0.72rem;padding:5px 11px;border-radius:5px;cursor:pointer;white-space:nowrap}
 .btn-close-map:hover{color:var(--tx);background:var(--surf2)}
-#map-container{flex:1;position:relative;min-height:0}
-#leaflet-map{position:absolute;inset:0;width:100%;height:100%}
+#map-container{flex:1;position:relative;min-height:0;overflow:hidden}
+#leaflet-map{width:100%;height:100%;min-height:200px}
 .map-controls{
   position:absolute;bottom:20px;left:50%;transform:translateX(-50%);
   display:flex;gap:8px;z-index:1000;flex-wrap:wrap;justify-content:center;
@@ -480,6 +475,30 @@ footer a{color:var(--mut);text-decoration:underline}
   background:var(--bg);flex-shrink:0;gap:10px;
 }
 .fav-view-body{flex:1;overflow-y:auto;padding:16px;max-width:700px;width:100%;margin:0 auto}
+
+/* ── EV / Colonnine ── */
+.ev-section{margin-top:20px;margin-bottom:20px}
+.ev-card{background:var(--surf);border:1px solid var(--brd);border-radius:9px;padding:12px 14px;display:grid;grid-template-columns:28px 1fr auto;gap:6px 12px;align-items:start;transition:border-color .15s;cursor:pointer}
+.ev-card:hover{border-color:var(--brd2)}
+.ev-card::before{content:'⚡';font-size:1rem;line-height:1;padding-top:2px;color:#7dd4fc}
+.ev-name{font-size:0.82rem;font-weight:500;color:var(--tx)}
+.ev-addr{font-size:0.7rem;color:var(--mut);margin-top:2px}
+.ev-tags{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+.ev-tag{font-size:0.6rem;padding:1px 6px;border-radius:3px;background:var(--surf2);color:var(--tx2)}
+.ev-tag.fast{background:rgba(125,212,252,.12);color:#7dd4fc}
+.ev-tag.slow{background:var(--surf2);color:var(--mut)}
+.ev-tag.avail{background:var(--gn-d);color:var(--gn)}
+.ev-tag.busy{background:var(--rd-d);color:var(--rd)}
+.ev-tag.unknown{background:var(--surf2);color:var(--mut)}
+.ev-power{text-align:right}
+.ev-kw{font-family:var(--fd);font-size:1.2rem;font-weight:700;color:#7dd4fc;line-height:1}
+.ev-kw-label{font-size:0.6rem;color:var(--mut)}
+.ev-dist{font-size:0.62rem;color:var(--bl);margin-top:4px;text-align:right}
+.ev-toggle-btn{background:var(--surf);border:1px solid var(--brd2);color:var(--tx2);font-family:var(--fm);font-size:0.69rem;padding:5px 11px;border-radius:5px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.ev-toggle-btn:hover,.ev-toggle-btn.on{color:#7dd4fc;border-color:#7dd4fc;background:rgba(125,212,252,.1)}
+.ev-loading{font-size:.78rem;color:var(--mut);padding:12px 0;text-align:center}
+/* Map EV marker */
+.ev-map-marker{background:#7dd4fc;width:12px;height:12px;border-radius:50%;border:2px solid rgba(255,255,255,.4);box-shadow:0 2px 6px rgba(0,0,0,.5)}
 </style>
 </head>
 <body>
@@ -620,6 +639,7 @@ footer a{color:var(--mut);text-decoration:underline}
       <button class="fb" data-f="Metano" onclick="setFuel(this)">Metano</button>
       <button class="fb" id="self-btn" onclick="toggleSelf()">Solo self</button>
       <button class="fb" id="sort-dist-btn" onclick="toggleSortDist()" style="display:none">↕ Distanza</button>
+      <button class="ev-toggle-btn" id="ev-toggle-btn" onclick="toggleEV()" style="display:none">⚡ Colonnine</button>
     </div>
     <div class="bandiera-row" id="brow"></div>
 
@@ -629,6 +649,10 @@ footer a{color:var(--mut);text-decoration:underline}
     </div>
 
     <div id="results"></div>
+    <div class="ev-section hidden" id="ev-section">
+      <div class="sect">⚡ Colonnine elettriche <span class="tag" style="background:rgba(125,212,252,.12);color:#7dd4fc;border-color:rgba(125,212,252,.3)">OpenChargeMap</span></div>
+      <div id="ev-list"></div>
+    </div>
   </main>
 
   <footer>
@@ -696,6 +720,7 @@ footer a{color:var(--mut);text-decoration:underline}
       <div class="map-controls">
         <button class="map-ctrl-btn active" id="map-gps-btn" onclick="mapLocateMe()">📍 Localizzami</button>
         <button class="map-ctrl-btn" id="map-self-btn" onclick="toggleMapSelf()">Self service</button>
+        <button class="map-ctrl-btn" id="map-ev-btn" onclick="toggleMapEV()">⚡ Colonnine</button>
         <button class="map-ctrl-btn" id="map-reload-btn" onclick="loadMapStations()" disabled>↻ Aggiorna area</button>
       </div>
     </div>
@@ -716,6 +741,20 @@ footer a{color:var(--mut);text-decoration:underline}
       <button class="btn-compare-go" id="btn-compare-go" onclick="runComparison()">Confronta</button>
       <div class="compare-results" id="compare-results"></div>
       <button class="compare-close" onclick="closeCompare()">Chiudi</button>
+    </div>
+  </div>
+
+
+  <!-- EV DETAIL MODAL -->
+  <div class="overlay hidden" id="ev-modal-overlay" onclick="closeEVModal(event)">
+    <div class="modal" id="ev-modal">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <div class="modal-title" id="ev-modal-nome">—</div>
+        <button class="modal-close" onclick="closeEVModal()">✕</button>
+      </div>
+      <div class="modal-rows" id="ev-modal-rows"></div>
+      <div class="modal-btns" id="ev-modal-btns"></div>
     </div>
   </div>
 
@@ -923,7 +962,12 @@ async function doSearch() {
   clearGPSLocation();
   _gpsActive = false;
   _sortByDist = false;
+  _evActive = false;
   document.getElementById('sort-dist-btn').style.display = 'none';
+  document.getElementById('ev-toggle-btn').style.display = 'none';
+  document.getElementById('ev-section').classList.add('hidden');
+  const evBtn = document.getElementById('ev-toggle-btn');
+  if (evBtn) { evBtn.classList.remove('on'); evBtn.textContent = '⚡ Colonnine'; }
   const q = document.getElementById('qinput').value.trim();
   if (!q) { document.getElementById('qinput').focus(); return; }
 
@@ -1000,6 +1044,16 @@ async function fetchStations() {
     const data = await api(url);
     renderStations(data);
     setStatus('ok', `${data.length} impianti trovati · ${capFn(activeComune)}`);
+    // Show EV toggle and store search coords for EV lookup
+    if (data.length > 0 && data[0].lat) {
+      _lastSearchLat = data[0].lat;
+      _lastSearchLng = data[0].lng;
+      _lastSearchRadius = 5;
+    } else if (activeComune) {
+      // Fallback: use centroid of results if available
+    }
+    document.getElementById('ev-toggle-btn').style.display = '';
+    if (_evActive) { document.getElementById('ev-section').classList.remove('hidden'); loadEVStations(); }
   } catch(e) {
     setStatus('err', 'Errore: ' + e.message);
   } finally {
@@ -1107,22 +1161,43 @@ let _suggestTimer2 = null;
 
 
 function openMapView() {
-  document.getElementById('map-view').classList.add('visible');
+  const view = document.getElementById('map-view');
+  view.classList.add('visible');
   document.body.style.overflow = 'hidden';
-  if (!_mapInitialized) {
-    setTimeout(() => {
+
+  // Wait for layout to settle, then measure and init
+  setTimeout(() => {
+    const mc = document.getElementById('map-container');
+    const mapEl = document.getElementById('leaflet-map');
+    // Explicitly set pixel dimensions - the only reliable cross-browser approach
+    const h = mc.clientHeight || (window.innerHeight - 155);
+    const w = mc.clientWidth  || window.innerWidth;
+    mapEl.style.width  = w + 'px';
+    mapEl.style.height = h + 'px';
+
+    if (!_mapInitialized) {
       initMap();
       _mapInitialized = true;
-    }, 150);
-  } else if (_map) {
-    setTimeout(() => _map.invalidateSize(), 100);
-  }
+    } else if (_map) {
+      _map.invalidateSize(true);
+    }
+  }, 200);
 }
 
 function closeMapView() {
   document.getElementById('map-view').classList.remove('visible');
   document.body.style.overflow = '';
 }
+
+window.addEventListener('resize', () => {
+  if (_map && document.getElementById('map-view').classList.contains('visible')) {
+    const mc = document.getElementById('map-container');
+    const mapEl = document.getElementById('leaflet-map');
+    mapEl.style.width  = mc.clientWidth + 'px';
+    mapEl.style.height = mc.clientHeight + 'px';
+    _map.invalidateSize(true);
+  }
+});
 
 
 // ── Map place search ─────────────────────────────────────────
@@ -1190,10 +1265,10 @@ function initMap() {
     zoomControl: true,
   });
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '© OpenStreetMap © CartoDB',
-    subdomains: 'abcd',
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
     maxZoom: 19,
+    subdomains: ['a','b','c'],
   }).addTo(_map);
 
   _map.on('moveend', () => {
@@ -1488,6 +1563,11 @@ async function doGPS() {
         const data = await api(url);
         renderStations(data, { gps: true, lat, lng });
         setStatus('ok', `${data.length} impianti entro 10 km`);
+        _lastSearchLat = pos.coords.latitude;
+        _lastSearchLng = pos.coords.longitude;
+        _lastSearchRadius = 10;
+        document.getElementById('ev-toggle-btn').style.display = '';
+        if (_evActive) { document.getElementById('ev-section').classList.remove('hidden'); loadEVStations(); }
       } catch(e) { setStatus('err', 'Errore: ' + e.message); }
       btn.classList.remove('active');
       btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7" stroke-dasharray="2 2" opacity=".4"/></svg> Vicino a me`;
@@ -1823,7 +1903,7 @@ function closeModal(e) {
 
 // Close on ESC
 document.addEventListener('keydown', e => {
-  if(e.key === 'Escape') { closeModal(); closeFavModal(); closeCompare(); closeFavView(); }
+  if(e.key === 'Escape') { closeModal(); closeFavModal(); closeCompare(); closeFavView(); closeEVModal(); }
 });
 
 // ── Fav comparison ─────────────────────────────────────────────
@@ -1953,49 +2033,5 @@ document.getElementById('fav-edit-overlay').addEventListener('click', e => {
 
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(r => console.log('SW registrato:', r.scope))
-      .catch(e => console.log('SW fallito:', e));
-  });
-}
-// Handle shortcut ?action=gps
-const _urlParams = new URLSearchParams(window.location.search);
-if (_urlParams.get('action') === 'gps') {
-  window.addEventListener('DOMContentLoaded', () => setTimeout(doGPS, 800));
-}
-
-// ── PWA Install ────────────────────────────────────────────────
-let _installPrompt = null;
-
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  _installPrompt = e;
-  // Show banner after 3 seconds if not dismissed before
-  const dismissed = localStorage.getItem('opf_install_dismissed');
-  if (!dismissed) {
-    setTimeout(() => document.getElementById('install-banner').classList.add('visible'), 3000);
-  }
-});
-
-document.getElementById('btn-install')?.addEventListener('click', async () => {
-  if (!_installPrompt) return;
-  _installPrompt.prompt();
-  const { outcome } = await _installPrompt.userChoice;
-  if (outcome === 'accepted') {
-    document.getElementById('install-banner').classList.remove('visible');
-  }
-  _installPrompt = null;
-});
-
-
-window.addEventListener('appinstalled', () => {
-  document.getElementById('install-banner').classList.remove('visible');
-  _installPrompt = null;
-});
-
-</script>
 </body>
 </html>
