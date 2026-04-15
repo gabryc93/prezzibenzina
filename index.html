@@ -2190,7 +2190,7 @@ async function runCmp() {
       + '<span class="cmp-tag">Il tuo preferito</span></div>'
       + '<div><div class="cmp-price' + (s.prezzo <= minP ? ' best' : '') + '">' + s.prezzo.toFixed(3) + '</div>'
       + '<div style="font-size:.62rem;color:var(--mut)">€/' + unit + '</div>'
-      + (favAboveMin ? '<div class="cmp-extra">+' + ((s.prezzo - minP) * 50).toFixed(2) + '€/50L</div>' : '<div class="cmp-save">Il più economico!</div>')
+      + (favAboveMin ? '<div class="cmp-extra">+' + ((s.prezzo - minP) * liters).toFixed(2) + '\u20AC/' + litersLabel + '</div>' : '<div class="cmp-save">Il pi\u00F9 economico!</div>')
       + '</div></div>';
 
     // Top competitors (exclude fav itself)
@@ -2208,14 +2208,14 @@ async function runCmp() {
         + '</div>'
         + '<div><div class="cmp-price' + (isBest ? ' best' : '') + '">' + o.prezzo.toFixed(3) + '</div>'
         + '<div style="font-size:.62rem;color:var(--mut)">€/' + unit + '</div>'
-        + (saves ? '<div class="cmp-save">risparmi ' + saves + '€/50L</div>' : '')
-        + (costs ? '<div class="cmp-extra">+' + costs + '€/50L</div>' : '')
+        + (saves ? '<div class="cmp-save">risparmi ' + saves + '\u20AC/' + litersLabel + '</div>' : '')
+        
         + '</div></div>';
     });
 
     // Summary
     if (favAboveMin) {
-      html += '<div class="cmp-summary">💡 Andando al distributore più economico risparmi <strong>' + ((s.prezzo - minP) * 50).toFixed(2) + '€</strong> ogni pieno da 50L</div>';
+      html += '<div class="cmp-summary">&#128161; Andando al distributore pi\u00F9 economico risparmi <strong>' + ((s.prezzo - minP) * liters).toFixed(2) + '\u20AC</strong> ogni pieno da ' + litersLabel + '.</div>';
     } else {
       html += '<div class="cmp-summary">✅ Il tuo preferito è già il più economico nell\'area!</div>';
     }
