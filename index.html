@@ -1416,7 +1416,7 @@ async function loadEVHome(lat, lng, radius) {
     const nodes = await fetchEV(lat, lng, radius);
     console.log('[EV] fetchEV returned', nodes.length, 'nodes', nodes.slice(0,2));
     if (!nodes.length) {
-      box.innerHTML = '<div style="color:var(--mut);font-size:.78rem;padding:12px 0;text-align:center">Nessuna colonnina trovata nell'area.</div>';
+      box.innerHTML = '<div style="color:var(--mut);font-size:.78rem;padding:12px 0;text-align:center">Nessuna colonnina trovata nell\'area.</div>';
       return;
     }
     const stations = nodes.map(n => parseEV(n, lat, lng)).sort((a,b) => (a.dist||999)-(b.dist||999));
