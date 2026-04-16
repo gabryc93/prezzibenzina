@@ -1604,13 +1604,7 @@ async function loadEVMap() {
         + '<div class="map-popup-unit">' + (s.isFast ? 'Ricarica rapida' : 'AC lenta') + ' &middot; ' + s.numPrese + ' prese</div>'
         + '<div class="map-popup-name">' + esc(s.nome) + '</div>'
         + '<div class="map-popup-addr">' + esc(s.indirizzo) + '</div>'
-        + '<div style="display:flex;gap:6px;margin-top:8px">'
-        + '<a class="map-popup-btn" style="flex:1;text-align:center;background:rgba(125,212,252,.15);color:#7dd4fc;border:1px solid rgba(125,212,252,.3)" href="https://www.google.com/maps/search/?api=1&query=' + s.lat + ',' + s.lng + '" target="_blank">Maps</a>'
-        + '<button class="map-popup-btn" style="flex:1;border:none;cursor:pointer">Scheda</button>'
-        + '</div>';
-      el.querySelector('button').addEventListener('click', (function(st) {
-        return function() { _map.closePopup(); openEVModal(st); };
-      })(s));
+        + '<a class="map-popup-btn" style="display:block;margin-top:8px;text-align:center;background:rgba(125,212,252,.15);color:#7dd4fc;border:1px solid rgba(125,212,252,.3)" href="https://www.google.com/maps/search/?api=1&query=' + s.lat + ',' + s.lng + '" target="_blank">&#128205; Apri in Maps</a>';
       const m = L.marker([s.lat, s.lng], { icon }).addTo(_map).bindPopup(el, { maxWidth: 240 });
       _evMapMarkers.push(m);
     });
