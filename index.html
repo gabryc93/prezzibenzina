@@ -39,38 +39,9 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 
-/* ── SETUP ────────────────────────────────────────────────── */
-#setup{
-  position:fixed;inset:0;background:var(--bg);z-index:200;
-  display:flex;align-items:center;justify-content:center;padding:24px;
-}
-.setup-card{
-  background:var(--surf);border:1px solid var(--brd2);
-  border-radius:14px;padding:32px 28px;max-width:440px;width:100%;
-}
-.setup-logo{display:flex;align-items:center;gap:12px;margin-bottom:24px}
-.s-icon{width:42px;height:42px;background:var(--am);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .setup-logo h1{font-family:var(--fd);font-weight:700;font-size:1.15rem;letter-spacing:-.02em;line-height:1.2}
 .setup-logo small{font-size:0.6rem;color:var(--mut);display:block;text-transform:uppercase;letter-spacing:.1em}
-.setup-card p{font-size:0.8rem;color:var(--tx2);margin-bottom:18px;line-height:1.7}
-.setup-card label{display:block;font-size:0.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
-.setup-card input{
-  width:100%;background:var(--surf2);border:1px solid var(--brd2);color:var(--tx);
-  font-family:var(--fm);font-size:0.82rem;padding:11px 14px;border-radius:7px;
-  outline:none;transition:border-color .2s;margin-bottom:8px;
-}
 .setup-card input:focus{border-color:var(--am)}
-.setup-hint{font-size:0.7rem;color:var(--mut);margin-bottom:20px}
-.setup-hint a{color:var(--am);text-decoration:none}
-.btn-full{
-  width:100%;background:var(--am);color:#0d0e0f;border:none;
-  font-family:var(--fm);font-size:0.85rem;font-weight:500;
-  padding:12px;border-radius:7px;cursor:pointer;
-  transition:opacity .2s;
-}
-.btn-full:hover{opacity:.88}
-.btn-full:disabled{opacity:.4;cursor:not-allowed}
-.setup-err{font-size:0.72rem;color:var(--rd);margin-top:8px;text-align:center;min-height:16px}
 
 /* ── LOADER ───────────────────────────────────────────────── */
 #loader{
@@ -263,7 +234,6 @@ footer a{color:var(--mut);text-decoration:underline}
 .fav-section{margin-bottom:20px}
 .fav-list{display:flex;flex-direction:column;gap:7px}
 .fav-empty{font-size:0.75rem;color:var(--mut);padding:4px 0}
-#fav-filter-btn.on{color:var(--am);border-color:var(--am);background:var(--am-d)}
 
 /* ── Distanza badge ── */
 .dist-badge{font-size:0.58rem;color:var(--bl);text-align:right;opacity:.85;margin-top:1px}
@@ -318,19 +288,6 @@ footer a{color:var(--mut);text-decoration:underline}
 .fav-edit-btn:hover{opacity:1}
 
 /* ── Preferiti button ── */
-#fav-filter-btn{
-  display:flex;align-items:center;gap:8px;
-  background:var(--surf);border:1px solid var(--brd2);color:var(--tx2);
-  font-family:var(--fm);font-size:0.82rem;padding:10px 16px;
-  border-radius:7px;cursor:pointer;transition:all .2s;width:100%;
-  justify-content:center;
-}
-#fav-filter-btn:hover{color:var(--am);border-color:var(--am);background:var(--am-d)}
-#fav-filter-btn.on{color:var(--am);border-color:var(--am);background:var(--am-d);font-weight:500}
-#fav-btn-count{
-  background:var(--am);color:#0d0e0f;font-size:0.65rem;font-weight:500;
-  padding:1px 7px;border-radius:10px;
-}
 
 /* ── Card hide toggle ── */
 .card-toggle-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;margin-top:-4px}
@@ -539,30 +496,6 @@ footer a{color:var(--mut);text-decoration:underline}
 </style>
 </head>
 <body>
-
-<!-- SETUP: inserisci URL del Worker -->
-<div id="setup" style="display:none">
-  <div class="setup-card">
-    <div class="setup-logo">
-      <div class="s-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0d0e0f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 22V4a2 2 0 012-2h6a2 2 0 012 2v18"/><path d="M5 12h10"/>
-          <path d="M15 7l4 4-4 4"/><path d="M19 7v8"/>
-        </svg>
-      </div>
-      <div><h1>OsservaPrezzi</h1><small>Carburanti Italia</small></div>
-    </div>
-    <p>Inserisci l'URL del tuo Cloudflare Worker. Viene salvato solo su questo dispositivo.</p>
-    <label for="worker-url">URL Cloudflare Worker</label>
-    <input type="url" id="worker-url" placeholder="https://opf.TUO-NOME.workers.dev" autocomplete="off" />
-    <div class="setup-hint">
-      Segui le istruzioni nel file <strong>ISTRUZIONI.txt</strong> per creare il Worker gratis su
-      <a href="https://workers.cloudflare.com" target="_blank">workers.cloudflare.com</a>
-    </div>
-    <button class="btn-full" onclick="saveWorkerUrl()">Connetti →</button>
-    <div class="setup-err" id="setup-err"></div>
-  </div>
-</div>
 
 <!-- LOADER -->
 <div id="loader">
@@ -917,36 +850,6 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // ── Setup ─────────────────────────────────────────────────────
-async function saveWorkerUrl() {
-  const url = document.getElementById('worker-url').value.trim().replace(/\/$/, '');
-  const err = document.getElementById('setup-err');
-  err.textContent = '';
-  if (!url.startsWith('https://')) { err.textContent = "L'URL deve iniziare con https://"; return; }
-  const btn = document.querySelector('#setup .btn-full');
-  btn.disabled = true; btn.textContent = 'Verifico…';
-  try {
-    const res = await fetch(url + '/');
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    await res.json();
-    WORKER = url;
-    localStorage.setItem('opf_worker', url);
-    document.getElementById('setup').style.display = 'none';
-    startApp();
-  } catch(e) {
-    err.textContent = 'Worker non raggiungibile: ' + e.message;
-    btn.disabled = false; btn.textContent = 'Connetti →';
-  }
-}
-
-function resetWorker() {
-  if (!confirm('Cambiare Worker URL?')) return;
-  localStorage.removeItem('opf_worker');
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('setup').style.display = 'flex';
-  document.getElementById('worker-url').value = WORKER;
-  WORKER = '';
-}
-
 // ── App start ─────────────────────────────────────────────────
 function startApp() {
   showLoader(true);
@@ -1520,10 +1423,8 @@ async function loadEVHome(lat, lng, radius) {
   const box = document.getElementById('ev-results');
   box.classList.remove('hidden');
   box.innerHTML = '<div style="color:var(--mut);font-size:.78rem;padding:12px 0;text-align:center">Carico colonnine...</div>';
-  console.log('[EV] loadEVHome called:', lat, lng, 'radius:', radius);
   try {
     const nodes = await fetchEV(lat, lng, radius);
-    console.log('[EV] fetchEV returned', nodes.length, 'nodes', nodes.slice(0,2));
     if (!nodes.length) {
       box.innerHTML = '<div style="color:var(--mut);font-size:.78rem;padding:12px 0;text-align:center">Nessuna colonnina trovata nell\'area.</div>';
       return;
@@ -1551,7 +1452,6 @@ async function loadEVHome(lat, lng, radius) {
       if (el) el.addEventListener('click', () => openEVModal(s));
     });
   } catch(e) {
-    console.log('[EV] ERROR:', e);
     box.innerHTML = '<div style="color:var(--rd);font-size:.78rem;padding:12px 0">Errore: ' + esc(e.message) + '</div>';
   }
 }
@@ -1879,28 +1779,6 @@ function toggleSortDist() {
     _stationData = sorted;
     renderStations(sorted);
   }
-}
-
-function toggleFavFilter() {
-  _favFilterActive = !_favFilterActive;
-  updateFavBtn();
-  if (_favFilterActive) {
-    showFavResults();
-  } else {
-    document.getElementById('results').innerHTML = '';
-    setStatus('', 'Cerca un comune o usa la geolocalizzazione');
-  }
-}
-
-function updateFavBtn() {
-  const btn = document.getElementById('fav-filter-btn');
-  const icon = document.getElementById('fav-btn-icon');
-  const count = document.getElementById('fav-btn-count');
-  const n = loadFavs().length;
-  btn.classList.toggle('on', _favFilterActive);
-  icon.textContent = _favFilterActive ? '★' : '☆';
-  if (n > 0) { count.textContent = n; count.style.display = 'inline'; }
-  else { count.style.display = 'none'; }
 }
 
 function showFavResults() {
