@@ -493,6 +493,22 @@ footer a{color:var(--mut);text-decoration:underline}
   border:1px solid rgba(255,255,255,.25);
   line-height:1.3;text-align:center;
 }
+
+/* ── Map weather widget ── */
+.map-weather{
+  position:absolute;bottom:80px;left:12px;z-index:1000;
+  background:rgba(15,16,18,0.82);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:12px;padding:8px 12px;
+  display:none;flex-direction:column;align-items:center;
+  gap:1px;min-width:64px;
+  box-shadow:0 4px 16px rgba(0,0,0,.5);
+  cursor:default;
+}
+.map-weather.visible{display:flex}
+.map-weather-icon{font-size:1.5rem;line-height:1}
+.map-weather-temp{font-family:var(--fd);font-size:1.1rem;font-weight:700;color:var(--tx);line-height:1.2}
+.map-weather-desc{font-size:0.6rem;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;text-align:center;margin-top:1px}
 </style>
 </head>
 <body>
@@ -684,6 +700,12 @@ footer a{color:var(--mut);text-decoration:underline}
     <div id="map-container">
       <div id="leaflet-map"></div>
       <div class="map-status hidden" id="map-status">—</div>
+      <!-- WEATHER WIDGET -->
+      <div class="map-weather" id="map-weather">
+        <div class="map-weather-icon" id="map-weather-icon">—</div>
+        <div class="map-weather-temp" id="map-weather-temp">—</div>
+        <div class="map-weather-desc" id="map-weather-desc"></div>
+      </div>
       <div class="map-controls">
         <button class="map-ctrl-btn active" id="map-gps-btn" onclick="mapLocateMe()">📍 Localizzami</button>
         <button class="map-ctrl-btn" id="map-self-btn" onclick="toggleMapSelf()">Self service</button>
@@ -1240,7 +1262,55 @@ async function mapGoToPlace() {
     _mapCenter = { lat, lng };
     _map.setView([lat, lng], 14);
     loadMapStations();
+    scheduleWeatherUpdate(lat, lng);
   } catch(e) { setMapStatus('Errore: ' + e.message); }
+}
+
+
+// ── Map weather widget ────────────────────────────────────────
+let _weatherTimer = null;
+let _weatherLat = null;
+let _weatherLng = null;
+
+// WMO weather code -> emoji + label
+function wmoToIcon(code, isDay) {
+  if (code === 0)              return { icon: isDay ? '☀️' : '🌙', label: 'Sereno' };
+  if (code <= 2)               return { icon: isDay ? '🌤' : '☁️', label: 'Poco nuvoloso' };
+  if (code === 3)              return { icon: '☁️', label: 'Nuvoloso' };
+  if (code <= 49)              return { icon: '🌫', label: 'Nebbia' };
+  if (code <= 55)              return { icon: '🌦', label: 'Pioggia leggera' };
+  if (code <= 65)              return { icon: '🌧', label: 'Pioggia' };
+  if (code <= 75)              return { icon: '🌨', label: 'Neve' };
+  if (code <= 77)              return { icon: '❄️', label: 'Neve granulare' };
+  if (code <= 82)              return { icon: '🌦', label: 'Rovesci' };
+  if (code <= 86)              return { icon: '🌨', label: 'Rovesci neve' };
+  if (code <= 99)              return { icon: '⛈', label: 'Temporale' };
+  return { icon: '🌡', label: '' };
+}
+
+async function updateMapWeather(lat, lng) {
+  try {
+    const res = await fetch(
+      'https://api.open-meteo.com/v1/forecast?latitude=' + lat.toFixed(4) +
+      '&longitude=' + lng.toFixed(4) +
+      '&current=temperature_2m,weather_code,is_day&timezone=auto&forecast_days=1'
+    );
+    if (!res.ok) return;
+    const d = await res.json();
+    const c = d.current;
+    const { icon, label } = wmoToIcon(c.weather_code, c.is_day === 1);
+    const temp = Math.round(c.temperature_2m);
+    document.getElementById('map-weather-icon').textContent = icon;
+    document.getElementById('map-weather-temp').textContent = temp + '°';
+    document.getElementById('map-weather-desc').textContent = label;
+    document.getElementById('map-weather').classList.add('visible');
+  } catch(e) {}
+}
+
+function scheduleWeatherUpdate(lat, lng) {
+  clearTimeout(_weatherTimer);
+  _weatherLat = lat; _weatherLng = lng;
+  _weatherTimer = setTimeout(() => updateMapWeather(lat, lng), 600);
 }
 
 function initMap() {
@@ -1257,11 +1327,10 @@ function initMap() {
   }).addTo(_map);
 
   _map.on('moveend', () => {
-    if (_map.getZoom() >= 13) {
-      document.getElementById('map-reload-btn').disabled = false;
-    } else {
-      document.getElementById('map-reload-btn').disabled = true;
-    }
+    const z = _map.getZoom();
+    document.getElementById('map-reload-btn').disabled = z < 13;
+    const c = _map.getCenter();
+    scheduleWeatherUpdate(c.lat, c.lng);
   });
 
   // Auto-locate on open
@@ -1285,6 +1354,7 @@ function mapLocateMe() {
       const { latitude: lat, longitude: lng } = pos.coords;
       _mapCenter = { lat, lng };
       _map.setView([lat, lng], 15);
+      scheduleWeatherUpdate(lat, lng);
 
       // User marker
       if (_userMarker) _userMarker.remove();
