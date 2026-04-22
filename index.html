@@ -782,13 +782,14 @@ footer a{color:var(--mut);text-decoration:underline}
       <div class="modal-btns">
         <a class="btn-maps" id="btn-gmaps" href="#" target="_blank">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          Apri in Google Maps
+          Google Maps
         </a>
         <a class="btn-maps btn-maps-apple" id="btn-apple" href="#" target="_blank">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
           Apple Maps
         </a>
       </div>
+      <button class="fav-btn" id="modal-fav-btn" onclick="toggleFavFromModal()" style="width:100%;margin-top:10px;padding:9px;font-size:0.8rem;border-radius:7px">☆ Aggiungi ai preferiti</button>
     </div>
   </div>
 
@@ -2042,8 +2043,35 @@ function openModal(s) {
   document.getElementById('btn-gmaps').href = gmaps;
   document.getElementById('btn-apple').href = apple;
 
+  // Store current station for fav toggle
+  _modalStation = s;
+  updateModalFavBtn();
+
   document.getElementById('modal-overlay').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
+}
+
+let _modalStation = null;
+
+function updateModalFavBtn() {
+  const btn = document.getElementById('modal-fav-btn');
+  if (!btn || !_modalStation) return;
+  const saved = isFav(_modalStation.id);
+  btn.textContent = saved ? '★ Salvato nei preferiti' : '☆ Aggiungi ai preferiti';
+  btn.classList.toggle('on', saved);
+}
+
+function toggleFavFromModal() {
+  if (!_modalStation) return;
+  const favs = loadFavs();
+  const idx = favs.findIndex(f => f.id === _modalStation.id);
+  if (idx >= 0) {
+    saveFavs(favs.filter((_, i) => i !== idx));
+  } else {
+    saveFavs([...favs, { ..._modalStation, savedAt: Date.now() }]);
+  }
+  updateModalFavBtn();
+  renderFavSection();
 }
 
 function closeModal(e) {
