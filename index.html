@@ -697,6 +697,7 @@ footer a{color:var(--mut);text-decoration:underline}
       <button class="fb" data-mf="Diesel Premium" onclick="setMapFuel(this)">Diesel Prem.</button>
       <button class="fb" data-mf="EV" onclick="setMapFuel(this)">⚡ EV</button>
     </div>
+    <div class="bandiera-row" id="map-brow" style="padding:0 12px 8px;display:none"></div>
     <div id="map-container">
       <div id="leaflet-map"></div>
       <div class="map-status hidden" id="map-status">—</div>
@@ -789,7 +790,10 @@ footer a{color:var(--mut);text-decoration:underline}
           Apple Maps
         </a>
       </div>
-      <button class="fav-btn" id="modal-fav-btn" onclick="toggleFavFromModal()" style="width:100%;margin-top:10px;padding:9px;font-size:0.8rem;border-radius:7px">☆ Aggiungi ai preferiti</button>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="fav-btn" id="modal-fav-btn" onclick="toggleFavFromModal()" style="flex:1;padding:9px;font-size:0.8rem;border-radius:7px">☆ Aggiungi ai preferiti</button>
+        <button class="fav-btn" id="modal-share-btn" onclick="shareStation()" style="padding:9px 13px;border-radius:7px" title="Condividi">&#x1F4E4;</button>
+      </div>
     </div>
   </div>
 
@@ -1387,6 +1391,7 @@ function setMapFuel(btn) {
   if (_mapFuel === 'EV') {
     _mapMarkers.forEach(m => m.remove());
     _mapMarkers = [];
+    document.getElementById('map-brow').style.display = 'none';
     loadEVMap();
   } else {
     clearEVMapMarkers();
@@ -1413,6 +1418,8 @@ async function loadMapStations() {
   try {
     const url = `/api/vicini?lat=${center.lat}&lng=${center.lng}&carburante=${encodeURIComponent(_mapFuel)}&self=${_mapSelf?1:0}&raggio=${radius}`;
     const data = await api(url);
+    _mapBandiera = null; // reset filter on new load
+    renderMapBandieraFilter(data);
     renderMapMarkers(data, center.lat, center.lng);
     setMapStatus(`${data.length} impianti trovati`, data.length > 0);
     if (data.length === 0) setTimeout(() => setMapStatus('Nessun impianto trovato in questa area — prova ad allargare la mappa', false), 100);
@@ -1490,6 +1497,7 @@ function renderMapMarkers(stations, userLat, userLng) {
 // EV — Overpass API (OpenStreetMap, no key needed)
 // ============================================================
 let _evMapMarkers = [];
+let _mapBandiera = null;
 
 async function fetchEV(lat, lng, radiusKm) {
   const res = await fetch(WORKER + '/api/ev?lat=' + lat + '&lng=' + lng + '&raggio=' + Math.min(radiusKm, 8));
@@ -1565,6 +1573,42 @@ function openEVModal(s) {
 }
 
 // ── Map EV layer ───────────────────────────────────────────────
+
+// ── Map bandiera filter ────────────────────────────────────────
+function renderMapBandieraFilter(stations) {
+  const brow = document.getElementById('map-brow');
+  const brands = [...new Set(stations.map(s => s.bandiera).filter(Boolean))].sort();
+  if (brands.length < 2) { brow.style.display = 'none'; return; }
+  brow.innerHTML = '<span style="font-size:.62rem;color:var(--mut);align-self:center;margin-right:4px">Marca:</span>';
+  // Reset button
+  const all = document.createElement('button');
+  all.className = 'bfb' + (!_mapBandiera ? ' on' : '');
+  all.textContent = 'Tutte';
+  all.onclick = () => { _mapBandiera = null; applyMapBandieraFilter(stations); document.querySelectorAll('#map-brow .bfb').forEach(b => b.classList.remove('on')); all.classList.add('on'); };
+  brow.appendChild(all);
+  brands.forEach(b => {
+    const btn = document.createElement('button');
+    btn.className = 'bfb' + (_mapBandiera === b ? ' on' : '');
+    btn.textContent = b;
+    btn.onclick = () => {
+      _mapBandiera = _mapBandiera === b ? null : b;
+      document.querySelectorAll('#map-brow .bfb').forEach(x => x.classList.remove('on'));
+      (_mapBandiera ? btn : all).classList.add('on');
+      applyMapBandieraFilter(stations);
+    };
+    brow.appendChild(btn);
+  });
+  brow.style.display = 'flex';
+}
+
+function applyMapBandieraFilter(stations) {
+  _mapMarkers.forEach(m => m.remove());
+  _mapMarkers = [];
+  _mapStationById = {};
+  const filtered = _mapBandiera ? stations.filter(s => s.bandiera === _mapBandiera) : stations;
+  renderMapMarkers(filtered, _mapCenter?.lat, _mapCenter?.lng);
+}
+
 async function loadEVMap() {
   const center = _map.getCenter();
   const zoom = _map.getZoom();
@@ -2052,6 +2096,30 @@ function openModal(s) {
 }
 
 let _modalStation = null;
+
+
+function shareStation() {
+  if (!_modalStation) return;
+  const s = _modalStation;
+  const name = s.nome || 'Distributore';
+  const addr = [s.indirizzo, s.comune].filter(Boolean).join(', ');
+  const price = s.prezzo ? s.prezzo.toFixed(3) + ' €/L' : '';
+  const coord = (s.lat && s.lng) ? s.lat + ',' + s.lng : null;
+  const mapsUrl = coord
+    ? 'https://www.google.com/maps/search/?api=1&query=' + coord
+    : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(name + ' ' + addr);
+  const text = [name, addr, price ? '⛽ ' + price : ''].filter(Boolean).join('\n');
+  if (navigator.share) {
+    navigator.share({ title: name, text, url: mapsUrl }).catch(() => {});
+  } else {
+    // Fallback: copy to clipboard
+    navigator.clipboard.writeText(text + '\n' + mapsUrl).then(() => {
+      const btn = document.getElementById('modal-share-btn');
+      btn.textContent = '✓';
+      setTimeout(() => { btn.innerHTML = '&#x1F4E4;'; }, 1500);
+    }).catch(() => {});
+  }
+}
 
 function updateModalFavBtn() {
   const btn = document.getElementById('modal-fav-btn');
