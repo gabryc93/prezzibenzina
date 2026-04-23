@@ -1417,11 +1417,14 @@ async function loadMapStations() {
 
   setMapStatus(`Cerco ${_mapFuel} entro ${radius} km…`);
   try {
+    // self=1 → only self; self=0 → all (filter servito client-side)
     const url = `/api/vicini?lat=${center.lat}&lng=${center.lng}&carburante=${encodeURIComponent(_mapFuel)}&self=${_mapSelf?1:0}&raggio=${radius}`;
     const data = await api(url);
     _mapBandiera = null; // reset filter on new load
-    renderMapBandieraFilter(data);
-    renderMapMarkers(data, center.lat, center.lng);
+    // When servito mode: exclude stations that only have self service
+    const displayData = (!_mapSelf) ? data.filter(s => !s.isSelf) : data;
+    renderMapBandieraFilter(displayData);
+    renderMapMarkers(displayData, center.lat, center.lng);
     setMapStatus(`${data.length} impianti trovati`, data.length > 0);
     if (data.length === 0) setTimeout(() => setMapStatus('Nessun impianto trovato in questa area — prova ad allargare la mappa', false), 100);
   } catch(e) {
