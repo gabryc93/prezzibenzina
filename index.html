@@ -709,7 +709,7 @@ footer a{color:var(--mut);text-decoration:underline}
       </div>
       <div class="map-controls">
         <button class="map-ctrl-btn active" id="map-gps-btn" onclick="mapLocateMe()">📍 Localizzami</button>
-        <button class="map-ctrl-btn" id="map-self-btn" onclick="toggleMapSelf()">Self service</button>
+        <button class="map-ctrl-btn" id="map-self-btn" onclick="toggleMapSelf()">Servito</button>
         <button class="map-ctrl-btn" id="map-reload-btn" onclick="loadMapStations()" disabled>↻ Aggiorna area</button>
       </div>
     </div>
@@ -1176,7 +1176,7 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 let _map = null;
 let _mapMarkers = [];
 let _mapFuel = 'Benzina';
-let _mapSelf = false;
+let _mapSelf = true;
 let _mapCenter = null;
 let _userMarker = null;
 let _mapInitialized = false;
@@ -1402,8 +1402,9 @@ function setMapFuel(btn) {
 function toggleMapSelf() {
   _mapSelf = !_mapSelf;
   const btn = document.getElementById('map-self-btn');
-  btn.classList.toggle('active', _mapSelf);
-  btn.textContent = _mapSelf ? '✓ Self service' : 'Self service';
+  // active = showing self (default); inactive = showing servito
+  btn.classList.toggle('active', !_mapSelf);
+  btn.textContent = _mapSelf ? 'Servito' : '✓ Servito';
   if (_mapCenter) loadMapStations();
 }
 
